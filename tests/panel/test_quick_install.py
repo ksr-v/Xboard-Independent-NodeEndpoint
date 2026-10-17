@@ -1,7 +1,9 @@
 """Bootstrap integrity and evidence-based FPM discovery; no real service changes."""
 import hashlib
+from contextlib import ExitStack
 import importlib.util
 import io
+import json
 from pathlib import Path
 import stat
 import sys
@@ -20,7 +22,7 @@ spec.loader.exec_module(quick)
 
 
 def bundle(extra=None, symlink=False):
-    files = {'tools/panel/' + name: b'# fixture\n' for name in ('manager.py', 'nginx.py', 'pki.py', 'panel_ca.py', 'sync_panel_ca.php')}
+    files = {'tools/panel/' + name: b'# fixture\n' for name in ('manager.py', 'nginx.py', 'pki.py', 'panel_ca.py', 'sync_panel_ca.php', 'firewall.py')}
     if extra:
         files.update(extra)
     manifest = ''.join(hashlib.sha256(data).hexdigest() + '  ' + name + '\n' for name, data in files.items())
@@ -46,7 +48,7 @@ class BootstrapTests(unittest.TestCase):
 
     def test_pinned_members_and_manifest_verified(self):
         raw, pin = bundle()
-        self.assertEqual(len(quick.verified_members(raw, pin)), 6)
+        self.assertEqual(len(quick.verified_members(raw, pin)), 7)
         changed = bytearray(raw)
         changed[-1] ^= 1
         with self.assertRaises(ValueError):
@@ -104,6 +106,96 @@ class BootstrapTests(unittest.TestCase):
     def test_multiple_candidates_require_explicit_choice(self):
         with patch('builtins.input', side_effect=['', '0', '2']), patch('builtins.print'):
             self.assertEqual(quick.select(['first', 'second'], '站点'), 'second')
+
+    def test_tools_without_firewall_rejected_even_with_valid_pin_and_manifest(self):
+        raw, _ = bundle()
+        output = io.BytesIO()
+        with zipfile.ZipFile(io.BytesIO(raw)) as source, zipfile.ZipFile(output, 'w') as target:
+            members = {name: source.read(name) for name in source.namelist()
+                       if name not in ('tools/panel/firewall.py', 'MANIFEST.sha256')}
+            for name, data in members.items():
+                target.writestr(name, data)
+            target.writestr('MANIFEST.sha256', ''.join(hashlib.sha256(data).hexdigest() + '  ' + name + '\n'
+                                                      for name, data in members.items()))
+        data = output.getvalue()
+        with self.assertRaisesRegex(ValueError, '防火墙'):
+            quick.verified_members(data, hashlib.sha256(data).hexdigest())
+
+
+class InstallFollowupTests(unittest.TestCase):
+    def test_firewall_failure_still_attempts_ca_and_keeps_entry(self):
+        with patch.object(quick, 'configure_firewall', side_effect=RuntimeError('firewall failed')), \
+                patch('panel_ca.sync_panel_ca', return_value={'status': 'imported'}) as ca, \
+                patch.object(manager, 'execute') as install, patch('builtins.print'):
+            with self.assertRaises(SystemExit) as caught:
+                quick.finish_install()
+            self.assertEqual(caught.exception.code, 2)
+            ca.assert_called_once_with()
+            install.assert_not_called()
+
+    def test_unsupported_firewall_reported_without_blocking_ca(self):
+        with patch.object(quick, 'configure_firewall', return_value={'status': 'manual_required'}), \
+                patch('panel_ca.sync_panel_ca', return_value={'status': 'unchanged'}) as ca, patch('builtins.print'):
+            with self.assertRaises(SystemExit) as caught:
+                quick.finish_install()
+            self.assertEqual(caught.exception.code, 2)
+            ca.assert_called_once_with()
+
+    def test_skip_firewall_still_syncs_ca(self):
+        with patch.object(quick, 'configure_firewall') as firewall, \
+                patch('panel_ca.sync_panel_ca', return_value={'status': 'imported'}) as ca, patch('builtins.print'):
+            quick.finish_install(skip_firewall=True)
+            firewall.assert_not_called()
+            ca.assert_called_once_with()
+
+    def test_ca_failure_reports_ca_retry_after_successful_firewall(self):
+        with patch.object(quick, 'configure_firewall', return_value={'status': 'ensured'}) as firewall, \
+                patch('panel_ca.sync_panel_ca', side_effect=ValueError('fixture mismatch')), patch('builtins.print') as output:
+            with self.assertRaises(SystemExit) as caught:
+                quick.finish_install()
+            self.assertEqual(caught.exception.code, 2)
+            firewall.assert_called_once_with()
+            self.assertIn('--sync-ca', str(output.call_args_list))
+
+    def test_noninteractive_actions_mutually_exclusive(self):
+        for args in (['--detect-only', '--configure-firewall'], ['--sync-ca', '--configure-firewall'],
+                     ['--detect-only', '--sync-ca']):
+            with self.subTest(args=args), patch.object(sys, 'argv', ['quick_install.py', *args]), \
+                    patch.object(quick, 'download') as download, patch('sys.stderr', io.StringIO()):
+                with self.assertRaises(SystemExit) as caught:
+                    quick.main()
+                self.assertEqual(caught.exception.code, 2)
+                download.assert_not_called()
+
+    def test_firewall_only_needs_no_tty_ca_or_nginx_discovery_and_reports_failure(self):
+        for status in ('ensured', 'saved_inactive', 'manual_required', 'error'):
+            with self.subTest(status=status), ExitStack() as stack:
+                stack.enter_context(patch.object(sys, 'argv', ['quick_install.py', '--configure-firewall']))
+                stack.enter_context(patch.object(sys, 'platform', 'linux'))
+                stack.enter_context(patch.object(sys, 'path', list(sys.path)))
+                stack.enter_context(patch.object(sys, 'stdin', SimpleNamespace(isatty=lambda: False)))
+                stack.enter_context(patch.object(quick.os, 'geteuid', return_value=0, create=True))
+                stack.enter_context(patch.object(quick.os, 'umask'))
+                stack.enter_context(patch.dict(sys.modules, {'pwd': SimpleNamespace()}))
+                stack.enter_context(patch.object(quick.shutil, 'which', return_value='/fixture/tool'))
+                stack.enter_context(patch.object(quick, 'download', return_value=b'fixture'))
+                stack.enter_context(patch.object(quick, 'verified_members', return_value={}))
+                stack.enter_context(patch.object(quick, 'install_cache', return_value=ROOT))
+                firewall = stack.enter_context(patch.object(quick, 'configure_firewall', return_value={'status': status}))
+                discovery = stack.enter_context(patch.object(manager, 'Environment'))
+                install = stack.enter_context(patch.object(manager, 'execute'))
+                ca = stack.enter_context(patch('panel_ca.sync_panel_ca'))
+                stack.enter_context(patch('builtins.print'))
+                if status in ('manual_required', 'error'):
+                    with self.assertRaises(SystemExit) as caught:
+                        quick.main()
+                    self.assertEqual(caught.exception.code, 2)
+                else:
+                    quick.main()
+                firewall.assert_called_once_with()
+                discovery.assert_not_called()
+                install.assert_not_called()
+                ca.assert_not_called()
 
 
 if __name__ == '__main__':

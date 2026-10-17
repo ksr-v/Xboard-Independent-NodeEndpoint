@@ -1,4 +1,26 @@
-# NodeEndpoint v1.0.3 发布说明
+# Root 防火墙一体化：root-installer-v1.0.4
+
+面板 Root 一键安装现在串联 **独立 HTTPS 入口 → 本机 TCP 端口放行 → 公共 CA 自动导入**，使用固定校验的 tools 1.0.3。
+
+新入口在面板服务器以 Root 执行：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.4/install.sh | bash
+```
+
+已有入口只补本机防火墙，无需重装或输入 CA 口令：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.4/install.sh | bash -s -- --configure-firewall
+```
+
+默认允许所有来源访问安装记录中的 TCP 通讯端口；支持 firewalld 默认 / 活动 zone 的运行时和永久规则，以及 UFW 持久规则。未启用 UFW 时仅保存规则并明确报告，保持未启用。冲突或不支持的策略需要手动处理；云安全组 / 服务商防火墙仍需另行放行。自管策略使用 `--skip-firewall`，单独 CA 同步使用 `--sync-ca`。
+
+本次只更新 Root 工具和文档。面板插件继续使用 **NodeEndpoint-1.0.3.zip**，无需重复上传、卸载其他插件、升级 Xboard 或重做 CA。README 已重写从零安装、原版面板保留数据接入、机器双选命令及保留配置迁移说明。原有 Release 及 ZIP 保持原字节。
+
+验证范围和限制见 [ROOT_FIREWALL_TEST_REPORT.md](ROOT_FIREWALL_TEST_REPORT.md) 及本次 Release 的结果 JSON。
+
+## NodeEndpoint v1.0.3 历史发布说明
 
 默认域名选项现为 **域名对接（独立部署）**，也使用你的 ksr-v 独立部署安装源。两个选项分别为：
 

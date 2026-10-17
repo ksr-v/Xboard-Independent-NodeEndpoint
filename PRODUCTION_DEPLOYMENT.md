@@ -8,17 +8,29 @@
 
 保留面板数据库、原网站 Nginx 配置与证书、`plugins/`、Admin bundle、Node 的配置/凭据/实例元数据/稳定数据目录和 FlowScope 采集器配置的受保护备份。记录各组件实际版本、摘要、应用运行用户与服务状态。不同机器的路径、IP、部署方式不能沿用开发机假设。
 
-从可信渠道取得 1.0.0 ZIP 和摘要，先核对 SHA-256 再解压。工具不自动下载并执行 Shell，不升级 Nginx、PHP 或系统软件。以 Root 通过 SSH 执行检测：
+当前原生插件为 **NodeEndpoint-1.0.3.zip**，Root 一键入口为 **root-installer-v1.0.4 / tools 1.0.3**；从对应 Release 取得包和摘要并核对。插件或 Root 工具更新不等于升级 Xboard 主程序，不要求卸载其他插件。Root 引导脚本通过固定 GitHub HTTPS 标签取得，并校验后续安装器 / 工具包；也可先下载、独立核对后本地执行。它不升级 Nginx、PHP 或系统软件。以 Root 通过 SSH 执行底层只读检测：
 
 ```bash
 bash tools/panel/node-endpoint-panel.sh detect
 ```
 
-检测展示运行 Nginx/OpenResty、主配置和加载文件、HTTP include、真实监听、Docker 端口与本机防火墙的证据。不主动打开防火墙；云安全组由云管理端明确放行独立端口。没有唯一 Nginx master、可证明 HTTP include、准确站点/后端或完整 Node 路由时停止，不改核心配置绕过检查。
+检测展示运行 Nginx/OpenResty、主配置和加载文件、HTTP include、真实监听、Docker 端口与本机防火墙的证据。检测本身不添加规则；云安全组由云管理端明确放行独立端口。没有唯一 Nginx master、可证明 HTTP include、准确站点/后端或完整 Node 路由时停止，不改核心配置绕过检查。
 
 ## 部署独立入口
 
-先原生安装并启用插件、保存相同 host/port/HTTPS/WS 模式。Root 菜单可交互填写；CLI 示例为已核对 Octane / loopback HTTP 后端的参数模板，所有路径和服务地址都必须来自本机检测：
+先原生安装并启用插件、保存相同 host/port/HTTPS/WS 模式。推荐在面板服务器以 Root 使用一键入口：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.4/install.sh | bash
+```
+
+标准 FPM 向导先安装 HTTPS 入口，再添加允许所有来源访问本机配置 TCP 端口的防火墙规则，最后自动尝试公共 CA 本机导入。firewalld 对默认及活动 zone 验证 runtime / permanent 放行；UFW 保存对应规则，未启用时报告 inactive 而不启用整个防火墙。未支持、冲突或无法确认时明确报告 `manual_required`，不修改云安全组或供应商策略。防火墙失败仍尝试 CA 导入，最终有未完成步骤时返回非零，保留已安装入口，不因此回滚或重新生成 CA。
+
+Docker / Octane 或特殊布局未发现可自动填写的 FPM 站点时，会进入底层手工菜单。菜单完成入口安装后不会自动处理防火墙或 CA，须分别执行 `--configure-firewall` 与 `--sync-ca`。需要来源 IP 限制的策略应由管理员维护，使用 `--skip-firewall` 跳过一键向导的全来源放行。
+
+已有入口只补防火墙时使用同一命令加 `-s -- --configure-firewall`；只同步公共 CA 使用 `-s -- --sync-ca`。只读部署检测使用 `-s -- --detect-only`（会准备下载缓存），不会安装入口、添加规则或导入 CA。自定义防火墙由管理员维护时，一键安装加 `-s -- --skip-firewall`，自行验证所需 TCP 来源与端口。
+
+以下是**底层手工安装**示例，不自动配置本机防火墙，也不包含一键公共 CA 导入。Root 菜单可交互填写；CLI 示例为已核对 Octane / loopback HTTP 后端的参数模板，所有路径和服务地址都必须来自本机检测：
 
 ```bash
 bash tools/panel/node-endpoint-panel.sh install \
@@ -37,13 +49,13 @@ bash tools/panel/node-endpoint-panel.sh install \
 
 ## CA 保管与验证
 
-Root `status` 查看公共 CA / server 指纹、SAN、真实起止时间与状态，将公共 CA 从可信 SSH 渠道复制到管理员和 Node。公共 `public-status.json` 可以导入页面；不要导出私钥到网站、静态目录或数据库。
+Root `status` 查看公共 CA / server 指纹、SAN、真实起止时间与状态。一键流程仅将公共 CA 本机导入插件，要求插件启用且通讯地址 / 端口 / HTTPS 与 Root 记录一致；不传私钥或口令。手工 / 异机导入时，将公共 CA 从可信 SSH 渠道复制到管理员并独立核对指纹；公共 `public-status.json` 可以导入页面。不要导出私钥到网站、静态目录或数据库。
 
 使用 Root `export-ca` / `verify-export` 导出并验证加密 CA 私钥和 manifest，独立确认公共 CA 指纹，再执行 `remove-online-ca-key`。离线介质应独立保管；同机其他目录仍属于在线副本。Root 状态保留证书和不可变历史私钥目录用于恢复，审计并离线保管每个 CA 的密钥。后续重签提供离线加密 `--ca-key` 路径，密码仅在终端输入。
 
 ## 新增与分批迁移
 
-先新增一个测试 Node：从已验证工具包目录运行管理页的 `prepare` 命令，隐藏输入 Token，验证 CA / REST / WSS；确认报告与架构后执行 `install-new`。核对二进制确实为用户维护的固定发行，未落回官方渠道。确认实际协议端口、内核、在线用户、流量和服务健康。
+先新增一个测试机器身份，可在原生机器管理选择“域名对接（独立部署）”或“新版：IP + 私有证书”，复制命令到新 Node 服务器安装。两种方式都使用用户维护的固定独立安装源和 v1.13-orphan.4；域名保持原 app_url 与默认系统 / 公有 CA 信任，IP 命令自动携带已导入的公共 CA。新装命令遇到旧安装会要求 `REPLACE` 并替换本机全部旧对接，不能用于保留配置迁移。另一条新建流程是从已验证工具包目录运行管理页的 `prepare`，隐藏输入 Token、验证 CA / REST / WSS，确认报告与架构后执行 `install-new`。两条流程都应确认协议端口、内核、在线用户、流量和服务健康。
 
 已有 Node 不重装。用 `inspect` 确认当前实例 ID 与原 URL，确认该身份没有在其他服务运行，保存配置/凭据/元数据和服务原状态。多实例确认已有显式固定数据目录，再执行 `migrate`，要求 `MIGRATE:指定实例ID`，先 CA / TLS / REST 预检；备份并停止目标服务后才做认证 WSS，再只改该实例地址并启动。官方 WS 认证可能替换业务连接和清理设备状态，启动后不能用另一测试连接抢占业务 WS。失败恢复原文件、信任和服务状态。未知 YAML、Docker、自定义 unit / overrides 应使用独立经验证适配方案，不能回退重装。
 

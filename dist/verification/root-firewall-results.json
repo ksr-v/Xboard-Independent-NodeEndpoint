@@ -1,0 +1,61 @@
+{
+  "release": "root-installer-v1.0.4",
+  "tools_version": "1.0.3",
+  "plugin_version_unchanged": "1.0.3",
+  "date": "2026-10-17",
+  "result": "PASS",
+  "tests": {
+    "windows_panel_tools": {
+      "passed": 98
+    },
+    "linux_panel_tools": {
+      "exit": 0,
+      "tests": 98
+    },
+    "firewall_unit_tests_with_command_fixtures": {
+      "passed": 29
+    },
+    "real_ufw_namespace": {
+      "result": "PASS",
+      "checks": [
+        "separate mount and network namespaces",
+        "active UFW IPv4/IPv6 TCP allow",
+        "repeat ensure leaves one persistent rule per IP family",
+        "SSH/user rules and default policies preserved",
+        "firewall-only uses owned custom port 18443",
+        "firewall-only leaves PKI and Nginx bytes/metadata unchanged",
+        "tampered installed port rejected before firewall mutation",
+        "UFW reload preserves rules",
+        "outer host UFW files and IPv4/IPv6 rules unchanged"
+      ],
+      "network_reachability": "not_tested",
+      "firewalld": "not_tested",
+      "host_rules_comparison": "exact after excluding counters and generated timestamps"
+    }
+  },
+  "package": {
+    "file": "node-endpoint-tools-1.0.3.zip",
+    "bytes": 614405,
+    "sha256": "ea46e0ea8fe1275204c9a7f1f3dd21157a3bdf34070917e1aad8e49cda537a93",
+    "members": 71,
+    "outer_pin_and_member_manifest_verified": true,
+    "private_key_scan": "PASS",
+    "bootstrap_excluded_to_avoid_self_pin": true
+  },
+  "source_sha256": {
+    "install.sh": "2708675438b2ef4ad81c0e9d5ab03259496ce8099b301651a7cfd215c0aeeadd",
+    "tools/panel/quick_install.py": "058e041eac8eacf31ff24926fd3d5154dce2045df0f7b0c3850b4e0e989caf40",
+    "tools/panel/firewall.py": "253756da5bc19664ead181770c7a3de9fe76aa6fc3e1802dab59762aa64380a6",
+    "tools/build/build_tools_patch.py": "6b371c062def1dc90d63c47b4e646b867ec1f309a42d8891eab6960849a95908",
+    "tests/panel/test_quick_install.py": "3a50067e5ea4b18f7634cc8ac437cd7fcde6e5de7a4eeffa5f268d73d8901773",
+    "tests/panel/test_firewall.py": "42556c7f2beccfadcffebcb05538c5908f2a18a170f4f1adedada093a41fb2d7",
+    "tests/panel/firewall_linux_integration.py": "d70304f91deba9c01162f25739c45e0538c501d6eb2f9d5cee23be45415df477"
+  },
+  "historical_plugin_sha256": "8863e19642823336ddb170670836a47c9b8507b551f1634021e47672fd121481",
+  "limits": [
+    "firewalld uses command fixtures; no real firewalld daemon tested",
+    "No full fresh Xboard or interactive Root install repeated",
+    "No production access, cloud security group change, or public node reachability test",
+    "No NodeWorker/proxy/traffic/ARM64 retest; historical UUID/Observer limits retained"
+  ]
+}

@@ -17,8 +17,8 @@ import urllib.parse
 import urllib.request
 import zipfile
 
-TOOLS_URL = 'https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/download/root-installer-v1.0.3/node-endpoint-tools-1.0.2.zip'
-TOOLS_SHA256 = 'ddef146228b8796e6ee1ce7bb28512bfb50e064f93672c4e10fb2e4f6100953a'
+TOOLS_URL = 'https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/download/root-installer-v1.0.4/node-endpoint-tools-1.0.3.zip'
+TOOLS_SHA256 = 'ea46e0ea8fe1275204c9a7f1f3dd21157a3bdf34070917e1aad8e49cda537a93'
 CACHE = Path('/opt/nodeendpoint-quick') / TOOLS_SHA256
 
 
@@ -76,7 +76,8 @@ def verified_members(data, expected=TOOLS_SHA256):
         require(set(manifest) == set(result) - {'MANIFEST.sha256'}, '工具包清单不完整')
         require(all(hashlib.sha256(result[name]).hexdigest() == digest for name, digest in manifest.items()), '成员摘要不匹配')
         require({'tools/panel/manager.py', 'tools/panel/nginx.py', 'tools/panel/pki.py',
-                 'tools/panel/panel_ca.py', 'tools/panel/sync_panel_ca.php'} <= set(result), '缺少管理器或 CA 导入工具')
+                 'tools/panel/panel_ca.py', 'tools/panel/sync_panel_ca.php',
+                 'tools/panel/firewall.py'} <= set(result), '缺少管理器、防火墙或 CA 导入工具')
         return result
 
 
@@ -189,27 +190,116 @@ def php_candidates():
     return sorted(paths)
 
 
+def configure_firewall(state='/var/lib/node-endpoint'):
+    """Open only the committed, owned entry's port while holding its manager lock."""
+    import manager
+    from firewall import ensure_port
+    manager.linux_root()
+    import fcntl
+    state = manager.safe_state(state)
+    for name in (manager.STATE_MARKER, 'installation.json', 'manager.lock'):
+        path = state / name
+        require(not path.is_symlink(), 'Root 状态文件不能为符号链接：' + name)
+        require(manager.trusted_file(path).stat().st_nlink == 1, 'Root 状态文件不能为硬链接：' + name)
+    marker = json.loads(manager.trusted_file(state / manager.STATE_MARKER).read_text())
+    require(isinstance(marker, dict) and marker.get('tool') == 'NodeEndpoint'
+            and marker.get('schema_version') == 1 and marker.get('path') == str(state)
+            and isinstance(marker.get('ownership'), str)
+            and re.fullmatch('[a-f0-9]{32}', marker['ownership']), 'Root 安装记录归属不一致')
+    descriptor = os.open(manager.trusted_file(state / 'manager.lock'), os.O_RDWR | os.O_NOFOLLOW)
+    try:
+        details = os.fstat(descriptor)
+        require(details.st_uid == 0 and details.st_nlink == 1 and stat.S_IMODE(details.st_mode) == 0o600,
+                'Root 管理锁必须为 Root 所有的独立 0600 文件')
+        try:
+            fcntl.flock(descriptor, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError as error:
+            raise ValueError('其他 Root 管理操作正在执行') from error
+        installed = json.loads(manager.trusted_file(state / 'installation.json').read_text())
+        require(isinstance(installed, dict) and isinstance(installed.get('plan'), dict), '缺少已安装入口计划')
+        require(isinstance(installed.get('config_path'), str)
+                and isinstance(installed.get('ownership'), str)
+                and re.fullmatch('[a-f0-9]{32}', installed['ownership']), '入口安装记录无效')
+        manager.trusted_file(installed['config_path'])
+        manager.Manager(state, None).assert_owned()
+        plan = installed['plan']
+        require(plan.get('ownership') == installed.get('ownership')
+                and plan.get('config_path') == installed.get('config_path'), '入口计划与配置归属不一致')
+        port = plan.get('port')
+        require(type(port) is int and 1 <= port <= 65535 and port not in (80, 443), '已安装入口端口无效')
+        config = manager.parse(Path(installed['config_path']).read_text(), installed['config_path'])
+        listeners = [entry.words for entry in manager.walk(config) if entry.words[0] == 'listen']
+        require(bool(listeners) and all(len(words) >= 2 and words[1] in
+                ('0.0.0.0:' + str(port), '[::]:' + str(port)) for words in listeners),
+                '入口监听与安装记录端口不一致')
+        return ensure_port(port)
+    finally:
+        os.close(descriptor)
+
+
+def finish_install(skip_firewall=False):
+    """Keep successful entry/PKI intact and report each independent follow-up."""
+    failures = []
+    if skip_firewall:
+        print('已按 --skip-firewall 保留现有本机防火墙规则。')
+    else:
+        try:
+            result = configure_firewall()
+            print('本机防火墙：' + json.dumps(result, ensure_ascii=False))
+            if result['status'] not in ('ensured', 'saved_inactive'):
+                failures.append('firewall')
+        except (RuntimeError, OSError, ValueError) as error:
+            print('入口已安装，本机防火墙处理未完成：' + str(error), file=sys.stderr)
+            failures.append('firewall')
+        if 'firewall' in failures:
+            print('核对后使用同一短命令加 bash -s -- --configure-firewall 重试；也可在宝塔安全页手动放行已配置的 TCP 端口。', file=sys.stderr)
+    from panel_ca import sync_panel_ca
+    try:
+        result = sync_panel_ca()
+        print('CA 公共证书已自动导入面板，请刷新插件页面：' + json.dumps(result, ensure_ascii=False))
+    except (RuntimeError, OSError, ValueError) as error:
+        print('入口已安装，CA 自动导入未完成：' + str(error), file=sys.stderr)
+        print('修正原因后使用同一短命令加 bash -s -- --sync-ca 单独重试；不会重新生成证书。', file=sys.stderr)
+        failures.append('ca')
+    print('云安全组/服务商防火墙仍需在服务商控制台放行；请从节点服务器测试实际连通性。')
+    print('公共 CA：/var/lib/node-endpoint/pki/trust-bundle.pem；状态：/var/lib/node-endpoint/public-status.json')
+    print('已有 Node 尚未自动迁移；新增机器可在原生机器管理中选择 IP + 私有证书并复制安装命令。')
+    if failures:
+        raise SystemExit(2)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--package-file', help='Offline ZIP; the same built-in SHA256 pin still applies')
     parser.add_argument('--nginx')
-    parser.add_argument('--detect-only', action='store_true', help='Prepare verified tool cache and inspect; do not install endpoint')
-    parser.add_argument('--sync-ca', action='store_true', help='Import public CA from existing Root state into this panel; do not reinstall endpoint')
+    actions = parser.add_mutually_exclusive_group()
+    actions.add_argument('--detect-only', action='store_true', help='Prepare verified tool cache and inspect; do not install endpoint or change firewall')
+    actions.add_argument('--sync-ca', action='store_true', help='Import public CA from existing Root state into this panel; do not reinstall endpoint')
+    actions.add_argument('--configure-firewall', action='store_true', help='Allow the installed entry TCP port persistently; do not reinstall or regenerate certificates')
+    parser.add_argument('--skip-firewall', action='store_true', help='Keep local firewall unchanged during entry installation')
     args = parser.parse_args()
     require(sys.platform == 'linux' and os.geteuid() == 0, '请在面板服务器以 Root 运行')
     require(sys.version_info >= (3, 10), '需要 Python 3.10+')
     import pwd
     os.umask(0o077)
-    require(not (args.detect_only and args.sync_ca), '--detect-only 与 --sync-ca 不可同时使用')
-    require(args.detect_only or args.sync_ca or sys.stdin.isatty(), '安装需要 SSH 交互终端，不要将脚本通过管道执行')
+    require(not (args.skip_firewall and (args.detect_only or args.sync_ca or args.configure_firewall)),
+            '--skip-firewall 仅用于入口安装')
+    require(args.detect_only or args.sync_ca or args.configure_firewall or sys.stdin.isatty(), '安装需要 SSH 交互终端，不要将脚本通过管道执行')
     for name in ('openssl', 'ss', 'runuser'):
         require(shutil.which(name), '缺少依赖：' + name + '，请先通过本机包管理器安装')
-    print('校验固定 tools v1.0.2（CA 本机自动导入）；不更新 Xboard、Node 或系统软件。')
+    print('校验固定 tools v1.0.3（本机 TCP 端口放行 + CA 自动导入）；不更新 Xboard、Node 或系统软件。')
     data = Path(args.package_file).read_bytes() if args.package_file else download()
     directory = install_cache(verified_members(data))
     sys.dont_write_bytecode = True
     sys.path.insert(0, str(directory / 'tools/panel'))
     import manager
+    if args.configure_firewall:
+        result = configure_firewall()
+        print('本机防火墙：' + json.dumps(result, ensure_ascii=False))
+        print('本命令只处理已安装入口的本机规则；云安全组/服务商防火墙请另行核对。')
+        if result['status'] not in ('ensured', 'saved_inactive'):
+            raise SystemExit(2)
+        return
     if args.sync_ca:
         from panel_ca import sync_panel_ca
         result = sync_panel_ca()
@@ -225,6 +315,7 @@ def main():
         return
     if not choices:
         print('未发现可自动填写的原生 PHP-FPM 站点。Docker/Octane 或特殊布局请在现有菜单核对真实路径和后端；不会按 FPM 猜测安装。')
+        print('手工管理菜单不自动配置防火墙或导入 CA。完成入口安装后，分别使用 --configure-firewall 和 --sync-ca。')
         return manager.menu(manager.parser().parse_args((['--nginx', selected_nginx] if selected_nginx else []) + ['menu']))
     site = select(choices, 'Xboard 原站点')
     print('检测结果：' + json.dumps(site, ensure_ascii=False))
@@ -249,19 +340,11 @@ def main():
         require(input('独立入口已存在。修改前请备份；输入 MODIFY 继续：') == 'MODIFY', '取消修改')
         argv[argv.index('install')] = 'modify'
     print('接下来由已校验管理器核对站点/路由/监听并展示计划，要求输入 INSTALL 地址:端口 和隐藏 CA 口令。')
+    if not args.skip_firewall:
+        print('入口成功后将为该 TCP 端口添加允许所有来源的本机防火墙规则并持久保存；自管规则可用 --skip-firewall。')
     manager.execute(manager.parser().parse_args(argv))
-    print('入口安装完成。正在通过本机非 Root 应用用户自动导入 CA 公共证书。')
-    from panel_ca import sync_panel_ca
-    try:
-        result = sync_panel_ca()
-        print('CA 公共证书已自动导入面板，请刷新插件页面：' + json.dumps(result, ensure_ascii=False))
-    except (RuntimeError, OSError, ValueError) as error:
-        print('入口已安装，CA 自动导入未完成：' + str(error), file=sys.stderr)
-        print('修正原因后使用同一短命令加 bash -s -- --sync-ca 单独重试；不会重新生成证书。', file=sys.stderr)
-        raise SystemExit(2)
-    print('防火墙/云安全组请按需要放行该端口；Node 端仍需分发并核对公共 CA。')
-    print('公共 CA：/var/lib/node-endpoint/pki/trust-bundle.pem；状态：/var/lib/node-endpoint/public-status.json')
-    print('已有 Node 尚未自动迁移，请先验证新测试身份，再按维护窗口逐个迁移。')
+    print('入口安装完成。正在处理本机防火墙并通过非 Root 应用用户自动导入 CA 公共证书。')
+    finish_install(args.skip_firewall)
 
 
 if __name__ == '__main__':

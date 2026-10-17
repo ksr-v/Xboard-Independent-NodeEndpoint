@@ -1,15 +1,49 @@
 # Linux Root 管理工具
 
-工具位于 `tools/panel/node-endpoint-panel.sh`，版本 **1.0.0**。仅由管理员通过 SSH 使用；Web 插件不执行 Shell、不持有 Root 权限。依赖 Linux、Python 3.10+、OpenSSL 1.1.1+、Nginx/OpenResty、`ss`；原生 PHP 部署需要 `php`、`runuser`，Docker 部署需要 Docker CLI。工具不安装依赖、不升级系统、不下载或替换 Node 二进制。
+底层入口管理器位于 `tools/panel/node-endpoint-panel.sh`，管理器版本 **1.0.0**；当前补充工具包为 **tools 1.0.3**，一键引导版本为 **root-installer-v1.0.4**。仅由管理员通过 SSH 使用；Web 插件不执行 Shell、不持有 Root 权限。依赖 Linux、Python 3.10+、OpenSSL 1.1.1+、Nginx/OpenResty、`ss`；原生 PHP 部署需要 `php`、`runuser`，Docker 部署需要 Docker CLI。工具不安装依赖、不升级系统、不下载或替换 Node 二进制。
 
-先校验完整发行包的 SHA-256、解压后执行本地文件。不要 `curl | bash`。示例路径必须替换为只读检测确认的真实路径。
+## 一键安装与防火墙
+
+先上传并启用 **NodeEndpoint-1.0.3.zip**，保存通讯地址 / 端口 / HTTPS，然后在面板服务器以 Root 登录交互 SSH：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.4/install.sh | bash
+```
+
+引导脚本通过 GitHub HTTPS 的固定标签下载，校验后续 Python 安装器和 tools 1.0.3 工具包摘要。首次下载需要信任仓库与下载渠道，也可先下载、独立核对再本地执行。标准 FPM 向导在安装独立入口后处理本机配置端口的 TCP 防火墙规则，允许所有来源访问该端口，再尝试公共 CA 本机导入。入口状态、PKI、插件设置及已有节点不因工具补丁更新而重建。
+
+未发现可自动填写的 FPM 站点时，Docker / Octane 或特殊布局会回退到底层手工菜单；该菜单不执行上述两个自动后续步骤。完成入口安装后，须分别运行 `--configure-firewall` 和 `--sync-ca`。需要自行限制来源 IP 时，跳过自动防火墙并按自己的策略配置。
+
+- firewalld：对运行中的默认及活动 zone 补齐 runtime / permanent 规则并验证，不重置整体防火墙策略。
+- UFW：保存对应 TCP 允许规则；未启用时明确报告 inactive，不自动启用整个 UFW。
+- 未支持、冲突或无法确认的本机策略：明确输出 `manual_required`，由管理员手工处理。
+- 云安全组、供应商防火墙、路由器和生产外部可达性不由本机工具修改或证明。
+
+防火墙失败或需要人工处理时仍继续尝试公共 CA 导入，最终列出未完成步骤并返回非零；已安装的入口不会因此回滚。已有入口只补对应步骤：
+
+```bash
+# 只读取已有安装记录并配置其 TCP 端口，不重装入口或生成证书。
+curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.4/install.sh | bash -s -- --configure-firewall
+
+# 只同步现有公共 CA；插件通讯地址、端口、HTTPS 必须与 Root 记录一致。
+curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.4/install.sh | bash -s -- --sync-ca
+
+# 只读部署检测；准备下载缓存，不添加规则、安装入口或导入 CA。
+curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.4/install.sh | bash -s -- --detect-only
+```
+
+已有自定义防火墙策略时，一键安装可加 `-s -- --skip-firewall` 跳过本机规则步骤，管理员自行确认入口 TCP 端口可达。`--configure-firewall` 不等于 `--sync-ca`，两者不重新生成 CA。插件仍为 1.0.3，无需为工具更新重新上传同版本 ZIP、卸载其他插件或升级 Xboard 主程序。
+
+## 底层管理器与手工安装
+
+手工部署先从同次 Root Release 下载工具 ZIP 与 SHA256SUMS，校验后解压到专用目录，再校验包内 `MANIFEST.sha256`。示例路径必须替换为只读检测确认的真实路径。以下直接调用管理器的 `detect / menu / install / modify` **不自动添加防火墙规则**；自动防火墙属于上面一键向导的独立后续步骤。
 
 ```bash
 bash tools/panel/node-endpoint-panel.sh detect
 bash tools/panel/node-endpoint-panel.sh menu
 ```
 
-`detect` 不写文件，也不执行应用 PHP。报告选定的唯一 Nginx master、真实主配置、`nginx -T` 加载文件及哈希、HTTP 层 include、监听端口、原生 FPM / HTTP proxy / WS 迹象、Docker 已发布端口和本机防火墙概况。宝塔同时运行控制面板 webserver 与网站 Nginx 时，使用 `--nginx /已核对的网站/nginx` 选择实际二进制；工具验证其 executable/inode 与唯一运行 master，仍拒绝同一二进制的多个 master。未指定二进制而存在多个 master、未知语法、无法解析 include 或无法确认运行二进制时拒绝。云安全组无法本机检测或修改，需管理员单独允许目标 TCP 端口。本机防火墙只读，不自动添加规则。
+底层管理器 `detect` 不写文件，也不执行应用 PHP。报告选定的唯一 Nginx master、真实主配置、`nginx -T` 加载文件及哈希、HTTP 层 include、监听端口、原生 FPM / HTTP proxy / WS 迹象、Docker 已发布端口和本机防火墙概况。宝塔同时运行控制面板 webserver 与网站 Nginx 时，使用 `--nginx /已核对的网站/nginx` 选择实际二进制；工具验证其 executable/inode 与唯一运行 master，仍拒绝同一二进制的多个 master。未指定二进制而存在多个 master、未知语法、无法解析 include 或无法确认运行二进制时拒绝。检测不改变本机防火墙；云安全组仍由管理员单独允许目标 TCP 端口。
 
 安装采用单独 `node-endpoint.conf`，只允许已被真实主配置 HTTP 层 include 匹配的目录，不修改原站 server block、原 443 证书、PHP、Redis、数据库或 Xboard 全局配置。默认 HTTPS 8443，拒绝 80/443 和已占用端口。
 
