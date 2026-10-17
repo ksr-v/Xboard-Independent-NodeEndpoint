@@ -11,6 +11,27 @@
 - `dist/xb-node-endpoint-1.0.0-source.zip`：源码和测试；不包含参考仓库、开发运行器、vendor、凭据或生成的私钥。
 - `dist/SHA256SUMS`、`dist/release.json`：版本与 SHA-256。
 
+## Root 一键安装独立入口
+
+**插件已经上传、安装并启用后**，在面板服务器以 Root 登录 SSH，直接粘贴下面这一行。需要 Python 3.10+、curl、OpenSSL、`ss` 和 `runuser`；不会自动升级系统、Xboard 或 Node。
+
+```bash
+( f=$(mktemp /root/nodeendpoint-install.XXXXXX.py) && trap 'rm -f -- "$f"' EXIT && curl --fail --show-error --location --proto '=https' --proto-redir '=https' --tlsv1.2 'https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/download/root-installer-v1.0.0/quick_install.py' -o "$f" && printf '%s  %s\n' '07a06c08642ed487cd696ddb891603716503cf3d5fc53b1cba00b9e5a108e9df' "$f" | sha256sum -c - && python3 -I "$f" )
+```
+
+这一行先核对安装器自身 SHA-256。安装器再下载并核对已验收 **v1.0.0 工具包**的固定摘要和全部成员清单，放在 Root 私有缓存目录；原发行 ZIP 不变。安装器作为独立的 [root-installer-v1.0.0 补充工具](https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/tag/root-installer-v1.0.0) 发布。
+
+标准宝塔/PHP-FPM 布局会自动识别网站 Nginx、Xboard 目录、站点、FPM 后端、include 目录、应用用户及可识别的 WS 后端。你只需：
+
+1. 多站点或多个 PHP 版本时选择正确候选；输入与插件页面一致的通讯 IP/域名和端口（默认 8443）。
+2. 确认是否使用检测到的 WS 后端。未配置 WS 时选择插件页面的 REST fallback。
+3. 核对管理器展示的计划，输入 `INSTALL 地址:端口`，隐藏输入至少 16 字符的 CA 口令。
+4. 安装完成后按需放行防火墙/云安全组，核对并导入公共 CA；先验证测试节点，再迁移已有 Node。
+
+脚本不读取管理员 Token、不自动迁移已有节点，也不配置防火墙。多站点不会盲选；无法确认的参数会询问。Docker/Octane 或特殊配置转入已有交互菜单，仍需核对真实后端；不承诺自动识别所有布局。已有入口须确认后才进入修改。CA 私钥仍按 [安全说明](SECURITY.md) 导出、验证并离线保管。
+
+安装器在 Windows/Linux 各完成 8 项校验/发现测试，并在实际测试面板通过只读 FPM 检测，未变更其入口。这个新增向导尚未重新执行完整交互安装验收；底层使用原先已实测的固定工具。安装器源码见 `tools/panel/quick_install.py`，手工部署方式保留在下文。
+
 ## 选择安装路线
 
 | 你的情况 | 从哪里开始 |
