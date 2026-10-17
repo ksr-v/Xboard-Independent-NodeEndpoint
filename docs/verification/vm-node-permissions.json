@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "passed": true,
+  "checks": [
+    {
+      "name": "production-lock-file-root-owned-private",
+      "passed": true
+    },
+    {
+      "name": "independent-process-competition-rejected",
+      "passed": true
+    },
+    {
+      "name": "lock-reacquired-after-graceful-release",
+      "passed": true
+    },
+    {
+      "name": "os-releases-flock-after-holder-termination",
+      "passed": true
+    },
+    {
+      "name": "safe-root-private-input-accepted",
+      "passed": true
+    },
+    {
+      "name": "group-writable-root-ancestry-rejected",
+      "passed": true
+    },
+    {
+      "name": "foreign-owned-ancestry-rejected",
+      "passed": true
+    },
+    {
+      "name": "other-uid-private-input-rejected",
+      "passed": true
+    },
+    {
+      "name": "group-readable-private-input-rejected",
+      "passed": true
+    },
+    {
+      "name": "hardlinked-private-input-rejected",
+      "passed": true
+    },
+    {
+      "name": "symlink-private-input-rejected",
+      "passed": true
+    },
+    {
+      "name": "symlink-parent-rejected",
+      "passed": true
+    },
+    {
+      "name": "group-writable-lock-file-rejected",
+      "passed": true
+    },
+    {
+      "name": "owned-processes-and-test-files-cleaned",
+      "passed": true
+    }
+  ],
+  "failure": null,
+  "cleanup_failures": [],
+  "scope": "real Linux filesystem ownership/modes/links and independent spawned-process production flock; no services or networking"
+}

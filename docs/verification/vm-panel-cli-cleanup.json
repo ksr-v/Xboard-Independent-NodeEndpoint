@@ -1,0 +1,12 @@
+{
+  "fixture_processes_stopped": true,
+  "services_unchanged": true,
+  "pids": [
+    1756301,
+    1756302,
+    1756305,
+    1756306,
+    1756577
+  ],
+  "evidence_retained": "/var/lib/node-endpoint-cli-integration-jrbesk_1"
+}

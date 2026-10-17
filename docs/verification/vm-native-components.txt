@@ -1,0 +1,27 @@
+PASS first native install creates only its table and starts disabled
+PASS node native handshake keeps original URL before plugin activation
+PASS repeated native enable and per-request boot do not duplicate api middleware
+PASS real Sanctum anonymous and ordinary-user tokens cannot use Admin API
+PASS native generic config save cannot bypass the isolated endpoint settings API
+PASS independent UI shell and extensionless assets serve native state-gated responses
+PASS HTTP requires explicit risk acknowledgement, and invalid save is atomic
+PASS format and original-website conflicts are refused
+PASS DNS absolute-name normalization and IPv6 URL generation remain consistent
+PASS request-scoped handshake rewrites independent IP and keeps old host unchanged
+PASS native ServerV2 node and machine credentials remain mandatory
+PASS trusted forwarded origin resolves independent scheme/port, untrusted headers do not
+PASS WS heartbeat absent and explicit REST fallback never claim WSS success
+PASS native disable makes retained routes inert and preserves Root-owned evidence
+PASS native version upgrade preserves endpoint settings and schema
+PASS public Root status import validates schema, excludes credentials and cannot change endpoint configuration
+PASS real OpenSSL CA import verifies fingerprint, public-only contents, root usages and modern key strength
+PASS two independently pinned CA roots support dual trust and reject duplicate roots
+PASS command generation supports complete mode/kernel/architecture matrix without Token argv
+PASS command API rejects unsupported Xray protocols and accepts sing-box counterparts
+PASS native API throttle rejects the thirty-first authenticated request
+PASS explicit local purge refuses enabled plugin and preserves all imported trust
+PASS actual three-plugin lifecycle coexistence leaves Admin resources byte intact
+PASS native uninstall removes plugin state and consistently retains restore settings/business/Root/other plugins
+PASS explicit local purge requires exact confirmation and removes only owned recovery data
+PASS reinstall after explicit purge and reverse foreign-plugin order preserve all current Admin changes
+{"result":"PASS","tests":26,"fixture":"\/opt\/node-endpoint-lab-20261010\/tests\/integration\/work\/20261009-181352-37dc46","framework":"12.69.3","scope":"Native PHP\/Laravel\/Sanctum components with SQLite; no Linux\/Nginx\/Go\/real WebSocket deployment"}

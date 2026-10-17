@@ -1,0 +1,13 @@
+{
+    "name": "node-endpoint/isolated-native-tests",
+    "description": "Isolated component integration tests using the audited native Xboard plugin runtime",
+    "require": {
+        "php": "^8.2",
+        "laravel/framework": "^12.0",
+        "laravel/sanctum": "^4.0"
+    },
+    "config": {
+        "allow-plugins": false,
+        "sort-packages": true
+    }
+}

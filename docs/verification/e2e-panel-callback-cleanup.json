@@ -1,0 +1,6 @@
+{
+  "result": "PASS",
+  "ephemeral_forced_command_key_removed": true,
+  "original_authorized_keys_bytes_restored": true,
+  "owner_and_mode_restored": true
+}

@@ -1,0 +1,41 @@
+test_all_node_bindings_are_checked (__main__.LayoutTests.test_all_node_bindings_are_checked) ... ok
+test_auto_identity_matches_go_raw_host_algorithm (__main__.LayoutTests.test_auto_identity_matches_go_raw_host_algorithm) ... ok
+test_corrupt_binary_download_never_creates_executable (__main__.LayoutTests.test_corrupt_binary_download_never_creates_executable) ... ok
+test_credentials_reject_every_go_business_and_trust_override (__main__.LayoutTests.test_credentials_reject_every_go_business_and_trust_override) ... ok
+test_endpoint_validation (__main__.LayoutTests.test_endpoint_validation) ... ok
+test_identity_and_original_url_must_match (__main__.LayoutTests.test_identity_and_original_url_must_match) ... ok
+test_implicit_multi_instance_data_directory_is_rejected (__main__.LayoutTests.test_implicit_multi_instance_data_directory_is_rejected) ... ok
+test_inspect_bindings_never_expose_nested_certificate_credentials (__main__.LayoutTests.test_inspect_bindings_never_expose_nested_certificate_credentials) ... ok
+test_machine_credentials_are_preserved (__main__.LayoutTests.test_machine_credentials_are_preserved) ... ok
+test_multibinding_byte_preservation (__main__.LayoutTests.test_multibinding_byte_preservation) ... ok
+test_protected_file_credentials_and_no_argument_token (__main__.LayoutTests.test_protected_file_credentials_and_no_argument_token) ... ok
+test_release_is_exactly_pinned (__main__.LayoutTests.test_release_is_exactly_pinned) ... ok
+test_unknown_yaml_is_rejected (__main__.LayoutTests.test_unknown_yaml_is_rejected) ... ok
+test_ws_authority_matches_ip_semantics_and_effective_port (__main__.LayoutTests.test_ws_authority_matches_ip_semantics_and_effective_port) ... ok
+test_actual_cli_accepts_token_stdin_without_exposing_it (__main__.RealTLSTests.test_actual_cli_accepts_token_stdin_without_exposing_it) ... ok
+test_ca_fingerprint_and_ca_properties_are_real (__main__.RealTLSTests.test_ca_fingerprint_and_ca_properties_are_real) ... ok
+test_default_cli_probe_never_registers_websocket_identity (__main__.RealTLSTests.test_default_cli_probe_never_registers_websocket_identity) ... ok
+test_disabled_wss_is_explicit (__main__.RealTLSTests.test_disabled_wss_is_explicit) ... ok
+test_dual_ca_requires_every_pin_and_accepts_both_server_chains (__main__.RealTLSTests.test_dual_ca_requires_every_pin_and_accepts_both_server_chains) ... ok
+test_failed_download_leaves_only_private_uninstalled_stage_with_failure_marker (__main__.RealTLSTests.test_failed_download_leaves_only_private_uninstalled_stage_with_failure_marker) ... ok
+test_old_advertised_ws_url_is_fatal_even_with_fallback (__main__.RealTLSTests.test_old_advertised_ws_url_is_fatal_even_with_fallback) ... ok
+test_prepare_node_and_machine_with_both_kernels_keeps_token_off_command_line (__main__.RealTLSTests.test_prepare_node_and_machine_with_both_kernels_keeps_token_off_command_line) ... ok
+test_prepare_rejects_incompatible_rest_protocol_before_wss_or_files (__main__.RealTLSTests.test_prepare_rejects_incompatible_rest_protocol_before_wss_or_files) ... ok
+test_real_machine_mode_multibinding_rest_and_wss (__main__.RealTLSTests.test_real_machine_mode_multibinding_rest_and_wss) ... ok
+test_real_rest_and_authenticated_wss_by_ip (__main__.RealTLSTests.test_real_rest_and_authenticated_wss_by_ip) ... ok
+test_same_ca_reissued_server_key_needs_no_reimport (__main__.RealTLSTests.test_same_ca_reissued_server_key_needs_no_reimport) ... ok
+test_tampered_root_self_signature_is_rejected_even_with_matching_pin (__main__.RealTLSTests.test_tampered_root_self_signature_is_rejected_even_with_matching_pin) ... ok
+test_wrong_ca_expiry_and_wrong_san_are_rejected (__main__.RealTLSTests.test_wrong_ca_expiry_and_wrong_san_are_rejected) ... ok
+test_wrong_websocket_node_and_machine_identity_is_rejected (__main__.RealTLSTests.test_wrong_websocket_node_and_machine_identity_is_rejected) ... ok
+test_wss_auth_proof_and_rest_fallback_are_separate (__main__.RealTLSTests.test_wss_auth_proof_and_rest_fallback_are_separate) ... ok
+test_concurrent_credentials_change_during_preflight_aborts_before_stop (__main__.SimulatedTransactionTests.test_concurrent_credentials_change_during_preflight_aborts_before_stop) ... ok
+test_damaged_backup_never_stops_service_or_partly_restores_files (__main__.SimulatedTransactionTests.test_damaged_backup_never_stops_service_or_partly_restores_files) ... ok
+test_failed_postcheck_restores_every_file_and_active_state (__main__.SimulatedTransactionTests.test_failed_postcheck_restores_every_file_and_active_state) ... ok
+test_inactive_snapshot_is_not_started_by_restore (__main__.SimulatedTransactionTests.test_inactive_snapshot_is_not_started_by_restore) ... ok
+test_install_start_and_cleanup_stop_failure_retains_unit_and_private_recovery_evidence (__main__.SimulatedTransactionTests.test_install_start_and_cleanup_stop_failure_retains_unit_and_private_recovery_evidence) ... ok
+test_successful_selected_migration_keeps_other_metadata_credentials_and_inactive_state (__main__.SimulatedTransactionTests.test_successful_selected_migration_keeps_other_metadata_credentials_and_inactive_state) ... ok
+
+----------------------------------------------------------------------
+Ran 36 tests in 13.388s
+
+OK

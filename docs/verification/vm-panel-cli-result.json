@@ -1,0 +1,53 @@
+{
+  "result": "PASS",
+  "checks": [
+    {
+      "check": "native_route_list_and_original_fpm_website",
+      "result": "PASS"
+    },
+    {
+      "check": "cli_install_verified_https_native_missing_token_422",
+      "result": "PASS"
+    },
+    {
+      "check": "cli_status_live_tls",
+      "result": "PASS"
+    },
+    {
+      "check": "cli_install_idempotence",
+      "result": "PASS"
+    },
+    {
+      "check": "cli_modify_verified_https",
+      "result": "PASS"
+    },
+    {
+      "check": "cli_rollback_verified_https",
+      "result": "PASS"
+    },
+    {
+      "check": "cli_uninstall_preserves_original_website",
+      "result": "PASS"
+    }
+  ],
+  "error": null,
+  "services_before": {
+    "php8.3-fpm.service": {
+      "state": "active",
+      "pid": "1739940",
+      "start": "14194247"
+    },
+    "docker.service": {
+      "state": "active",
+      "pid": "81683",
+      "start": "524641"
+    },
+    "flowscope-collector.service": {
+      "state": "active",
+      "pid": "1236131",
+      "start": "10137689"
+    }
+  },
+  "evidence": "/var/lib/node-endpoint-cli-integration-jrbesk_1",
+  "scope": "real Root CLI + isolated native Laravel component + PHP-FPM; no production deployment"
+}

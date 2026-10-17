@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-17",
+  "passed": true,
+  "scope": "Owned-resource removal, raw authentication-row restore, synthetic data cleanup, original node backup restoration and credential revocation. Original config bytes and resumed metadata/services preserved; historical failed scenarios remain failures.",
+  "whole_end_to_end_pass": false,
+  "original_node_backup_restored": true,
+  "synthetic_records_and_statistics_removed": true,
+  "native_plugin_and_root_entry_removed": true,
+  "ssh_keys_and_synthetic_credential_relays_revoked": true,
+  "original_authorized_keys_bytes_owner_mode_restored": true,
+  "worker_files_original_bytes_owner_mode_restored": true,
+  "queue_empty_and_worker_heartbeat_at_baseline": true,
+  "external_vm_restore": {
+    "initial_pid_continuity": false,
+    "initial_original_config_metadata_continuity": false,
+    "changed_original_config_metadata_entries": 9,
+    "initial_node_foreign_nft_snapshot_matches": false,
+    "resumed_state_preserved_by_cleanup": true
+  },
+  "private_evidence": "Root-only backups, encrypted CA exports/passphrases and revoked test evidence retained; not physically air-gapped; excluded from releases.",
+  "known_failed_scenarios": [
+    "run003 Xray full UUID replacement",
+    "run004 CLI UUID save Observer delivery",
+    "run005 sole-user Xray UUID delta",
+    "run007 initial fixture cleanup, independently recovered"
+  ]
+}

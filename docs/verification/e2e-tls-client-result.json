@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "date": "2026-10-10",
+  "result": "PASS",
+  "scope": "Actual panel TLS certificate on IPv4:8443, client from Node VM; no REST or WS authentication and no insecure verification",
+  "checks": [
+    {"name": "unknown-ca-rejected", "passed": true},
+    {"name": "wrong-san-rejected", "passed": true},
+    {"name": "pinned-private-ca-ip-san-accepted", "passed": true}
+  ],
+  "certificate_sha256": "2e25c9bdd9ebac2d84e57aea7952b18ce9cb425621e353904fa785334eb96720",
+  "certificate_pem_sha256": "1a7bafe23ec1e9146b603dbaeb0e04f47a5dbb7f13ae748fe0177a90f5208058",
+  "privacy": "Public certificate hashes only; no credentials, private keys or raw host logs"
+}

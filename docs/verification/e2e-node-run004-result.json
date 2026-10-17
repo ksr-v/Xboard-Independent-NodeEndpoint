@@ -1,0 +1,84 @@
+{
+  "schema": 1,
+  "run_id": "e2e-20261010",
+  "result": "FAIL",
+  "binary_sha256": "2b37ea5fdfeb721d08b53330134b7a2e072447c10913620da13ceba600d7b772",
+  "upstream_version": "v1.13-orphan.4",
+  "source_commit": "8dbee14fb2f32a4f9324929fc24828cea6e29b38",
+  "runner_sha256": "5066fe66f237371d31b0da2d045a5e26d9ab95dea4ea3930b1639761f0edf813",
+  "node_tool_sha256": "a87ead78a183f86c49f031b012aea5184c5e1d52e08fb321d181ff27c2ec479c",
+  "asset_staging": "uploaded fixed release asset, independently SHA256/ELF verified; CLI network download excluded",
+  "checks": [
+    {
+      "name": "fixed-uploaded-amd64-release-sha256-and-elf",
+      "passed": true
+    },
+    {
+      "name": "own-four-port-nft-boundary-foreign-tables-preserved",
+      "passed": true
+    },
+    {
+      "name": "real-systemd-go-proxy-listeners-own-nft-non-panel-source-rejected",
+      "passed": true
+    },
+    {
+      "name": "real-panel-owned-standard-fixture-old-http-worker-already-started-node-and-machine-multibinding",
+      "passed": true
+    },
+    {
+      "name": "real-systemd-go-proxy-listeners-own-nft-non-panel-source-rejected",
+      "passed": true
+    },
+    {
+      "name": "actual-cli-selected-node-https-migration-all-bindings-kernel-data-preserved",
+      "passed": true,
+      "dual_ca": false
+    },
+    {
+      "name": "real-nodeworker-wss-active-node-fresh-go-metrics",
+      "passed": true,
+      "binding_count": 2
+    },
+    {
+      "name": "real-systemd-go-proxy-listeners-own-nft-non-panel-source-rejected",
+      "passed": true
+    },
+    {
+      "name": "actual-cli-selected-machine-https-migration-all-bindings-kernel-data-preserved",
+      "passed": true,
+      "dual_ca": false
+    },
+    {
+      "name": "real-nodeworker-wss-active-machine-fresh-go-metrics",
+      "passed": true,
+      "binding_count": 2
+    },
+    {
+      "name": "real-nodeworker-wss-active-all-fresh-go-metrics",
+      "passed": true,
+      "binding_count": 4
+    },
+    {
+      "name": "owned-units-pids-standard-layout-echo-network-cleaned-protected-services-unchanged",
+      "passed": true
+    }
+  ],
+  "check_count": 12,
+  "cleanup_failures": [],
+  "evidence_run": "run004",
+  "failure_reason": "redis_full_sync_new_uuid_not_applied",
+  "safe_cleanup_verified": true,
+  "private_evidence_retained": true,
+  "observed_sync_boundary": {
+    "status": "NO_OBSERVER_USER_SYNC_OBSERVED",
+    "traditional_ws_delta_binding_count": 0,
+    "machine_full_user_binding_count": 0,
+    "ws_disconnect_or_rest_reconciliation_observed": false,
+    "queue_pending_counts": {
+      "traffic_fetch": 0,
+      "stat": 0,
+      "node_sync": 0
+    },
+    "effect": "An Observer-only synthetic DB UUID update did not produce observed user-sync WSS messages, and new-UUID proxy authentication did not succeed within the bounded wait. This run does not establish the Observer/Admin update path; the cause remains under read-only deployment audit."
+  }
+}

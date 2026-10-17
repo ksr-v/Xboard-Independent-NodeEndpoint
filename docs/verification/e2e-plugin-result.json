@@ -1,0 +1,172 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-10",
+  "status": "PASS",
+  "completed_check_count": 24,
+  "scope": "24 historical native-plugin checks plus separately evidenced final native uninstall and exact owned recovery/token/file cleanup. Final rebuilt-package validation is reported separately.",
+  "package": {
+    "version": "1.0.0",
+    "sha256": "8df4a4a28138019266f6b5080e520a14f58ac406e92e34837d2d9e473dd53533",
+    "members_verified": 52,
+    "note": "This package was the published baseline supplied for this real-panel run. Final rebuilt-package validation is a separate phase."
+  },
+  "completed_checks": [
+    {
+      "name": "Pinned ZIP has one safe NodeEndpoint root and version 1.0.0",
+      "pass": true
+    },
+    {
+      "name": "Native PluginManager.upload imported all 52 members with exact byte hashes",
+      "pass": true
+    },
+    {
+      "name": "Native PluginManager.install and enable created enabled version 1.0.0",
+      "pass": true
+    },
+    {
+      "name": "Existing public/Admin file hashes and original public symlink targets preserved",
+      "pass": true
+    },
+    {
+      "name": "Foreign plugin file hashes preserved",
+      "pass": true
+    },
+    {
+      "name": "Protected foreign database rows, including foreign plugin records and existing administrator, preserved",
+      "pass": true
+    },
+    {
+      "name": "Actual original-site anonymous settings request rejected",
+      "pass": true,
+      "http_status": 403
+    },
+    {
+      "name": "Actual original-site ordinary synthetic user settings request rejected",
+      "pass": true,
+      "http_status": 403
+    },
+    {
+      "name": "Actual original-site existing administrator settings request authorized using a new ephemeral Sanctum token",
+      "pass": true,
+      "http_status": 200
+    },
+    {
+      "name": "Actual settings POST saved enabled HTTPS IP:8443 endpoint with rewrite mode",
+      "pass": true,
+      "http_status": 200
+    },
+    {
+      "name": "Actual management page, JavaScript and CSS requests succeeded",
+      "pass": true,
+      "http_status": 200
+    },
+    {
+      "name": "Only the two owned expired ephemeral Sanctum tokens renewed; previous exact owned IDs removed",
+      "pass": true
+    },
+    {
+      "name": "Public single-root CA independently verified against coordinator-provided SHA256 pin before API import",
+      "pass": true,
+      "certificates_verified": 1
+    },
+    {
+      "name": "Actual administrator CA import and export succeeded with identical independently pinned certificate",
+      "pass": true,
+      "http_status": 200
+    },
+    {
+      "name": "Native disable made actual original-site management page unavailable",
+      "pass": true,
+      "http_status": 404
+    },
+    {
+      "name": "Native disable made actual original-site administrator settings API unavailable",
+      "pass": true,
+      "http_status": 404
+    },
+    {
+      "name": "Native re-enable restored actual original-site management page and administrator settings API",
+      "pass": true,
+      "http_status": 200
+    },
+    {
+      "name": "Settings records and public CA bytes preserved across native disable, re-enable and repeated enable",
+      "pass": true
+    },
+    {
+      "name": "Repeated native enable kept exactly one ScopedHandshake middleware in the CLI application's API group",
+      "pass": true,
+      "middleware_count": 1
+    },
+    {
+      "name": "Native upload of the same pinned version rejected with the expected version check; installed files, settings, CA and plugin identity unchanged",
+      "pass": true
+    },
+    {
+      "name": "Only the rejected upload's new extraction directory removed after every member matched the pinned package",
+      "pass": true
+    },
+    {
+      "name": "Original public/Admin files, foreign plugin files and protected foreign database rows preserved after lifecycle tests",
+      "pass": true
+    },
+    {
+      "name": "Both independently pinned public roots imported and exported unchanged through the actual administrator CA API",
+      "pass": true,
+      "certificates_verified": 2,
+      "http_status": 200
+    },
+    {
+      "name": "Original public/Admin files, foreign plugin files and protected foreign database rows preserved after dual-root CA import",
+      "pass": true
+    }
+  ],
+  "ca": {
+    "certificates_verified": 2,
+    "sha256_fingerprints": [
+      "2e25c9bdd9ebac2d84e57aea7952b18ce9cb425621e353904fa785334eb96720",
+      "6bd7e8281cef5cb84f3878d62b0fc20d6c0d069f5266a97dd96e4657a9eaee04"
+    ],
+    "phases": [
+      "Single-root independent pin plus import/export PASS",
+      "Dual-root independent pins plus import/export PASS"
+    ],
+    "independent_pins_and_native_export": "PASS"
+  },
+  "current_plugin_state": "UNINSTALLED_AND_OWN_RECOVERY_STATE_PURGED",
+  "protected_foreign_plugin_record_count": 7,
+  "final_cleanup": {
+    "status": "PASS",
+    "executed": true,
+    "evidence": "e2e-plugin-final-cleanup.json",
+    "checks": {
+      "status": "CLEANED",
+      "run": "e2e-20261010",
+      "checks": {
+        "public_admin_unchanged": true,
+        "foreign_plugin_files_unchanged": true,
+        "foreign_database_rows_unchanged": true
+      },
+      "native_uninstall_preserved_settings_and_public_ca_before_explicit_purge": true,
+      "own_settings_table_migration_marker_and_public_ca_purged": true,
+      "own_plugin_source_and_public_assets_removed": true,
+      "ephemeral_tokens_removed": true,
+      "root_entry_and_pki_touched": false,
+      "passed": true
+    }
+  },
+  "final_rebuilt_package_validation": {
+    "status": "TRACKED_SEPARATELY",
+    "report": "dist/verification/final-package-results.json"
+  },
+  "pending_phases": [],
+  "privacy": "No passwords, tokens, user UUIDs, private keys, environment values, database contents or private HMACs are included. Detailed journals and newly minted Sanctum tokens remain in the Root-only test stage.",
+  "precheck_corrections": [
+    "The test helper initially rejected the numeric suffix in --zip-sha256; parameter parsing was corrected before any native install or database mutation.",
+    "The test helper initially rejected an existing public symlink; foreign link targets are now hashed without traversal or mutation, while all new owned plugin trees still reject symlinks."
+  ],
+  "not_tested_here": [
+    "Go traffic, WSS heartbeat, user synchronization and real database accounting are reported by the separate end-to-end suite",
+    "The repeated-enable middleware count was observed in the actual bootstrapped CLI router; it is not a count extracted from a live FPM worker"
+  ]
+}

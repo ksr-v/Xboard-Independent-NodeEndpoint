@@ -1,0 +1,17 @@
+{
+  "passed": 9,
+  "checks": [
+    "public login shell hides sensitive workspace",
+    "native administrator API login with memory-only token",
+    "IPv6 preview brackets and HTTPS/WSS schemes",
+    "HTTP without administrator acknowledgement rejected by real API",
+    "acknowledged HTTP saved and WS derived",
+    "new node command matches CLI and contains no Token",
+    "machine Xray ARM64 command and node-type visibility",
+    "desktop and mobile layout without horizontal overflow",
+    "refresh clears administrator session"
+  ],
+  "browser": "154.0.8037.98",
+  "base": "http://127.0.0.1:18743",
+  "page_errors": []
+}

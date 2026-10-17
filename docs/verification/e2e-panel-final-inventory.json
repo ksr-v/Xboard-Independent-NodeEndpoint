@@ -1,0 +1,22 @@
+{
+  "passed": true,
+  "status": "OK",
+  "counts": {
+    "v2_user": 1,
+    "v2_server_group": 0,
+    "v2_plan": 0,
+    "v2_server": 0,
+    "v2_server_machine": 0,
+    "v2_stat_user": 0,
+    "v2_stat_server": 0
+  },
+  "worker_heartbeat": false,
+  "ws_enabled": true,
+  "ws_url_present": false,
+  "node_token_present": false,
+  "queue": {
+    "traffic_fetch": 0,
+    "stat": 0,
+    "node_sync": 0
+  }
+}

@@ -1,0 +1,242 @@
+{
+  "schema": 1,
+  "run_id": "e2e-20261010",
+  "evidence_run": "run002",
+  "result": "FAIL",
+  "failure_reason": "panel_leaf_certificate_did_not_change",
+  "binary_sha256": "2b37ea5fdfeb721d08b53330134b7a2e072447c10913620da13ceba600d7b772",
+  "upstream_version": "v1.13-orphan.4",
+  "source_commit": "8dbee14fb2f32a4f9324929fc24828cea6e29b38",
+  "runner_sha256_at_last_stored_report": "4f2b327cdaf6aadca3e588177bdeba28fc6664c2f68ef2de21850e784c05575d",
+  "checks": [
+    {
+      "name": "fixed-uploaded-amd64-release-sha256-and-elf",
+      "passed": true
+    },
+    {
+      "name": "own-four-port-nft-boundary-foreign-tables-preserved",
+      "passed": true
+    },
+    {
+      "name": "real-systemd-go-proxy-listeners-own-nft-non-panel-source-rejected",
+      "passed": true
+    },
+    {
+      "name": "real-panel-rest-baseline-node-multibinding-machine-two-bindings",
+      "passed": true
+    },
+    {
+      "name": "real-systemd-go-proxy-listeners-own-nft-non-panel-source-rejected",
+      "passed": true
+    },
+    {
+      "name": "real-systemd-go-proxy-listeners-own-nft-non-panel-source-rejected",
+      "passed": true
+    },
+    {
+      "name": "cross-vm-real-proxy-rest-report-queue-user-and-each-server-db-metering",
+      "passed": true,
+      "payload_bytes_per_binding": 1048576,
+      "binding_count": 4,
+      "user_uploaded_delta": 4194304,
+      "user_downloaded_delta": 4194304,
+      "user_stat_uploaded_delta": 4194304,
+      "user_stat_downloaded_delta": 4194304,
+      "per_binding_server_stats": [
+        {
+          "node_id": 1,
+          "u": 1048576,
+          "d": 1048576
+        },
+        {
+          "node_id": 2,
+          "u": 1048576,
+          "d": 1048576
+        },
+        {
+          "node_id": 3,
+          "u": 1048576,
+          "d": 1048576
+        },
+        {
+          "node_id": 4,
+          "u": 1048576,
+          "d": 1048576
+        }
+      ]
+    },
+    {
+      "name": "real-systemd-go-proxy-listeners-own-nft-non-panel-source-rejected",
+      "passed": true
+    },
+    {
+      "name": "real-systemd-go-proxy-listeners-own-nft-non-panel-source-rejected",
+      "passed": true
+    },
+    {
+      "name": "actual-cli-selected-node-https-migration-all-bindings-kernel-data-preserved",
+      "passed": true,
+      "dual_ca": false
+    },
+    {
+      "name": "real-nodeworker-wss-active-node-fresh-go-metrics",
+      "passed": true,
+      "binding_count": 2
+    },
+    {
+      "name": "real-systemd-go-proxy-listeners-own-nft-non-panel-source-rejected",
+      "passed": true
+    },
+    {
+      "name": "cross-vm-real-proxy-rest-report-queue-user-and-each-server-db-metering",
+      "passed": true,
+      "payload_bytes_per_binding": 1048576,
+      "binding_count": 4,
+      "user_uploaded_delta": 4194304,
+      "user_downloaded_delta": 4194304,
+      "user_stat_uploaded_delta": 4194304,
+      "user_stat_downloaded_delta": 4194304,
+      "per_binding_server_stats": [
+        {
+          "node_id": 1,
+          "u": 1048576,
+          "d": 1048576
+        },
+        {
+          "node_id": 2,
+          "u": 1048576,
+          "d": 1048576
+        },
+        {
+          "node_id": 3,
+          "u": 1048576,
+          "d": 1048576
+        },
+        {
+          "node_id": 4,
+          "u": 1048576,
+          "d": 1048576
+        }
+      ]
+    },
+    {
+      "name": "exact-unrelated-installer-metadata-credentials-kernels-binary-bindings-and-data-preserved",
+      "passed": true
+    },
+    {
+      "name": "real-systemd-go-proxy-listeners-own-nft-non-panel-source-rejected",
+      "passed": true
+    },
+    {
+      "name": "real-nodeworker-wss-active-all-fresh-go-metrics",
+      "passed": true,
+      "binding_count": 2
+    },
+    {
+      "name": "real-go-reconnected-changed-panel-certificate-existing-trust-unchanged",
+      "passed": true,
+      "leaf_sha256": "2e851f166b0008236f9261729eebdc16fc956468b2e71a1b554573a6fcf6a767"
+    },
+    {
+      "name": "real-systemd-go-proxy-listeners-own-nft-non-panel-source-rejected",
+      "passed": true
+    },
+    {
+      "name": "real-nodeworker-wss-active-all-fresh-go-metrics",
+      "passed": true,
+      "binding_count": 2
+    },
+    {
+      "name": "real-go-reconnected-changed-panel-certificate-existing-trust-unchanged",
+      "passed": true,
+      "leaf_sha256": "d216a0e48101aaa71223c4f8b392cba47d8885450615011aa17bdc50e40cef07"
+    },
+    {
+      "name": "real-systemd-go-proxy-listeners-own-nft-non-panel-source-rejected",
+      "passed": true
+    },
+    {
+      "name": "actual-cli-selected-machine-https-migration-all-bindings-kernel-data-preserved",
+      "passed": true,
+      "dual_ca": true
+    },
+    {
+      "name": "real-nodeworker-wss-active-machine-fresh-go-metrics",
+      "passed": true,
+      "binding_count": 2
+    },
+    {
+      "name": "real-nodeworker-wss-active-all-fresh-go-metrics",
+      "passed": true,
+      "binding_count": 4
+    },
+    {
+      "name": "real-systemd-go-proxy-listeners-own-nft-non-panel-source-rejected",
+      "passed": true
+    },
+    {
+      "name": "cross-vm-real-proxy-rest-report-queue-user-and-each-server-db-metering",
+      "passed": true,
+      "payload_bytes_per_binding": 1048576,
+      "binding_count": 4,
+      "user_uploaded_delta": 4194304,
+      "user_downloaded_delta": 4194304,
+      "user_stat_uploaded_delta": 4194304,
+      "user_stat_downloaded_delta": 4194304,
+      "per_binding_server_stats": [
+        {
+          "node_id": 1,
+          "u": 1048576,
+          "d": 1048576
+        },
+        {
+          "node_id": 2,
+          "u": 1048576,
+          "d": 1048576
+        },
+        {
+          "node_id": 3,
+          "u": 1048576,
+          "d": 1048576
+        },
+        {
+          "node_id": 4,
+          "u": 1048576,
+          "d": 1048576
+        }
+      ]
+    },
+    {
+      "name": "real-systemd-go-proxy-listeners-own-nft-non-panel-source-rejected",
+      "passed": true
+    },
+    {
+      "name": "real-nodeworker-wss-active-all-fresh-go-metrics",
+      "passed": true,
+      "binding_count": 4
+    },
+    {
+      "name": "real-go-reconnected-changed-panel-certificate-existing-trust-unchanged",
+      "passed": true,
+      "leaf_sha256": "d9db9c87c3fe1fa01429b668d5917a474797760844917506cfa843f5055cdb90"
+    },
+    {
+      "name": "real-systemd-go-proxy-listeners-own-nft-non-panel-source-rejected",
+      "passed": true
+    },
+    {
+      "name": "real-nodeworker-wss-active-all-fresh-go-metrics",
+      "passed": true,
+      "binding_count": 4
+    },
+    {
+      "name": "owned-units-pids-standard-layout-echo-network-cleaned-protected-services-unchanged",
+      "passed": true
+    }
+  ],
+  "check_count": 32,
+  "cleanup_failures": [],
+  "safe_cleanup_verified": true,
+  "private_evidence_retained": true,
+  "explanation": "The real REST baseline, migrations, same-CA rekey and rollback, dual-root and new-root reconnect checks passed. A second coordinated same-leaf reconnect was incorrectly required by the fixture to change the leaf again; it failed with safe cleanup. The fixture was corrected and its repeated-same-leaf regression subsequently passed in run003."
+}

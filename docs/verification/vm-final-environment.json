@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "passed": true,
+  "checks": {
+    "protected_services_unchanged": true,
+    "fixture_node_units_removed": true,
+    "fixture_standard_binary_removed": true,
+    "fixture_standard_unit_removed": true,
+    "fixture_standard_dropin_removed": true,
+    "original_backups_restored": true,
+    "nginx_fixture_processes_absent": true,
+    "openresty_fixture_processes_absent": true,
+    "xboard-node_fixture_processes_absent": true
+  },
+  "services": {
+    "docker.service": {
+      "state": "active",
+      "pid": "81683",
+      "start": "524641",
+      "unchanged": true
+    },
+    "flowscope-collector.service": {
+      "state": "active",
+      "pid": "1236131",
+      "start": "10137689",
+      "unchanged": true
+    },
+    "php8.3-fpm.service": {
+      "state": "active",
+      "pid": "1739940",
+      "start": "14194247",
+      "unchanged": true
+    }
+  },
+  "retained": "Installed test dependencies and marked isolated source workspace; private diagnostics remain Root-only. Original backups restored without edits."
+}

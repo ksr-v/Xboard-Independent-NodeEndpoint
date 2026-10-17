@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-17",
+  "status": "TESTING_AND_OWNED_CLEANUP_COMPLETED_PACKAGE_VALIDATION_TRACKED_SEPARATELY",
+  "whole_end_to_end_pass": false,
+  "historical_evidence": {
+    "run006": "PASS: 22 executed checks including install-new, four current-UUID proxies, database metering, native Admin property apply/restore, device onClose cleanup and reconnection; owned resources cleaned",
+    "run007": "14 operational checks passed including selected migration, exact CLI reverse rollback and post-rollback metering; final fixture cleanup failed and original failed report is retained",
+    "known_failed_scenarios": [
+      "run003 Xray full UUID replacement",
+      "run004 CLI UUID-save Observer delivery",
+      "run005 sole-user Xray UUID delta"
+    ]
+  },
+  "local_cleanup_fix": {
+    "source": "tests/e2e/node_runner.py",
+    "behavior": "Validate the owned drop-in directory as a directory, accept an empty directory after rollback, remove only the exact owned trust file when present, reject foreign or changed files, retain Root ancestry checks",
+    "local_regression_result": "PASS",
+    "local_regression_checks": 13,
+    "new_regression_cases": 3,
+    "deployed_and_executed_on_vm": true,
+    "linux_regression_checks": 13,
+    "linux_regression_result": "PASS"
+  },
+  "connectivity": {
+    "panel_original_address": "192.168.128.128",
+    "node_original_address": "192.168.128.129",
+    "both_ssh_attempts": "Strict-known-host SSH authenticated successfully after user restored machines",
+    "host_vmnet8_address": "192.168.128.1/24",
+    "vmware_nat_and_dhcp_services": "Running",
+    "currently_running_registered_names": [
+      "machine1-codex-x",
+      "machine2-codex-x"
+    ],
+    "original_registered_vmx_paths_present": false,
+    "current_instances_have_original_test_state": "NOT VERIFIED"
+  },
+  "remaining_required_work": [],
+  "final_cleanup_verified": true,
+  "privacy": "No credentials, UUID values, administrative route, private snapshots or private keys are published.",
+  "final_rebuilt_package_validation_report": "dist/verification/final-package-results.json"
+}

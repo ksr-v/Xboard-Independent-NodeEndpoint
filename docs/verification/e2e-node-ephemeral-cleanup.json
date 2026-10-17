@@ -1,0 +1,10 @@
+{
+  "result": "PASS",
+  "ephemeral_callback_key_removed": true,
+  "ephemeral_known_hosts_removed": true,
+  "synthetic_credential_relays_removed": [
+    "/opt/node-endpoint-lab-20261010/e2e-20261010-credentials.json",
+    "/home/codex/node-endpoint-stage-20261010/e2e-20261010-credentials.json"
+  ],
+  "private_revoked_run_evidence_retained_root_only": true
+}

@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "repository": "https://github.com/ksr-v/Xboard-Node--Custom-Source",
+  "version": "v1.13-orphan.4",
+  "source_commit": "8dbee14fb2f32a4f9324929fc24828cea6e29b38",
+  "audited_at": "2026-10-09",
+  "release_is_immutable": false,
+  "assets": {
+    "install.sh": "7a4d33d097b78d71faf5c3741b068e6c8b2ebdb30e85c40a433dde4e653b7453",
+    "SHA256SUMS": "6f50b339f2eb1e68f11eac239c356efdbc113e862337d01fadefc1e484e0be3a",
+    "xbctl-linux-amd64": "2ea33645f2f43bf23cdd966989ba01840bdc79a6ad562d522457799bebbd3fb9",
+    "xbctl-linux-arm64": "16c652558433016adececea6f4fb3d3bfe0692943307cada51742ac3708274fa",
+    "xboard-node-linux-amd64": "2b37ea5fdfeb721d08b53330134b7a2e072447c10913620da13ceba600d7b772",
+    "xboard-node-linux-arm64": "004b5801338cfb0fd1f56f6b4c39f4ff57468cd012cdab1454abdc7bb31e1327"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "passed": true,
+  "scope": "Original config bytes; resumed metadata and process identities preserved during owned cleanup, with external restoration exceptions.",
+  "original_config_byte_checks": 17,
+  "external_restore_metadata_change_count": 9,
+  "initial_pid_start_preserved_across_vm_restore": false,
+  "evidence": "e2e-panel-owned-cleanup.json"
+}

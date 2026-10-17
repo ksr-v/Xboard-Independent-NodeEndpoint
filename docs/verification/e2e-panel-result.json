@@ -1,0 +1,1804 @@
+{
+  "schema_version": 1,
+  "passed": true,
+  "scope": "Historical actual Root CLI/PKI phases plus owned cleanup; external VM restoration changed initial PIDs and nine original-file metadata entries. Original config bytes and resumed state were preserved by cleanup.",
+  "host": "192.168.128.128",
+  "port": 8443,
+  "nginx_version": "nginx version: nginx/1.30.5",
+  "original_nginx_configs": [
+    {
+      "path": "/www/server/nginx/conf/nginx.conf",
+      "sha256": "dd87d0dad8fd394fb7e5f0fbe6420bc2fc02a50196d144600b732b87771c65ef",
+      "mode": 420,
+      "uid": 0,
+      "gid": 0
+    },
+    {
+      "path": "/www/server/nginx/conf/mime.types",
+      "sha256": "6f95d1d7d75e3c072907d845622a69d23110d1266c16ff122b3109b8b21f3ae9",
+      "mode": 420,
+      "uid": 0,
+      "gid": 0
+    },
+    {
+      "path": "/www/server/nginx/conf/proxy.conf",
+      "sha256": "d6909158d2f1d124f685fac288d5ecaf3ce68c3bca4d59d671d6e9bf3fb781a8",
+      "mode": 420,
+      "uid": 0,
+      "gid": 0
+    },
+    {
+      "path": "/www/server/nginx/conf/enable-php.conf",
+      "sha256": "f502de2284c3378a66f930b3da148362c25c37b890c39ccd17678c1b2ecd0473",
+      "mode": 420,
+      "uid": 0,
+      "gid": 0
+    },
+    {
+      "path": "/www/server/nginx/conf/fastcgi.conf",
+      "sha256": "6deeb10b0fc8cfe670b7d4373d5d9319ef5a82d7f77ace047bed0575cd2cf260",
+      "mode": 420,
+      "uid": 0,
+      "gid": 0
+    },
+    {
+      "path": "/www/server/panel/vhost/nginx/0.default.conf",
+      "sha256": "90a2e88a247509e673b5be68e9a83a6997f33d9ae269d09f9dc1d529229ce6b9",
+      "mode": 420,
+      "uid": 0,
+      "gid": 0
+    },
+    {
+      "path": "/www/server/panel/vhost/nginx/0.fastcgi_cache.conf",
+      "sha256": "1db1d19ab113df6707d98f551e1d5e8daade8c4ff2825c39fed7879ee0613035",
+      "mode": 420,
+      "uid": 1001,
+      "gid": 1001
+    },
+    {
+      "path": "/www/server/panel/vhost/nginx/0.site_total_log_format.conf",
+      "sha256": "2685cbcd4f59511196c2f556c20abfd628aeaa53b5e5347fed8329caeaaf5f47",
+      "mode": 420,
+      "uid": 0,
+      "gid": 0
+    },
+    {
+      "path": "/www/server/panel/vhost/nginx/0.websocket.conf",
+      "sha256": "077ddca6aa9735f243819b2305e14f5b22fdaabaa446c974717effb2ad7e7fa9",
+      "mode": 420,
+      "uid": 0,
+      "gid": 0
+    },
+    {
+      "path": "/www/server/panel/vhost/nginx/192.168.128.128.conf",
+      "sha256": "76daca972265551e4fbef5d799495b19894623ceb10470cd1e35b9e448ad2426",
+      "mode": 420,
+      "uid": 0,
+      "gid": 0
+    },
+    {
+      "path": "/www/server/panel/vhost/nginx/extension/192.168.128.128/site_total.conf",
+      "sha256": "6868b2924add58e79f54ca59ebef4cf5e48cafb50926639b432462490e8cf141",
+      "mode": 420,
+      "uid": 0,
+      "gid": 0
+    },
+    {
+      "path": "/www/server/nginx/conf/enable-php-83.conf",
+      "sha256": "2ce07f36af7e3f7c0290b7dcdf440cddf9d00f1dbd860c0013f7d2234ea9ab36",
+      "mode": 420,
+      "uid": 0,
+      "gid": 0
+    },
+    {
+      "path": "/www/server/nginx/conf/pathinfo.conf",
+      "sha256": "49e9a46da3a83cbf73ada0ea9b7e449cb01956f74578eb8f4f8ec95d07f40847",
+      "mode": 420,
+      "uid": 0,
+      "gid": 0
+    },
+    {
+      "path": "/www/server/panel/vhost/rewrite/192.168.128.128.conf",
+      "sha256": "bf4225b65130f07c3fa16ad6cb57231af8e2ec5bbdd7ea2292db14e93603f18a",
+      "mode": 420,
+      "uid": 0,
+      "gid": 0
+    },
+    {
+      "path": "/www/server/panel/vhost/nginx/phpfpm_status.conf",
+      "sha256": "4f6fa6f1b35b82b39c061e7bc2d44dcdc1591dde54b6dfe65a19d2862e1e9f8a",
+      "mode": 420,
+      "uid": 0,
+      "gid": 0
+    },
+    {
+      "path": "/www/server/nginx/conf/fastcgi_params",
+      "sha256": "f37852d0113de30fa6bfc3d9b180ef99383c06739530dd482a8538503afd5a58",
+      "mode": 420,
+      "uid": 0,
+      "gid": 0
+    },
+    {
+      "path": "/www/server/panel/vhost/nginx/waf2monitor_data.conf",
+      "sha256": "1361b7ab989c7d539e318269a574b9a944d044fe178296d4731e4990d8a4035d",
+      "mode": 420,
+      "uid": 0,
+      "gid": 0
+    }
+  ],
+  "initial_service_process_identities": [
+    {
+      "pid": 22578,
+      "start": "181117",
+      "uid": 0,
+      "executable": "/www/server/panel/webserver/sbin/webserver",
+      "exe_dev": 64512,
+      "exe_ino": 1709463
+    },
+    {
+      "pid": 41071,
+      "start": "381068",
+      "uid": 0,
+      "executable": "/www/server/nginx/sbin/nginx",
+      "exe_dev": 64512,
+      "exe_ino": 1728799
+    },
+    {
+      "pid": 127786,
+      "start": "625700",
+      "uid": 0,
+      "executable": "/www/server/php/83/sbin/php-fpm",
+      "exe_dev": 64512,
+      "exe_ino": 1728918
+    },
+    {
+      "pid": 124722,
+      "start": "551148",
+      "uid": 1003,
+      "executable": "/usr/bin/redis-check-rdb",
+      "exe_dev": 64512,
+      "exe_ino": 1217291
+    },
+    {
+      "pid": 45156,
+      "start": "388105",
+      "uid": 1002,
+      "executable": "/www/server/mysql/bin/mariadbd",
+      "exe_dev": 64512,
+      "exe_ino": 1729368
+    },
+    {
+      "pid": 130227,
+      "start": "712892",
+      "uid": 1001,
+      "executable": "/www/server/php/83/bin/php",
+      "exe_dev": 64512,
+      "exe_ino": 1728895
+    }
+  ],
+  "original_queue_continuity": {
+    "schema": 1,
+    "unit_sha256": "98ef016dffb2707e57332e03d036d01d14b87d33520dc22896a3fb4af46af057",
+    "initial_process_identity": {
+      "pid": 130227,
+      "start": "712892",
+      "uid": 1001,
+      "executable": "/www/server/php/83/bin/php",
+      "exe_dev": 64512,
+      "exe_ino": 1728895
+    },
+    "observed_process_identity": {
+      "pid": 204230,
+      "start": "2619388",
+      "uid": 1001,
+      "executable": "/www/server/php/83/bin/php",
+      "exe_dev": 64512,
+      "exe_ino": 1728895
+    },
+    "lifetime_seconds": 3600,
+    "systemd_restart": "always",
+    "evidence": "original-queue-lifecycle-public.json",
+    "statement": "Original queue worker follows its existing hourly automatic restart policy; test never stops, restarts or rewrites it."
+  },
+  "external_redis_maintenance": {
+    "schema": 1,
+    "initial_process_identity": {
+      "pid": 124722,
+      "start": "551148",
+      "uid": 1003,
+      "executable": "/usr/bin/redis-check-rdb",
+      "exe_dev": 64512,
+      "exe_ino": 1217291
+    },
+    "observed_process_identity": {
+      "pid": 204119,
+      "start": "2618858",
+      "uid": 1003,
+      "executable": "/usr/bin/redis-check-rdb",
+      "exe_dev": 64512,
+      "exe_ino": 1192324
+    },
+    "post_upgrade_files": [
+      {
+        "path": "/usr/lib/systemd/system/redis-server.service",
+        "mtime_ns": 1790837960000000000,
+        "sha256": "638211a92bf860f096003559005d7f54d51b16ebd1036d76c408c6ac3e081e8a"
+      },
+      {
+        "path": "/etc/systemd/system/redis-server.service.d/jemalloc.conf",
+        "mtime_ns": 1791173989412909100,
+        "sha256": "151b65739de0832fd87f9c5ebcc238387b33f7b080967285f541eb1f2fd38a1c"
+      },
+      {
+        "path": "/etc/redis/redis.conf",
+        "sha256": "f558f95397acc98423d3521b4c59af5ab8c36264e43c58c7e97419e0d4fcbbdf",
+        "mtime_ns": 1775983645000000000,
+        "uid": 1003,
+        "gid": 1003,
+        "mode": 416
+      }
+    ],
+    "evidence": "original-queue-lifecycle-public.json",
+    "statement": "Distro unattended upgrade .4 to .5 independently restarted Redis; initial Redis PID was not preserved. Root fixture never stops/restarts/rewrites Redis; subsequent process/config are strictly pinned."
+  },
+  "maintenance_public_evidence": {
+    "read_only": true,
+    "original_queue_properties": {
+      "Restart": "always",
+      "RestartUSec": "5s",
+      "MainPID": "204230",
+      "Result": "success",
+      "NRestarts": "6",
+      "ExecMainStartTimestamp": "Sat 2026-10-10 06:36:32 UTC",
+      "ExecMainExitTimestamp": "",
+      "ExecMainCode": "0",
+      "ExecMainStatus": "0",
+      "User": "www",
+      "ActiveState": "active",
+      "SubState": "running",
+      "FragmentPath": "/etc/systemd/system/xboard-queue.service",
+      "DropInPaths": ""
+    },
+    "current_process_identity": {
+      "pid": 204230,
+      "start": "2619388",
+      "uid": 1001,
+      "executable": "/www/server/php/83/bin/php",
+      "exe_dev": 64512,
+      "exe_ino": 1728895
+    },
+    "service_file_sha256": "98ef016dffb2707e57332e03d036d01d14b87d33520dc22896a3fb4af46af057",
+    "service_file_mtime_ns": 1791175619370731698,
+    "snapshot_metadata_mtime_ns": 1791614242366410699,
+    "numeric_worker_lifetime_options": [
+      "--sleep=3",
+      "--tries=3",
+      "--max-time=3600"
+    ],
+    "systemd_lifecycle_messages": [
+      {
+        "at_us": "1791175619818489",
+        "message": "Started xboard-queue.service - Xboard aaPanel queue worker."
+      },
+      {
+        "at_us": "1791598730498151",
+        "message": "xboard-queue.service: Deactivated successfully."
+      },
+      {
+        "at_us": "1791598730505280",
+        "message": "xboard-queue.service: Consumed 2.784s CPU time, 37.2M memory peak, 0B memory swap peak."
+      },
+      {
+        "at_us": "1791598735682078",
+        "message": "xboard-queue.service: Scheduled restart job, restart counter is at 1."
+      },
+      {
+        "at_us": "1791598735694565",
+        "message": "Started xboard-queue.service - Xboard aaPanel queue worker."
+      },
+      {
+        "at_us": "1791602336416265",
+        "message": "xboard-queue.service: Deactivated successfully."
+      },
+      {
+        "at_us": "1791602336421639",
+        "message": "xboard-queue.service: Consumed 3.051s CPU time."
+      },
+      {
+        "at_us": "1791602341431859",
+        "message": "xboard-queue.service: Scheduled restart job, restart counter is at 2."
+      },
+      {
+        "at_us": "1791602341444595",
+        "message": "Started xboard-queue.service - Xboard aaPanel queue worker."
+      },
+      {
+        "at_us": "1791605942394208",
+        "message": "xboard-queue.service: Deactivated successfully."
+      },
+      {
+        "at_us": "1791605942398363",
+        "message": "xboard-queue.service: Consumed 3.059s CPU time."
+      },
+      {
+        "at_us": "1791605947433386",
+        "message": "xboard-queue.service: Scheduled restart job, restart counter is at 3."
+      },
+      {
+        "at_us": "1791605947441664",
+        "message": "Started xboard-queue.service - Xboard aaPanel queue worker."
+      },
+      {
+        "at_us": "1791609548300746",
+        "message": "xboard-queue.service: Deactivated successfully."
+      },
+      {
+        "at_us": "1791609548303627",
+        "message": "xboard-queue.service: Consumed 3.047s CPU time."
+      },
+      {
+        "at_us": "1791609553431440",
+        "message": "xboard-queue.service: Scheduled restart job, restart counter is at 4."
+      },
+      {
+        "at_us": "1791609553446415",
+        "message": "Started xboard-queue.service - Xboard aaPanel queue worker."
+      },
+      {
+        "at_us": "1791613154457185",
+        "message": "xboard-queue.service: Deactivated successfully."
+      },
+      {
+        "at_us": "1791613154463124",
+        "message": "xboard-queue.service: Consumed 3.026s CPU time, 37.6M memory peak, 0B memory swap peak."
+      },
+      {
+        "at_us": "1791613159695094",
+        "message": "xboard-queue.service: Scheduled restart job, restart counter is at 5."
+      },
+      {
+        "at_us": "1791613159700655",
+        "message": "Started xboard-queue.service - Xboard aaPanel queue worker."
+      },
+      {
+        "at_us": "1791614187439697",
+        "message": "xboard-queue.service: Main process exited, code=exited, status=1/FAILURE"
+      },
+      {
+        "at_us": "1791614187444044",
+        "message": "xboard-queue.service: Consumed 1.246s CPU time, 37.8M memory peak, 0B memory swap peak."
+      },
+      {
+        "at_us": "1791614192597255",
+        "message": "xboard-queue.service: Scheduled restart job, restart counter is at 6."
+      },
+      {
+        "at_us": "1791614192607912",
+        "message": "Started xboard-queue.service - Xboard aaPanel queue worker."
+      }
+    ],
+    "redis_systemd_lifecycle_messages": [
+      {
+        "at_us": "1791173882345834",
+        "message": "Starting redis-server.service - Advanced key-value store..."
+      },
+      {
+        "at_us": "1791173882388723",
+        "message": "redis-server.service: Main process exited, code=exited, status=127/n/a"
+      },
+      {
+        "at_us": "1791173882597528",
+        "message": "redis-server.service: Scheduled restart job, restart counter is at 1."
+      },
+      {
+        "at_us": "1791173882606730",
+        "message": "Starting redis-server.service - Advanced key-value store..."
+      },
+      {
+        "at_us": "1791173882646658",
+        "message": "redis-server.service: Main process exited, code=exited, status=127/n/a"
+      },
+      {
+        "at_us": "1791173882847827",
+        "message": "redis-server.service: Scheduled restart job, restart counter is at 2."
+      },
+      {
+        "at_us": "1791173882864082",
+        "message": "Starting redis-server.service - Advanced key-value store..."
+      },
+      {
+        "at_us": "1791173882898763",
+        "message": "redis-server.service: Main process exited, code=exited, status=127/n/a"
+      },
+      {
+        "at_us": "1791173883015116",
+        "message": "redis-server.service: Scheduled restart job, restart counter is at 3."
+      },
+      {
+        "at_us": "1791173883024235",
+        "message": "Starting redis-server.service - Advanced key-value store..."
+      },
+      {
+        "at_us": "1791173883057943",
+        "message": "redis-server.service: Main process exited, code=exited, status=127/n/a"
+      },
+      {
+        "at_us": "1791173883169499",
+        "message": "redis-server.service: Scheduled restart job, restart counter is at 4."
+      },
+      {
+        "at_us": "1791173883177508",
+        "message": "Starting redis-server.service - Advanced key-value store..."
+      },
+      {
+        "at_us": "1791173883225556",
+        "message": "redis-server.service: Main process exited, code=exited, status=127/n/a"
+      },
+      {
+        "at_us": "1791173883348074",
+        "message": "redis-server.service: Scheduled restart job, restart counter is at 5."
+      },
+      {
+        "at_us": "1791174002376453",
+        "message": "Starting redis-server.service - Advanced key-value store..."
+      },
+      {
+        "at_us": "1791174002414961",
+        "message": "Started redis-server.service - Advanced key-value store."
+      },
+      {
+        "at_us": "1791614187225067",
+        "message": "Stopping redis-server.service - Advanced key-value store..."
+      },
+      {
+        "at_us": "1791614187294022",
+        "message": "redis-server.service: Deactivated successfully."
+      },
+      {
+        "at_us": "1791614187304920",
+        "message": "Stopped redis-server.service - Advanced key-value store."
+      },
+      {
+        "at_us": "1791614187310520",
+        "message": "redis-server.service: Consumed 4min 5.208s CPU time, 5.5M memory peak, 0B memory swap peak."
+      },
+      {
+        "at_us": "1791614187311541",
+        "message": "Starting redis-server.service - Advanced key-value store..."
+      },
+      {
+        "at_us": "1791614187512604",
+        "message": "Started redis-server.service - Advanced key-value store."
+      }
+    ],
+    "redis_package_events": [
+      "2026-10-05 04:18:01 status unpacked redis-tools:amd64 5:7.0.15-1ubuntu0.24.04.4",
+      "2026-10-05 04:18:01 install redis-server:amd64 <none> 5:7.0.15-1ubuntu0.24.04.4",
+      "2026-10-05 04:18:01 status half-installed redis-server:amd64 5:7.0.15-1ubuntu0.24.04.4",
+      "2026-10-05 04:18:01 status unpacked redis-server:amd64 5:7.0.15-1ubuntu0.24.04.4",
+      "2026-10-05 04:18:01 configure redis-tools:amd64 5:7.0.15-1ubuntu0.24.04.4 <none>",
+      "2026-10-05 04:18:01 status unpacked redis-tools:amd64 5:7.0.15-1ubuntu0.24.04.4",
+      "2026-10-05 04:18:01 status half-configured redis-tools:amd64 5:7.0.15-1ubuntu0.24.04.4",
+      "2026-10-05 04:18:01 status installed redis-tools:amd64 5:7.0.15-1ubuntu0.24.04.4",
+      "2026-10-05 04:18:01 configure redis-server:amd64 5:7.0.15-1ubuntu0.24.04.4 <none>",
+      "2026-10-05 04:18:01 status unpacked redis-server:amd64 5:7.0.15-1ubuntu0.24.04.4",
+      "2026-10-05 04:18:01 status half-configured redis-server:amd64 5:7.0.15-1ubuntu0.24.04.4",
+      "2026-10-05 04:18:02 status installed redis-server:amd64 5:7.0.15-1ubuntu0.24.04.4",
+      "2026-10-10 06:36:23 upgrade redis-server:amd64 5:7.0.15-1ubuntu0.24.04.4 5:7.0.15-1ubuntu0.24.04.5",
+      "2026-10-10 06:36:23 status half-configured redis-server:amd64 5:7.0.15-1ubuntu0.24.04.4",
+      "2026-10-10 06:36:23 status unpacked redis-server:amd64 5:7.0.15-1ubuntu0.24.04.4",
+      "2026-10-10 06:36:23 status half-installed redis-server:amd64 5:7.0.15-1ubuntu0.24.04.4",
+      "2026-10-10 06:36:23 status unpacked redis-server:amd64 5:7.0.15-1ubuntu0.24.04.5",
+      "2026-10-10 06:36:23 upgrade redis-tools:amd64 5:7.0.15-1ubuntu0.24.04.4 5:7.0.15-1ubuntu0.24.04.5",
+      "2026-10-10 06:36:23 status half-configured redis-tools:amd64 5:7.0.15-1ubuntu0.24.04.4",
+      "2026-10-10 06:36:23 status unpacked redis-tools:amd64 5:7.0.15-1ubuntu0.24.04.4",
+      "2026-10-10 06:36:23 status half-installed redis-tools:amd64 5:7.0.15-1ubuntu0.24.04.4",
+      "2026-10-10 06:36:23 status unpacked redis-tools:amd64 5:7.0.15-1ubuntu0.24.04.5",
+      "2026-10-10 06:36:23 configure redis-tools:amd64 5:7.0.15-1ubuntu0.24.04.5 <none>",
+      "2026-10-10 06:36:23 status unpacked redis-tools:amd64 5:7.0.15-1ubuntu0.24.04.5",
+      "2026-10-10 06:36:23 status half-configured redis-tools:amd64 5:7.0.15-1ubuntu0.24.04.5",
+      "2026-10-10 06:36:24 status installed redis-tools:amd64 5:7.0.15-1ubuntu0.24.04.5",
+      "2026-10-10 06:36:24 configure redis-server:amd64 5:7.0.15-1ubuntu0.24.04.5 <none>",
+      "2026-10-10 06:36:24 status unpacked redis-server:amd64 5:7.0.15-1ubuntu0.24.04.5",
+      "2026-10-10 06:36:24 status half-configured redis-server:amd64 5:7.0.15-1ubuntu0.24.04.5",
+      "2026-10-10 06:36:27 status installed redis-server:amd64 5:7.0.15-1ubuntu0.24.04.5"
+    ],
+    "redis_unit_metadata": [
+      {
+        "path": "/usr/lib/systemd/system/redis-server.service",
+        "mtime_ns": 1790837960000000000,
+        "sha256": "638211a92bf860f096003559005d7f54d51b16ebd1036d76c408c6ac3e081e8a"
+      },
+      {
+        "path": "/etc/systemd/system/redis-server.service.d/jemalloc.conf",
+        "mtime_ns": 1791173989412909100,
+        "sha256": "151b65739de0832fd87f9c5ebcc238387b33f7b080967285f541eb1f2fd38a1c"
+      }
+    ],
+    "unattended_upgrade_public_events": [
+      "2026-10-10 01:26:44,059 INFO Starting unattended upgrades script",
+      "2026-10-10 01:44:06,415 INFO Starting unattended upgrades script",
+      "2026-10-10 06:14:03,408 INFO Starting unattended upgrades script",
+      "2026-10-10 06:18:22,433 INFO Packages that will be upgraded: amd64-microcode bind9-dnsutils bind9-host bind9-libs coreutils cpio dirmngr distro-info-data dracut-install gir1.2-packagekitglib-1.0 gnupg gnupg-l10n gnupg-utils gpg gpg-agent gpg-wks-client gpgconf gpgsm gpgv gzip inetutils-telnet intel-microcode jq keyboxd klibc-utils kmod libarchive13t64 libattr1 libde265-0 libde265-dev libdrm-common libdrm2 libfreetype-dev libfreetype6 libgcrypt20 libgnutls30t64 libisns0t64 libjq1 libklibc libkmod2 libnghttp2-14 libnss-systemd libnss3 libntfs-3g89t64 libp11-kit0 libpackagekit-glib2-18 libpam-systemd libpng-dev libpng-tools libpng16-16t64 libpolkit-agent-1-0 libpolkit-gobject-1-0 libpython3-stdlib libpython3.12-minimal libpython3.12-stdlib libpython3.12t64 libsgutils2-1.46-2 libssh-4 libsystemd-shared libsystemd0 libtasn1-6 libudev1 libudisks2-0 libxml2 libxml2-dev linux-firmware linux-generic linux-headers-generic linux-image-generic linux-libc-dev linux-tools-common nano ntfs-3g open-vm-tools openssh-client openssh-server openssh-sftp-server packagekit packagekit-tools polkitd pollinate python-apt-common python3 python3-apt python3-cryptography python3-httplib2 python3-idna python3-jwt python3-minimal python3-openssl python3-pyasn1 python3-requests python3-twisted python3-urllib3 python3.12 python3.12-minimal redis-server redis-tools rsync screen sed sg3-utils sg3-utils-udev snapd sudo systemd systemd-dev systemd-resolved systemd-sysv systemd-timesyncd telnet tzdata ubuntu-pro-client ubuntu-pro-client-l10n udev udisks2 usbmuxd wireless-regdb",
+      "2026-10-10 06:18:22,434 INFO Writing dpkg log to /var/log/unattended-upgrades/unattended-upgrades-dpkg.log",
+      "2026-10-10 06:36:39,460 INFO All upgrades installed"
+    ],
+    "redis_config_metadata": {
+      "path": "/etc/redis/redis.conf",
+      "sha256": "f558f95397acc98423d3521b4c59af5ab8c36264e43c58c7e97419e0d4fcbbdf",
+      "mtime_ns": 1775983645000000000
+    }
+  },
+  "public_ca_files": {
+    "current": {
+      "path": "/home/codex/node-endpoint-e2e-stage-20261010/ca-current.pem",
+      "fingerprints": [
+        "2e25c9bdd9ebac2d84e57aea7952b18ce9cb425621e353904fa785334eb96720"
+      ],
+      "file_sha256": "1a7bafe23ec1e9146b603dbaeb0e04f47a5dbb7f13ae748fe0177a90f5208058",
+      "certificate_count": 1
+    },
+    "dual": {
+      "path": "/home/codex/node-endpoint-e2e-stage-20261010/ca-dual.pem",
+      "fingerprints": [
+        "2e25c9bdd9ebac2d84e57aea7952b18ce9cb425621e353904fa785334eb96720",
+        "6bd7e8281cef5cb84f3878d62b0fc20d6c0d069f5266a97dd96e4657a9eaee04"
+      ],
+      "file_sha256": "6cdfb4d84a1343ce92d539d2dfd546564be164928912f4d46ff267660ee0db2e",
+      "certificate_count": 2
+    },
+    "next": {
+      "path": "/home/codex/node-endpoint-e2e-stage-20261010/ca-next.pem",
+      "fingerprints": [
+        "6bd7e8281cef5cb84f3878d62b0fc20d6c0d069f5266a97dd96e4657a9eaee04"
+      ],
+      "file_sha256": "8e277d0112ccdfa34bf3f896214b4d241d8b9a85e01ca92716070218c23691cf",
+      "certificate_count": 1
+    }
+  },
+  "phases": [
+    {
+      "phase": "firewall-open",
+      "at_ns": 1791614531653848448,
+      "result": {
+        "firewall_owned": true,
+        "source": "192.168.128.129",
+        "tcp_port": 8443
+      }
+    },
+    {
+      "phase": "install",
+      "at_ns": 1791614538430519021,
+      "result": {
+        "installed": true,
+        "endpoint": {
+          "host": "192.168.128.128",
+          "port": 8443,
+          "https": true
+        },
+        "ca": {
+          "sha256": "2e25c9bdd9ebac2d84e57aea7952b18ce9cb425621e353904fa785334eb96720",
+          "subject": "CN = NodeEndpoint Root e94c12f65c56a863",
+          "issuer": "CN = NodeEndpoint Root e94c12f65c56a863",
+          "serial": "2F2F7D250173767CC3C8202D77594A3A",
+          "not_before": "2026-10-10T06:37:15+00:00",
+          "not_after": "2036-10-10T06:42:15+00:00",
+          "remaining_days": 3652,
+          "san": "",
+          "status": "valid",
+          "reminder_days": null
+        },
+        "server": {
+          "sha256": "d216a0e48101aaa71223c4f8b392cba47d8885450615011aa17bdc50e40cef07",
+          "subject": "CN = 192.168.128.128",
+          "issuer": "CN = NodeEndpoint Root e94c12f65c56a863",
+          "serial": "48E28C2B5FC42AB6E712FAEFD57DC797",
+          "not_before": "2026-10-10T06:37:15+00:00",
+          "not_after": "2036-10-10T06:42:15+00:00",
+          "remaining_days": 3652,
+          "san": "IP Address:192.168.128.128",
+          "status": "valid",
+          "reminder_days": null
+        },
+        "checks": {
+          "tls": "verified",
+          "rest_unauthenticated": "reachable_authentication_required",
+          "rest_authenticated": "NOT TESTED",
+          "websocket_authenticated": "NOT TESTED"
+        },
+        "trust": [
+          {
+            "sha256": "2e25c9bdd9ebac2d84e57aea7952b18ce9cb425621e353904fa785334eb96720",
+            "subject": "CN = NodeEndpoint Root e94c12f65c56a863",
+            "issuer": "CN = NodeEndpoint Root e94c12f65c56a863",
+            "serial": "2F2F7D250173767CC3C8202D77594A3A",
+            "not_before": "2026-10-10T06:37:15+00:00",
+            "not_after": "2036-10-10T06:42:15+00:00",
+            "remaining_days": 3652,
+            "san": "",
+            "status": "valid",
+            "reminder_days": null
+          }
+        ],
+        "rotation": null,
+        "ca_key_online": true,
+        "public_ca": {
+          "path": "/home/codex/node-endpoint-e2e-stage-20261010/ca-current.pem",
+          "fingerprints": [
+            "2e25c9bdd9ebac2d84e57aea7952b18ce9cb425621e353904fa785334eb96720"
+          ],
+          "file_sha256": "1a7bafe23ec1e9146b603dbaeb0e04f47a5dbb7f13ae748fe0177a90f5208058",
+          "certificate_count": 1
+        }
+      }
+    },
+    {
+      "phase": "idempotent",
+      "at_ns": 1791614572078128413,
+      "result": {
+        "installed": true,
+        "endpoint": {
+          "host": "192.168.128.128",
+          "port": 8443,
+          "https": true
+        },
+        "ca": {
+          "sha256": "2e25c9bdd9ebac2d84e57aea7952b18ce9cb425621e353904fa785334eb96720",
+          "subject": "CN = NodeEndpoint Root e94c12f65c56a863",
+          "issuer": "CN = NodeEndpoint Root e94c12f65c56a863",
+          "serial": "2F2F7D250173767CC3C8202D77594A3A",
+          "not_before": "2026-10-10T06:37:15+00:00",
+          "not_after": "2036-10-10T06:42:15+00:00",
+          "remaining_days": 3652,
+          "san": "",
+          "status": "valid",
+          "reminder_days": null
+        },
+        "server": {
+          "sha256": "d216a0e48101aaa71223c4f8b392cba47d8885450615011aa17bdc50e40cef07",
+          "subject": "CN = 192.168.128.128",
+          "issuer": "CN = NodeEndpoint Root e94c12f65c56a863",
+          "serial": "48E28C2B5FC42AB6E712FAEFD57DC797",
+          "not_before": "2026-10-10T06:37:15+00:00",
+          "not_after": "2036-10-10T06:42:15+00:00",
+          "remaining_days": 3652,
+          "san": "IP Address:192.168.128.128",
+          "status": "valid",
+          "reminder_days": null
+        },
+        "checks": {
+          "tls": "verified",
+          "rest_unauthenticated": "reachable_authentication_required",
+          "rest_authenticated": "NOT TESTED",
+          "websocket_authenticated": "NOT TESTED",
+          "nginx": "loaded"
+        },
+        "trust": [
+          {
+            "sha256": "2e25c9bdd9ebac2d84e57aea7952b18ce9cb425621e353904fa785334eb96720",
+            "subject": "CN = NodeEndpoint Root e94c12f65c56a863",
+            "issuer": "CN = NodeEndpoint Root e94c12f65c56a863",
+            "serial": "2F2F7D250173767CC3C8202D77594A3A",
+            "not_before": "2026-10-10T06:37:15+00:00",
+            "not_after": "2036-10-10T06:42:15+00:00",
+            "remaining_days": 3652,
+            "san": "",
+            "status": "valid",
+            "reminder_days": null
+          }
+        ],
+        "rotation": null,
+        "ca_key_online": true,
+        "changed": false,
+        "installation_and_pki_unchanged": true
+      }
+    },
+    {
+      "phase": "export-current",
+      "at_ns": 1791614576938725520,
+      "result": {
+        "ca_fingerprint": "2e25c9bdd9ebac2d84e57aea7952b18ce9cb425621e353904fa785334eb96720",
+        "encrypted_root_private_export_verified": true
+      }
+    },
+    {
+      "phase": "remove-current-online",
+      "at_ns": 1791614582414267712,
+      "result": {
+        "ca_fingerprint": "2e25c9bdd9ebac2d84e57aea7952b18ce9cb425621e353904fa785334eb96720",
+        "encrypted_root_private_export_verified": true,
+        "online_ca_key_removed": true
+      }
+    },
+    {
+      "phase": "status",
+      "at_ns": 1791614588124695307,
+      "result": {
+        "installed": true,
+        "endpoint": {
+          "host": "192.168.128.128",
+          "port": 8443,
+          "https": true
+        },
+        "ca": {
+          "sha256": "2e25c9bdd9ebac2d84e57aea7952b18ce9cb425621e353904fa785334eb96720",
+          "subject": "CN = NodeEndpoint Root e94c12f65c56a863",
+          "issuer": "CN = NodeEndpoint Root e94c12f65c56a863",
+          "serial": "2F2F7D250173767CC3C8202D77594A3A",
+          "not_before": "2026-10-10T06:37:15+00:00",
+          "not_after": "2036-10-10T06:42:15+00:00",
+          "remaining_days": 3652,
+          "san": "",
+          "status": "valid",
+          "reminder_days": null
+        },
+        "server": {
+          "sha256": "d216a0e48101aaa71223c4f8b392cba47d8885450615011aa17bdc50e40cef07",
+          "subject": "CN = 192.168.128.128",
+          "issuer": "CN = NodeEndpoint Root e94c12f65c56a863",
+          "serial": "48E28C2B5FC42AB6E712FAEFD57DC797",
+          "not_before": "2026-10-10T06:37:15+00:00",
+          "not_after": "2036-10-10T06:42:15+00:00",
+          "remaining_days": 3652,
+          "san": "IP Address:192.168.128.128",
+          "status": "valid",
+          "reminder_days": null
+        },
+        "checks": {
+          "tls": "verified",
+          "rest_unauthenticated": "reachable_authentication_required",
+          "rest_authenticated": "NOT TESTED",
+          "websocket_authenticated": "NOT TESTED",
+          "nginx": "loaded"
+        },
+        "trust": [
+          {
+            "sha256": "2e25c9bdd9ebac2d84e57aea7952b18ce9cb425621e353904fa785334eb96720",
+            "subject": "CN = NodeEndpoint Root e94c12f65c56a863",
+            "issuer": "CN = NodeEndpoint Root e94c12f65c56a863",
+            "serial": "2F2F7D250173767CC3C8202D77594A3A",
+            "not_before": "2026-10-10T06:37:15+00:00",
+            "not_after": "2036-10-10T06:42:15+00:00",
+            "remaining_days": 3652,
+            "san": "",
+            "status": "valid",
+            "reminder_days": null
+          }
+        ],
+        "rotation": null,
+        "ca_key_online": false
+      }
+    },
+    {
+      "phase": "rekey",
+      "at_ns": 1791614827742428818,
+      "result": {
+        "installed": true,
+        "endpoint": {
+          "host": "192.168.128.128",
+          "port": 8443,
+          "https": true
+        },
+        "ca": {
+          "sha256": "2e25c9bdd9ebac2d84e57aea7952b18ce9cb425621e353904fa785334eb96720",
+          "subject": "CN = NodeEndpoint Root e94c12f65c56a863",
+          "issuer": "CN = NodeEndpoint Root e94c12f65c56a863",
+          "serial": "2F2F7D250173767CC3C8202D77594A3A",
+          "not_before": "2026-10-10T06:37:15+00:00",
+          "not_after": "2036-10-10T06:42:15+00:00",
+          "remaining_days": 3652,
+          "san": "",
+          "status": "valid",
+          "reminder_days": null
+        },
+        "server": {
+          "sha256": "2e851f166b0008236f9261729eebdc16fc956468b2e71a1b554573a6fcf6a767",
+          "subject": "CN = 192.168.128.128",
+          "issuer": "CN = NodeEndpoint Root e94c12f65c56a863",
+          "serial": "231A0D32160E109DCB0B6D43BC00DFC8",
+          "not_before": "2026-10-10T06:42:04+00:00",
+          "not_after": "2036-10-10T06:42:15+00:00",
+          "remaining_days": 3652,
+          "san": "IP Address:192.168.128.128",
+          "status": "valid",
+          "reminder_days": null
+        },
+        "checks": {
+          "tls": "verified",
+          "rest_unauthenticated": "reachable_authentication_required",
+          "rest_authenticated": "NOT TESTED",
+          "websocket_authenticated": "NOT TESTED"
+        },
+        "trust": [
+          {
+            "sha256": "2e25c9bdd9ebac2d84e57aea7952b18ce9cb425621e353904fa785334eb96720",
+            "subject": "CN = NodeEndpoint Root e94c12f65c56a863",
+            "issuer": "CN = NodeEndpoint Root e94c12f65c56a863",
+            "serial": "2F2F7D250173767CC3C8202D77594A3A",
+            "not_before": "2026-10-10T06:37:15+00:00",
+            "not_after": "2036-10-10T06:42:15+00:00",
+            "remaining_days": 3652,
+            "san": "",
+            "status": "valid",
+            "reminder_days": null
+          }
+        ],
+        "rotation": null,
+        "ca_key_online": false,
+        "same_ca": true,
+        "server_key_replaced": true
+      }
+    },
+    {
+      "phase": "rollback",
+      "at_ns": 1791614912994856956,
+      "result": {
+        "installed": true,
+        "endpoint": {
+          "host": "192.168.128.128",
+          "port": 8443,
+          "https": true
+        },
+        "ca": {
+          "sha256": "2e25c9bdd9ebac2d84e57aea7952b18ce9cb425621e353904fa785334eb96720",
+          "subject": "CN = NodeEndpoint Root e94c12f65c56a863",
+          "issuer": "CN = NodeEndpoint Root e94c12f65c56a863",
+          "serial": "2F2F7D250173767CC3C8202D77594A3A",
+          "not_before": "2026-10-10T06:37:15+00:00",
+          "not_after": "2036-10-10T06:42:15+00:00",
+          "remaining_days": 3652,
+          "san": "",
+          "status": "valid",
+          "reminder_days": null
+        },
+        "server": {
+          "sha256": "d216a0e48101aaa71223c4f8b392cba47d8885450615011aa17bdc50e40cef07",
+          "subject": "CN = 192.168.128.128",
+          "issuer": "CN = NodeEndpoint Root e94c12f65c56a863",
+          "serial": "48E28C2B5FC42AB6E712FAEFD57DC797",
+          "not_before": "2026-10-10T06:37:15+00:00",
+          "not_after": "2036-10-10T06:42:15+00:00",
+          "remaining_days": 3652,
+          "san": "IP Address:192.168.128.128",
+          "status": "valid",
+          "reminder_days": null
+        },
+        "checks": {
+          "tls": "verified",
+          "rest_unauthenticated": "reachable_authentication_required",
+          "rest_authenticated": "NOT TESTED",
+          "websocket_authenticated": "NOT TESTED",
+          "nginx": "loaded"
+        },
+        "trust": [
+          {
+            "sha256": "2e25c9bdd9ebac2d84e57aea7952b18ce9cb425621e353904fa785334eb96720",
+            "subject": "CN = NodeEndpoint Root e94c12f65c56a863",
+            "issuer": "CN = NodeEndpoint Root e94c12f65c56a863",
+            "serial": "2F2F7D250173767CC3C8202D77594A3A",
+            "not_before": "2026-10-10T06:37:15+00:00",
+            "not_after": "2036-10-10T06:42:15+00:00",
+            "remaining_days": 3652,
+            "san": "",
+            "status": "valid",
+            "reminder_days": null
+          }
+        ],
+        "rotation": null,
+        "ca_key_online": false,
+        "expected_original_leaf_restored": true
+      }
+    },
+    {
+      "phase": "rotate-prepare",
+      "at_ns": 1791614982780561685,
+      "result": {
+        "installed": true,
+        "endpoint": {
+          "host": "192.168.128.128",
+          "port": 8443,
+          "https": true
+        },
+        "ca": {
+          "sha256": "2e25c9bdd9ebac2d84e57aea7952b18ce9cb425621e353904fa785334eb96720",
+          "subject": "CN = NodeEndpoint Root e94c12f65c56a863",
+          "issuer": "CN = NodeEndpoint Root e94c12f65c56a863",
+          "serial": "2F2F7D250173767CC3C8202D77594A3A",
+          "not_before": "2026-10-10T06:37:15+00:00",
+          "not_after": "2036-10-10T06:42:15+00:00",
+          "remaining_days": 3652,
+          "san": "",
+          "status": "valid",
+          "reminder_days": null
+        },
+        "server": {
+          "sha256": "d216a0e48101aaa71223c4f8b392cba47d8885450615011aa17bdc50e40cef07",
+          "subject": "CN = 192.168.128.128",
+          "issuer": "CN = NodeEndpoint Root e94c12f65c56a863",
+          "serial": "48E28C2B5FC42AB6E712FAEFD57DC797",
+          "not_before": "2026-10-10T06:37:15+00:00",
+          "not_after": "2036-10-10T06:42:15+00:00",
+          "remaining_days": 3652,
+          "san": "IP Address:192.168.128.128",
+          "status": "valid",
+          "reminder_days": null
+        },
+        "checks": {
+          "tls": "verified",
+          "rest_unauthenticated": "reachable_authentication_required",
+          "rest_authenticated": "NOT TESTED",
+          "websocket_authenticated": "NOT TESTED",
+          "nginx": "loaded"
+        },
+        "trust": [
+          {
+            "sha256": "2e25c9bdd9ebac2d84e57aea7952b18ce9cb425621e353904fa785334eb96720",
+            "subject": "CN = NodeEndpoint Root e94c12f65c56a863",
+            "issuer": "CN = NodeEndpoint Root e94c12f65c56a863",
+            "serial": "2F2F7D250173767CC3C8202D77594A3A",
+            "not_before": "2026-10-10T06:37:15+00:00",
+            "not_after": "2036-10-10T06:42:15+00:00",
+            "remaining_days": 3652,
+            "san": "",
+            "status": "valid",
+            "reminder_days": null
+          },
+          {
+            "sha256": "6bd7e8281cef5cb84f3878d62b0fc20d6c0d069f5266a97dd96e4657a9eaee04",
+            "subject": "CN = NodeEndpoint Root d1de9af765b7ca34",
+            "issuer": "CN = NodeEndpoint Root d1de9af765b7ca34",
+            "serial": "98E4DC54F3D737A945E15CD8F64A61F4",
+            "not_before": "2026-10-10T06:44:40+00:00",
+            "not_after": "2036-10-10T06:49:40+00:00",
+            "remaining_days": 3652,
+            "san": "",
+            "status": "valid",
+            "reminder_days": null
+          }
+        ],
+        "rotation": {
+          "phase": "distribute_dual_trust",
+          "old_ca": "e94c12f65c56a863",
+          "new_ca": "d1de9af765b7ca34",
+          "old_leaf": "4e2e2081c2ec39ee",
+          "new_leaf": "1d00015b0a1b1c5a"
+        },
+        "ca_key_online": false,
+        "public_dual_ca": {
+          "path": "/home/codex/node-endpoint-e2e-stage-20261010/ca-dual.pem",
+          "fingerprints": [
+            "2e25c9bdd9ebac2d84e57aea7952b18ce9cb425621e353904fa785334eb96720",
+            "6bd7e8281cef5cb84f3878d62b0fc20d6c0d069f5266a97dd96e4657a9eaee04"
+          ],
+          "file_sha256": "6cdfb4d84a1343ce92d539d2dfd546564be164928912f4d46ff267660ee0db2e",
+          "certificate_count": 2
+        },
+        "public_next_ca": {
+          "path": "/home/codex/node-endpoint-e2e-stage-20261010/ca-next.pem",
+          "fingerprints": [
+            "6bd7e8281cef5cb84f3878d62b0fc20d6c0d069f5266a97dd96e4657a9eaee04"
+          ],
+          "file_sha256": "8e277d0112ccdfa34bf3f896214b4d241d8b9a85e01ca92716070218c23691cf",
+          "certificate_count": 1
+        }
+      }
+    },
+    {
+      "phase": "export-next",
+      "at_ns": 1791615004028124480,
+      "result": {
+        "ca_fingerprint": "6bd7e8281cef5cb84f3878d62b0fc20d6c0d069f5266a97dd96e4657a9eaee04",
+        "encrypted_root_private_export_verified": true
+      }
+    },
+    {
+      "phase": "remove-next-online",
+      "at_ns": 1791615009571509000,
+      "result": {
+        "ca_fingerprint": "6bd7e8281cef5cb84f3878d62b0fc20d6c0d069f5266a97dd96e4657a9eaee04",
+        "encrypted_root_private_export_verified": true,
+        "online_ca_key_removed": true
+      }
+    },
+    {
+      "phase": "status",
+      "at_ns": 1791615013940646463,
+      "result": {
+        "installed": true,
+        "endpoint": {
+          "host": "192.168.128.128",
+          "port": 8443,
+          "https": true
+        },
+        "ca": {
+          "sha256": "2e25c9bdd9ebac2d84e57aea7952b18ce9cb425621e353904fa785334eb96720",
+          "subject": "CN = NodeEndpoint Root e94c12f65c56a863",
+          "issuer": "CN = NodeEndpoint Root e94c12f65c56a863",
+          "serial": "2F2F7D250173767CC3C8202D77594A3A",
+          "not_before": "2026-10-10T06:37:15+00:00",
+          "not_after": "2036-10-10T06:42:15+00:00",
+          "remaining_days": 3652,
+          "san": "",
+          "status": "valid",
+          "reminder_days": null
+        },
+        "server": {
+          "sha256": "d216a0e48101aaa71223c4f8b392cba47d8885450615011aa17bdc50e40cef07",
+          "subject": "CN = 192.168.128.128",
+          "issuer": "CN = NodeEndpoint Root e94c12f65c56a863",
+          "serial": "48E28C2B5FC42AB6E712FAEFD57DC797",
+          "not_before": "2026-10-10T06:37:15+00:00",
+          "not_after": "2036-10-10T06:42:15+00:00",
+          "remaining_days": 3652,
+          "san": "IP Address:192.168.128.128",
+          "status": "valid",
+          "reminder_days": null
+        },
+        "checks": {
+          "tls": "verified",
+          "rest_unauthenticated": "reachable_authentication_required",
+          "rest_authenticated": "NOT TESTED",
+          "websocket_authenticated": "NOT TESTED",
+          "nginx": "loaded"
+        },
+        "trust": [
+          {
+            "sha256": "2e25c9bdd9ebac2d84e57aea7952b18ce9cb425621e353904fa785334eb96720",
+            "subject": "CN = NodeEndpoint Root e94c12f65c56a863",
+            "issuer": "CN = NodeEndpoint Root e94c12f65c56a863",
+            "serial": "2F2F7D250173767CC3C8202D77594A3A",
+            "not_before": "2026-10-10T06:37:15+00:00",
+            "not_after": "2036-10-10T06:42:15+00:00",
+            "remaining_days": 3652,
+            "san": "",
+            "status": "valid",
+            "reminder_days": null
+          },
+          {
+            "sha256": "6bd7e8281cef5cb84f3878d62b0fc20d6c0d069f5266a97dd96e4657a9eaee04",
+            "subject": "CN = NodeEndpoint Root d1de9af765b7ca34",
+            "issuer": "CN = NodeEndpoint Root d1de9af765b7ca34",
+            "serial": "98E4DC54F3D737A945E15CD8F64A61F4",
+            "not_before": "2026-10-10T06:44:40+00:00",
+            "not_after": "2036-10-10T06:49:40+00:00",
+            "remaining_days": 3652,
+            "san": "",
+            "status": "valid",
+            "reminder_days": null
+          }
+        ],
+        "rotation": {
+          "phase": "distribute_dual_trust",
+          "old_ca": "e94c12f65c56a863",
+          "new_ca": "d1de9af765b7ca34",
+          "old_leaf": "4e2e2081c2ec39ee",
+          "new_leaf": "1d00015b0a1b1c5a"
+        },
+        "ca_key_online": false
+      }
+    },
+    {
+      "phase": "rotate-activate",
+      "at_ns": 1791615177972734205,
+      "result": {
+        "installed": true,
+        "endpoint": {
+          "host": "192.168.128.128",
+          "port": 8443,
+          "https": true
+        },
+        "ca": {
+          "sha256": "6bd7e8281cef5cb84f3878d62b0fc20d6c0d069f5266a97dd96e4657a9eaee04",
+          "subject": "CN = NodeEndpoint Root d1de9af765b7ca34",
+          "issuer": "CN = NodeEndpoint Root d1de9af765b7ca34",
+          "serial": "98E4DC54F3D737A945E15CD8F64A61F4",
+          "not_before": "2026-10-10T06:44:40+00:00",
+          "not_after": "2036-10-10T06:49:40+00:00",
+          "remaining_days": 3652,
+          "san": "",
+          "status": "valid",
+          "reminder_days": null
+        },
+        "server": {
+          "sha256": "d9db9c87c3fe1fa01429b668d5917a474797760844917506cfa843f5055cdb90",
+          "subject": "CN = 192.168.128.128",
+          "issuer": "CN = NodeEndpoint Root d1de9af765b7ca34",
+          "serial": "815FB150A7A8E65463518B0AFAC87940",
+          "not_before": "2026-10-10T06:44:40+00:00",
+          "not_after": "2036-10-10T06:49:40+00:00",
+          "remaining_days": 3652,
+          "san": "IP Address:192.168.128.128",
+          "status": "valid",
+          "reminder_days": null
+        },
+        "checks": {
+          "tls": "verified",
+          "rest_unauthenticated": "reachable_authentication_required",
+          "rest_authenticated": "NOT TESTED",
+          "websocket_authenticated": "NOT TESTED"
+        },
+        "trust": [
+          {
+            "sha256": "2e25c9bdd9ebac2d84e57aea7952b18ce9cb425621e353904fa785334eb96720",
+            "subject": "CN = NodeEndpoint Root e94c12f65c56a863",
+            "issuer": "CN = NodeEndpoint Root e94c12f65c56a863",
+            "serial": "2F2F7D250173767CC3C8202D77594A3A",
+            "not_before": "2026-10-10T06:37:15+00:00",
+            "not_after": "2036-10-10T06:42:15+00:00",
+            "remaining_days": 3652,
+            "san": "",
+            "status": "valid",
+            "reminder_days": null
+          },
+          {
+            "sha256": "6bd7e8281cef5cb84f3878d62b0fc20d6c0d069f5266a97dd96e4657a9eaee04",
+            "subject": "CN = NodeEndpoint Root d1de9af765b7ca34",
+            "issuer": "CN = NodeEndpoint Root d1de9af765b7ca34",
+            "serial": "98E4DC54F3D737A945E15CD8F64A61F4",
+            "not_before": "2026-10-10T06:44:40+00:00",
+            "not_after": "2036-10-10T06:49:40+00:00",
+            "remaining_days": 3652,
+            "san": "",
+            "status": "valid",
+            "reminder_days": null
+          }
+        ],
+        "rotation": {
+          "phase": "new_ca_active_dual_trust",
+          "old_ca": "e94c12f65c56a863",
+          "new_ca": "d1de9af765b7ca34",
+          "old_leaf": "4e2e2081c2ec39ee",
+          "new_leaf": "1d00015b0a1b1c5a"
+        },
+        "ca_key_online": false,
+        "node_dual_trust_acknowledged": true
+      }
+    },
+    {
+      "phase": "rollback",
+      "at_ns": 1791615536395585019,
+      "result": {
+        "installed": true,
+        "endpoint": {
+          "host": "192.168.128.128",
+          "port": 8443,
+          "https": true
+        },
+        "ca": {
+          "sha256": "2e25c9bdd9ebac2d84e57aea7952b18ce9cb425621e353904fa785334eb96720",
+          "subject": "CN = NodeEndpoint Root e94c12f65c56a863",
+          "issuer": "CN = NodeEndpoint Root e94c12f65c56a863",
+          "serial": "2F2F7D250173767CC3C8202D77594A3A",
+          "not_before": "2026-10-10T06:37:15+00:00",
+          "not_after": "2036-10-10T06:42:15+00:00",
+          "remaining_days": 3652,
+          "san": "",
+          "status": "valid",
+          "reminder_days": null
+        },
+        "server": {
+          "sha256": "d216a0e48101aaa71223c4f8b392cba47d8885450615011aa17bdc50e40cef07",
+          "subject": "CN = 192.168.128.128",
+          "issuer": "CN = NodeEndpoint Root e94c12f65c56a863",
+          "serial": "48E28C2B5FC42AB6E712FAEFD57DC797",
+          "not_before": "2026-10-10T06:37:15+00:00",
+          "not_after": "2036-10-10T06:42:15+00:00",
+          "remaining_days": 3652,
+          "san": "IP Address:192.168.128.128",
+          "status": "valid",
+          "reminder_days": null
+        },
+        "checks": {
+          "tls": "verified",
+          "rest_unauthenticated": "reachable_authentication_required",
+          "rest_authenticated": "NOT TESTED",
+          "websocket_authenticated": "NOT TESTED",
+          "nginx": "loaded"
+        },
+        "trust": [
+          {
+            "sha256": "2e25c9bdd9ebac2d84e57aea7952b18ce9cb425621e353904fa785334eb96720",
+            "subject": "CN = NodeEndpoint Root e94c12f65c56a863",
+            "issuer": "CN = NodeEndpoint Root e94c12f65c56a863",
+            "serial": "2F2F7D250173767CC3C8202D77594A3A",
+            "not_before": "2026-10-10T06:37:15+00:00",
+            "not_after": "2036-10-10T06:42:15+00:00",
+            "remaining_days": 3652,
+            "san": "",
+            "status": "valid",
+            "reminder_days": null
+          },
+          {
+            "sha256": "6bd7e8281cef5cb84f3878d62b0fc20d6c0d069f5266a97dd96e4657a9eaee04",
+            "subject": "CN = NodeEndpoint Root d1de9af765b7ca34",
+            "issuer": "CN = NodeEndpoint Root d1de9af765b7ca34",
+            "serial": "98E4DC54F3D737A945E15CD8F64A61F4",
+            "not_before": "2026-10-10T06:44:40+00:00",
+            "not_after": "2036-10-10T06:49:40+00:00",
+            "remaining_days": 3652,
+            "san": "",
+            "status": "valid",
+            "reminder_days": null
+          }
+        ],
+        "rotation": {
+          "phase": "distribute_dual_trust",
+          "old_ca": "e94c12f65c56a863",
+          "new_ca": "d1de9af765b7ca34",
+          "old_leaf": "4e2e2081c2ec39ee",
+          "new_leaf": "1d00015b0a1b1c5a"
+        },
+        "ca_key_online": false,
+        "expected_original_leaf_restored": true
+      }
+    },
+    {
+      "phase": "rotate-activate",
+      "at_ns": 1791616120155435758,
+      "result": {
+        "installed": true,
+        "endpoint": {
+          "host": "192.168.128.128",
+          "port": 8443,
+          "https": true
+        },
+        "ca": {
+          "sha256": "6bd7e8281cef5cb84f3878d62b0fc20d6c0d069f5266a97dd96e4657a9eaee04",
+          "subject": "CN = NodeEndpoint Root d1de9af765b7ca34",
+          "issuer": "CN = NodeEndpoint Root d1de9af765b7ca34",
+          "serial": "98E4DC54F3D737A945E15CD8F64A61F4",
+          "not_before": "2026-10-10T06:44:40+00:00",
+          "not_after": "2036-10-10T06:49:40+00:00",
+          "remaining_days": 3652,
+          "san": "",
+          "status": "valid",
+          "reminder_days": null
+        },
+        "server": {
+          "sha256": "d9db9c87c3fe1fa01429b668d5917a474797760844917506cfa843f5055cdb90",
+          "subject": "CN = 192.168.128.128",
+          "issuer": "CN = NodeEndpoint Root d1de9af765b7ca34",
+          "serial": "815FB150A7A8E65463518B0AFAC87940",
+          "not_before": "2026-10-10T06:44:40+00:00",
+          "not_after": "2036-10-10T06:49:40+00:00",
+          "remaining_days": 3652,
+          "san": "IP Address:192.168.128.128",
+          "status": "valid",
+          "reminder_days": null
+        },
+        "checks": {
+          "tls": "verified",
+          "rest_unauthenticated": "reachable_authentication_required",
+          "rest_authenticated": "NOT TESTED",
+          "websocket_authenticated": "NOT TESTED"
+        },
+        "trust": [
+          {
+            "sha256": "2e25c9bdd9ebac2d84e57aea7952b18ce9cb425621e353904fa785334eb96720",
+            "subject": "CN = NodeEndpoint Root e94c12f65c56a863",
+            "issuer": "CN = NodeEndpoint Root e94c12f65c56a863",
+            "serial": "2F2F7D250173767CC3C8202D77594A3A",
+            "not_before": "2026-10-10T06:37:15+00:00",
+            "not_after": "2036-10-10T06:42:15+00:00",
+            "remaining_days": 3652,
+            "san": "",
+            "status": "valid",
+            "reminder_days": null
+          },
+          {
+            "sha256": "6bd7e8281cef5cb84f3878d62b0fc20d6c0d069f5266a97dd96e4657a9eaee04",
+            "subject": "CN = NodeEndpoint Root d1de9af765b7ca34",
+            "issuer": "CN = NodeEndpoint Root d1de9af765b7ca34",
+            "serial": "98E4DC54F3D737A945E15CD8F64A61F4",
+            "not_before": "2026-10-10T06:44:40+00:00",
+            "not_after": "2036-10-10T06:49:40+00:00",
+            "remaining_days": 3652,
+            "san": "",
+            "status": "valid",
+            "reminder_days": null
+          }
+        ],
+        "rotation": {
+          "phase": "new_ca_active_dual_trust",
+          "old_ca": "e94c12f65c56a863",
+          "new_ca": "d1de9af765b7ca34",
+          "old_leaf": "4e2e2081c2ec39ee",
+          "new_leaf": "1d00015b0a1b1c5a"
+        },
+        "ca_key_online": false,
+        "node_dual_trust_acknowledged": true
+      }
+    },
+    {
+      "phase": "rotate-finish",
+      "at_ns": 1791616499836603892,
+      "result": {
+        "installed": true,
+        "endpoint": {
+          "host": "192.168.128.128",
+          "port": 8443,
+          "https": true
+        },
+        "ca": {
+          "sha256": "6bd7e8281cef5cb84f3878d62b0fc20d6c0d069f5266a97dd96e4657a9eaee04",
+          "subject": "CN = NodeEndpoint Root d1de9af765b7ca34",
+          "issuer": "CN = NodeEndpoint Root d1de9af765b7ca34",
+          "serial": "98E4DC54F3D737A945E15CD8F64A61F4",
+          "not_before": "2026-10-10T06:44:40+00:00",
+          "not_after": "2036-10-10T06:49:40+00:00",
+          "remaining_days": 3652,
+          "san": "",
+          "status": "valid",
+          "reminder_days": null
+        },
+        "server": {
+          "sha256": "d9db9c87c3fe1fa01429b668d5917a474797760844917506cfa843f5055cdb90",
+          "subject": "CN = 192.168.128.128",
+          "issuer": "CN = NodeEndpoint Root d1de9af765b7ca34",
+          "serial": "815FB150A7A8E65463518B0AFAC87940",
+          "not_before": "2026-10-10T06:44:40+00:00",
+          "not_after": "2036-10-10T06:49:40+00:00",
+          "remaining_days": 3652,
+          "san": "IP Address:192.168.128.128",
+          "status": "valid",
+          "reminder_days": null
+        },
+        "checks": {
+          "tls": "verified",
+          "rest_unauthenticated": "reachable_authentication_required",
+          "rest_authenticated": "NOT TESTED",
+          "websocket_authenticated": "NOT TESTED",
+          "nginx": "loaded"
+        },
+        "trust": [
+          {
+            "sha256": "6bd7e8281cef5cb84f3878d62b0fc20d6c0d069f5266a97dd96e4657a9eaee04",
+            "subject": "CN = NodeEndpoint Root d1de9af765b7ca34",
+            "issuer": "CN = NodeEndpoint Root d1de9af765b7ca34",
+            "serial": "98E4DC54F3D737A945E15CD8F64A61F4",
+            "not_before": "2026-10-10T06:44:40+00:00",
+            "not_after": "2036-10-10T06:49:40+00:00",
+            "remaining_days": 3652,
+            "san": "",
+            "status": "valid",
+            "reminder_days": null
+          }
+        ],
+        "rotation": null,
+        "ca_key_online": false,
+        "node_new_only_trust_acknowledged": true
+      }
+    },
+    {
+      "phase": "uninstall",
+      "at_ns": 1792210156175805741,
+      "result": {
+        "installed": false,
+        "endpoint": {
+          "host": null,
+          "port": null,
+          "https": null
+        },
+        "ca": {
+          "sha256": "6bd7e8281cef5cb84f3878d62b0fc20d6c0d069f5266a97dd96e4657a9eaee04",
+          "subject": "CN = NodeEndpoint Root d1de9af765b7ca34",
+          "issuer": "CN = NodeEndpoint Root d1de9af765b7ca34",
+          "serial": "98E4DC54F3D737A945E15CD8F64A61F4",
+          "not_before": "2026-10-10T06:44:40+00:00",
+          "not_after": "2036-10-10T06:49:40+00:00",
+          "remaining_days": 3646,
+          "san": "",
+          "status": "valid",
+          "reminder_days": null
+        },
+        "server": {
+          "sha256": "d9db9c87c3fe1fa01429b668d5917a474797760844917506cfa843f5055cdb90",
+          "subject": "CN = 192.168.128.128",
+          "issuer": "CN = NodeEndpoint Root d1de9af765b7ca34",
+          "serial": "815FB150A7A8E65463518B0AFAC87940",
+          "not_before": "2026-10-10T06:44:40+00:00",
+          "not_after": "2036-10-10T06:49:40+00:00",
+          "remaining_days": 3646,
+          "san": "IP Address:192.168.128.128",
+          "status": "valid",
+          "reminder_days": null
+        },
+        "checks": {},
+        "trust": [
+          {
+            "sha256": "6bd7e8281cef5cb84f3878d62b0fc20d6c0d069f5266a97dd96e4657a9eaee04",
+            "subject": "CN = NodeEndpoint Root d1de9af765b7ca34",
+            "issuer": "CN = NodeEndpoint Root d1de9af765b7ca34",
+            "serial": "98E4DC54F3D737A945E15CD8F64A61F4",
+            "not_before": "2026-10-10T06:44:40+00:00",
+            "not_after": "2036-10-10T06:49:40+00:00",
+            "remaining_days": 3646,
+            "san": "",
+            "status": "valid",
+            "reminder_days": null
+          }
+        ],
+        "rotation": null,
+        "ca_key_online": false
+      }
+    },
+    {
+      "phase": "firewall-close",
+      "at_ns": 1792210156448398013,
+      "result": {
+        "owned_firewall_rule_removed": true,
+        "original_firewall_listing_restored": true
+      }
+    }
+  ],
+  "cleanup": {
+    "root_entry_absent": true,
+    "owned_nginx_files_absent": true,
+    "owned_firewall_rule_absent_original_listing_exact": true,
+    "owned_units_absent": true,
+    "original_worker_file_content_mode_uid_gid_restored": true,
+    "original_nginx_file_bytes_preserved": true,
+    "resumed_nginx_file_metadata_preserved": true,
+    "current_protected_service_identities_preserved": true
+  },
+  "missing_required_phases": [],
+  "authenticated_native_node_checks": "Recorded separately by the real Node integration runner; Root CLI unauthenticated probe does not authenticate nodes.",
+  "private_evidence_retained_on_panel_vm": true,
+  "private_keys_or_passphrases_exported_from_panel_vm": false,
+  "whole_end_to_end_pass": false,
+  "historical_initial_pid_start_records": [
+    {
+      "pid": 22578,
+      "start": "181117",
+      "uid": 0,
+      "executable": "/www/server/panel/webserver/sbin/webserver",
+      "exe_dev": 64512,
+      "exe_ino": 1709463
+    },
+    {
+      "pid": 41071,
+      "start": "381068",
+      "uid": 0,
+      "executable": "/www/server/nginx/sbin/nginx",
+      "exe_dev": 64512,
+      "exe_ino": 1728799
+    },
+    {
+      "pid": 127786,
+      "start": "625700",
+      "uid": 0,
+      "executable": "/www/server/php/83/sbin/php-fpm",
+      "exe_dev": 64512,
+      "exe_ino": 1728918
+    },
+    {
+      "pid": 45156,
+      "start": "388105",
+      "uid": 1002,
+      "executable": "/www/server/mysql/bin/mariadbd",
+      "exe_dev": 64512,
+      "exe_ino": 1729368
+    }
+  ],
+  "initial_pid_start_preserved_across_vm_restore": false,
+  "external_vm_restore": {
+    "schema_version": 1,
+    "passed": true,
+    "scope": "Owned panel cleanup after externally restored/rebooted VMs; original config bytes verified, resumed file metadata and protected processes pinned before/after cleanup. Initial PIDs and initial metadata are not claimed preserved across VM restoration.",
+    "results": {
+      "root_uninstall": {
+        "installed": false,
+        "endpoint": {
+          "host": null,
+          "port": null,
+          "https": null
+        },
+        "ca": {
+          "sha256": "6bd7e8281cef5cb84f3878d62b0fc20d6c0d069f5266a97dd96e4657a9eaee04",
+          "subject": "CN = NodeEndpoint Root d1de9af765b7ca34",
+          "issuer": "CN = NodeEndpoint Root d1de9af765b7ca34",
+          "serial": "98E4DC54F3D737A945E15CD8F64A61F4",
+          "not_before": "2026-10-10T06:44:40+00:00",
+          "not_after": "2036-10-10T06:49:40+00:00",
+          "remaining_days": 3646,
+          "san": "",
+          "status": "valid",
+          "reminder_days": null
+        },
+        "server": {
+          "sha256": "d9db9c87c3fe1fa01429b668d5917a474797760844917506cfa843f5055cdb90",
+          "subject": "CN = 192.168.128.128",
+          "issuer": "CN = NodeEndpoint Root d1de9af765b7ca34",
+          "serial": "815FB150A7A8E65463518B0AFAC87940",
+          "not_before": "2026-10-10T06:44:40+00:00",
+          "not_after": "2036-10-10T06:49:40+00:00",
+          "remaining_days": 3646,
+          "san": "IP Address:192.168.128.128",
+          "status": "valid",
+          "reminder_days": null
+        },
+        "checks": {},
+        "trust": [
+          {
+            "sha256": "6bd7e8281cef5cb84f3878d62b0fc20d6c0d069f5266a97dd96e4657a9eaee04",
+            "subject": "CN = NodeEndpoint Root d1de9af765b7ca34",
+            "issuer": "CN = NodeEndpoint Root d1de9af765b7ca34",
+            "serial": "98E4DC54F3D737A945E15CD8F64A61F4",
+            "not_before": "2026-10-10T06:44:40+00:00",
+            "not_after": "2036-10-10T06:49:40+00:00",
+            "remaining_days": 3646,
+            "san": "",
+            "status": "valid",
+            "reminder_days": null
+          }
+        ],
+        "rotation": null,
+        "ca_key_online": false
+      },
+      "firewall_close": {
+        "owned_firewall_rule_removed": true,
+        "original_firewall_listing_restored": true
+      },
+      "bridge": {
+        "bridge_removed": true,
+        "original_serverblock_bytes_and_expected_service_guards_verified": true
+      },
+      "ws": {
+        "service": "node-endpoint-e2e-ws-20261010.service",
+        "stopped_and_unit_removed": true,
+        "original_config_bytes_and_expected_service_guards_verified": true
+      },
+      "worker_files": {
+        "original_worker_log_and_pid_files_restored": true,
+        "private_final_log_evidence_retained": true
+      },
+      "queue": {
+        "service": "node-endpoint-e2e-queue-20261010.service",
+        "stopped_and_unit_removed": true,
+        "original_config_bytes_and_expected_service_guards_verified": true
+      }
+    },
+    "original_nginx_file_bytes_preserved": true,
+    "resumed_nginx_file_metadata_preserved": true,
+    "external_restore_metadata_changes": [
+      {
+        "path": "/www/server/panel/vhost/nginx/0.default.conf",
+        "before": [
+          0,
+          0,
+          420
+        ],
+        "resumed": [
+          0,
+          0,
+          384
+        ]
+      },
+      {
+        "path": "/www/server/panel/vhost/nginx/0.fastcgi_cache.conf",
+        "before": [
+          1001,
+          1001,
+          420
+        ],
+        "resumed": [
+          0,
+          0,
+          384
+        ]
+      },
+      {
+        "path": "/www/server/panel/vhost/nginx/0.site_total_log_format.conf",
+        "before": [
+          0,
+          0,
+          420
+        ],
+        "resumed": [
+          0,
+          0,
+          384
+        ]
+      },
+      {
+        "path": "/www/server/panel/vhost/nginx/0.websocket.conf",
+        "before": [
+          0,
+          0,
+          420
+        ],
+        "resumed": [
+          0,
+          0,
+          384
+        ]
+      },
+      {
+        "path": "/www/server/panel/vhost/nginx/192.168.128.128.conf",
+        "before": [
+          0,
+          0,
+          420
+        ],
+        "resumed": [
+          0,
+          0,
+          384
+        ]
+      },
+      {
+        "path": "/www/server/panel/vhost/nginx/extension/192.168.128.128/site_total.conf",
+        "before": [
+          0,
+          0,
+          420
+        ],
+        "resumed": [
+          0,
+          0,
+          384
+        ]
+      },
+      {
+        "path": "/www/server/panel/vhost/rewrite/192.168.128.128.conf",
+        "before": [
+          0,
+          0,
+          420
+        ],
+        "resumed": [
+          0,
+          0,
+          384
+        ]
+      },
+      {
+        "path": "/www/server/panel/vhost/nginx/phpfpm_status.conf",
+        "before": [
+          0,
+          0,
+          420
+        ],
+        "resumed": [
+          0,
+          0,
+          384
+        ]
+      },
+      {
+        "path": "/www/server/panel/vhost/nginx/waf2monitor_data.conf",
+        "before": [
+          0,
+          0,
+          420
+        ],
+        "resumed": [
+          0,
+          0,
+          384
+        ]
+      }
+    ],
+    "original_worker_files_restored": true,
+    "current_protected_processes_preserved": true,
+    "initial_process_pids_preserved_across_external_vm_restore": false,
+    "external_vm_restore_user_confirmed": true,
+    "current_process_identities": [
+      {
+        "pid": 1925,
+        "start": "1812",
+        "uid": 0,
+        "executable": "/www/server/panel/webserver/sbin/webserver",
+        "exe_dev": 64512,
+        "exe_ino": 1709463
+      },
+      {
+        "pid": 977,
+        "start": "1259",
+        "uid": 0,
+        "executable": "/www/server/nginx/sbin/nginx",
+        "exe_dev": 64512,
+        "exe_ino": 1728799
+      },
+      {
+        "pid": 1473,
+        "start": "1530",
+        "uid": 0,
+        "executable": "/www/server/php/83/sbin/php-fpm",
+        "exe_dev": 64512,
+        "exe_ino": 1728918
+      },
+      {
+        "pid": 1787,
+        "start": "1610",
+        "uid": 1002,
+        "executable": "/www/server/mysql/bin/mariadbd",
+        "exe_dev": 64512,
+        "exe_ino": 1729368
+      },
+      {
+        "pid": 1103,
+        "start": "1390",
+        "uid": 1001,
+        "executable": "/www/server/php/83/bin/php",
+        "exe_dev": 64512,
+        "exe_ino": 1728895
+      },
+      {
+        "pid": 1080,
+        "start": "1352",
+        "uid": 1003,
+        "executable": "/usr/bin/redis-check-rdb",
+        "exe_dev": 64512,
+        "exe_ino": 1192324
+      }
+    ],
+    "original_private_control_snapshot_retained": true
+  },
+  "actual_deployed_source": {
+    "sha256": {
+      "tools/panel/manager.py": "566428d5884c23a7a314609cdcfec6db80a080047999f34a2983399aed0d76c1",
+      "tools/panel/nginx.py": "ca63085c50271636f95e359d6ebaa848f1b8ed995db1766ee71fc859fe56a4f0",
+      "tools/panel/pki.py": "006aadb8a413fa2c04dac75040ee318ea248aab1a082b181458e03afd5c3c5c2",
+      "tests/panel/test_panel.py": "93f3e55434b64df1c8910164482691bff045f443c2e2dd5397d843f6e041d22d"
+    },
+    "remote_lab": "/opt/node-endpoint-e2e-20261010",
+    "remote_sha256_verified_against_workspace": true,
+    "version_scope": "Root production Python tools with explicit binary master selection and quoted Nginx token fixes; differs from the earlier native plugin baseline ZIP tools."
+  },
+  "product_unit_regression": {
+    "windows": {
+      "executed": true,
+      "tests": 36,
+      "result": "OK",
+      "command": ".runtime/python/python.exe tests/panel/test_panel.py",
+      "openssl_binary": "C:/Program Files/Git/usr/bin/openssl.exe",
+      "isolation": "Temporary PKI and mocked Nginx; no real service signals"
+    },
+    "linux": {
+      "executed": true,
+      "host": "192.168.128.128",
+      "tests": 36,
+      "elapsed_seconds": 10.306,
+      "result": "OK",
+      "command": "sudo python3 /opt/node-endpoint-e2e-20261010/tests/panel/test_panel.py",
+      "isolation": "Temporary PKI and mocked Nginx; no real service signals"
+    },
+    "added_meaningful_regression_cases": [
+      {
+        "test": "test_explicit_website_master_preserves_control_panel",
+        "coverage": "Two physical executable identities with mocked /proc; selected website master only, no service command"
+      },
+      {
+        "test": "test_multiple_unselected_or_same_executable_masters_refused",
+        "coverage": "Unspecified multiple masters, same executable duplicate masters and hardlink aliases rejected"
+      },
+      {
+        "test": "test_quoted_json_punctuation_remains_literal_arguments",
+        "coverage": "Quoted JSON log-format structural characters remain literal Nginx arguments"
+      }
+    ]
+  },
+  "private_ca_export_scope": {
+    "encrypted_export_and_fingerprint_verification_executed": true,
+    "both_ca_online_keys_removed": true,
+    "offline_export_used_for_same_ca_rekey": true,
+    "encrypted_exports_and_passphrases_retained_on_root_private_panel_vm": true,
+    "physically_air_gapped_ca_storage_tested": false
+  },
+  "known_observed_limitations": [
+    "run003 native Xray full UUID synchronization did not activate new UUID traffic",
+    "run004 actual deployment helper save did not produce Observer/WS delivery; registration is present and delivery cause remains unresolved",
+    "run005 sole-user Xray UUID delta reached the kernel but removal stopped it, so AddUsers and UpdateUsers fallback failed with not running"
+  ],
+  "aggregate_status": "completed_with_known_upstream_cli_observer_and_external_restore_limitations",
+  "normal_admin_property_path": {
+    "status": "PASS",
+    "uuid_unchanged": true,
+    "evidence": "e2e-admin-user-sync-result.json"
+  },
+  "pass_semantics": {
+    "passed": "Historical required Root phases and owned cleanup, original config bytes and resumed-state guards; initial PID and metadata continuity across external VM restoration is explicitly false.",
+    "whole_end_to_end_pass": "False: UUID-update failures and unresolved CLI UUID save delivery retained."
+  }
+}

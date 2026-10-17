@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "result": "PASS",
+  "passed": true,
+  "scope": "Separate recovery of owned run007 fixture cleanup after user-restored VMs; original failed run and state remain unchanged.",
+  "original_run_result": "FAIL",
+  "original_business_checks": 14,
+  "original_failed_history_preserved": true,
+  "owned_standard_layout_removed": true,
+  "owned_services_absent_and_no_own_processes": true,
+  "owned_nft_table_already_absent_after_vm_restore": true,
+  "current_foreign_nft_preserved": true,
+  "current_protected_services_preserved": true,
+  "original_protected_service_pids_changed_during_external_vm_restore": true,
+  "original_foreign_nft_snapshot_matches_after_external_vm_restore": false,
+  "recovery_runner_sha256": "9997badda23bd2a17dcce412157cb24479897b042994ce657a48478e28a84a71",
+  "historical_state_unmodified": true
+}

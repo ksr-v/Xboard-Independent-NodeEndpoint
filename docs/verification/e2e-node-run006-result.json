@@ -1,0 +1,214 @@
+{
+  "schema": 1,
+  "run_id": "e2e-20261010",
+  "result": "PASS",
+  "binary_sha256": "2b37ea5fdfeb721d08b53330134b7a2e072447c10913620da13ceba600d7b772",
+  "upstream_version": "v1.13-orphan.4",
+  "source_commit": "8dbee14fb2f32a4f9324929fc24828cea6e29b38",
+  "runner_sha256": "131666207c6572889d20dd9f4a3e8698f76def531fd717570f93046475f661a5",
+  "node_tool_sha256": "a87ead78a183f86c49f031b012aea5184c5e1d52e08fb321d181ff27c2ec479c",
+  "asset_staging": "uploaded fixed release asset, independently SHA256/ELF verified; CLI network download excluded",
+  "checks": [
+    {
+      "name": "fixed-uploaded-amd64-release-sha256-and-elf",
+      "passed": true
+    },
+    {
+      "name": "own-four-port-nft-boundary-foreign-tables-preserved",
+      "passed": true
+    },
+    {
+      "name": "real-systemd-go-proxy-listeners-own-nft-non-panel-source-rejected",
+      "passed": true
+    },
+    {
+      "name": "real-nodeworker-wss-active-all-fresh-go-metrics",
+      "passed": true,
+      "binding_count": 4
+    },
+    {
+      "name": "actual-prepare-and-install-new-cli-independent-pin-stage-both-kernels-multiple-bindings",
+      "passed": true
+    },
+    {
+      "name": "real-systemd-go-proxy-listeners-own-nft-non-panel-source-rejected",
+      "passed": true
+    },
+    {
+      "name": "cross-vm-real-proxy-rest-report-queue-user-and-each-server-db-metering",
+      "passed": true,
+      "payload_bytes_per_binding": 1048576,
+      "binding_count": 4,
+      "user_uploaded_delta": 4194304,
+      "user_downloaded_delta": 4194304,
+      "user_stat_uploaded_delta": 4194304,
+      "user_stat_downloaded_delta": 4194304,
+      "per_binding_server_stats": [
+        {
+          "node_id": 1,
+          "u": 1048576,
+          "d": 1048576
+        },
+        {
+          "node_id": 2,
+          "u": 1048576,
+          "d": 1048576
+        },
+        {
+          "node_id": 3,
+          "u": 1048576,
+          "d": 1048576
+        },
+        {
+          "node_id": 4,
+          "u": 1048576,
+          "d": 1048576
+        }
+      ]
+    },
+    {
+      "name": "real-nodeworker-wss-active-all-fresh-go-metrics",
+      "passed": true,
+      "binding_count": 4
+    },
+    {
+      "name": "real-nodeworker-wss-active-all-fresh-go-metrics",
+      "passed": true,
+      "binding_count": 4
+    },
+    {
+      "name": "real-nodeworker-wss-active-all-fresh-go-metrics",
+      "passed": true,
+      "binding_count": 4
+    },
+    {
+      "name": "actual-admin-http-user-property-apply-redis-wss-four-proxies-uuid-and-node-pids-unchanged",
+      "passed": true,
+      "traditional_ws_delta_binding_count": 2,
+      "machine_mailbox_full_user_binding_count": 2,
+      "binding_count": 4,
+      "uuid_unchanged": true,
+      "node_pids_unchanged": true,
+      "ws_disconnect_or_rest_reconciliation_observed": false,
+      "observation_helper_sha256": "89d6c8e5f7a8cf3ff735a047c8f43d3d9fc99411f457a3dd3471db4eaa91cd1d"
+    },
+    {
+      "name": "real-nodeworker-wss-active-all-fresh-go-metrics",
+      "passed": true,
+      "binding_count": 4
+    },
+    {
+      "name": "real-nodeworker-wss-active-all-fresh-go-metrics",
+      "passed": true,
+      "binding_count": 4
+    },
+    {
+      "name": "real-nodeworker-wss-active-all-fresh-go-metrics",
+      "passed": true,
+      "binding_count": 4
+    },
+    {
+      "name": "actual-admin-http-user-property-restore-redis-wss-four-proxies-uuid-and-node-pids-unchanged",
+      "passed": true,
+      "traditional_ws_delta_binding_count": 2,
+      "machine_mailbox_full_user_binding_count": 2,
+      "binding_count": 4,
+      "uuid_unchanged": true,
+      "node_pids_unchanged": true,
+      "ws_disconnect_or_rest_reconciliation_observed": false,
+      "observation_helper_sha256": "89d6c8e5f7a8cf3ff735a047c8f43d3d9fc99411f457a3dd3471db4eaa91cd1d"
+    },
+    {
+      "name": "real-nodeworker-wss-active-all-fresh-go-metrics",
+      "passed": true,
+      "binding_count": 4
+    },
+    {
+      "name": "real-systemd-go-proxy-listeners-own-nft-non-panel-source-rejected",
+      "passed": true
+    },
+    {
+      "name": "real-nodeworker-wss-active-all-fresh-go-metrics",
+      "passed": true,
+      "binding_count": 4
+    },
+    {
+      "name": "real-held-cross-vm-connections-wss-device-cache-positive-onclose-zero-before-ttl-and-reconnected",
+      "passed": true,
+      "binding_count": 4,
+      "positive_device_entries": [
+        {
+          "node_id": 1,
+          "entries": 1
+        },
+        {
+          "node_id": 2,
+          "entries": 1
+        },
+        {
+          "node_id": 3,
+          "entries": 1
+        },
+        {
+          "node_id": 4,
+          "entries": 1
+        }
+      ],
+      "observed_user_online_count": 1,
+      "cleared_device_entries": 0
+    },
+    {
+      "name": "real-systemd-go-proxy-listeners-own-nft-non-panel-source-rejected",
+      "passed": true
+    },
+    {
+      "name": "cross-vm-real-proxy-rest-report-queue-user-and-each-server-db-metering",
+      "passed": true,
+      "payload_bytes_per_binding": 1048576,
+      "binding_count": 4,
+      "user_uploaded_delta": 4194304,
+      "user_downloaded_delta": 4194304,
+      "user_stat_uploaded_delta": 4194304,
+      "user_stat_downloaded_delta": 4194304,
+      "per_binding_server_stats": [
+        {
+          "node_id": 1,
+          "u": 1048576,
+          "d": 1048576
+        },
+        {
+          "node_id": 2,
+          "u": 1048576,
+          "d": 1048576
+        },
+        {
+          "node_id": 3,
+          "u": 1048576,
+          "d": 1048576
+        },
+        {
+          "node_id": 4,
+          "u": 1048576,
+          "d": 1048576
+        }
+      ]
+    },
+    {
+      "name": "owned-units-pids-standard-layout-echo-network-cleaned-protected-services-unchanged",
+      "passed": true
+    }
+  ],
+  "check_count": 22,
+  "cleanup_failures": [],
+  "evidence_run": "run006",
+  "check_count_definition": "Executed checks, including repeated runtime/WSS/traffic verification; not a count of unique test cases.",
+  "safe_cleanup_verified": true,
+  "private_evidence_retained": true,
+  "scope": [
+    "Actual CLI prepare and install-new for independently verified uploaded fixed binary; traditional Xray two VLESS bindings and machine Singbox two SOCKS bindings.",
+    "Four current-UUID cross-VM proxy streams, real REST reports and real queue/database User/UserStat/per-node ServerStat metering before and after reconnect.",
+    "One actual Admin HTTP device_limit apply and restore, unchanged UUID, two traditional WSS delta events and two machine mailbox full-user events for each phase, four proxies and Go PIDs unchanged.",
+    "Held cross-VM connections populate all four device caches, real NodeWorker onClose clears all four before TTL, then both owned units reconnect.",
+    "Only owned random units, PIDs, echo and nft table cleaned; protected Docker/collector and foreign nft policies preserved."
+  ]
+}

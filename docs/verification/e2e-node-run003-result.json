@@ -1,0 +1,168 @@
+{
+  "schema": 1,
+  "run_id": "e2e-20261010",
+  "result": "FAIL",
+  "binary_sha256": "2b37ea5fdfeb721d08b53330134b7a2e072447c10913620da13ceba600d7b772",
+  "upstream_version": "v1.13-orphan.4",
+  "source_commit": "8dbee14fb2f32a4f9324929fc24828cea6e29b38",
+  "runner_sha256": "c85b61f10c086f366907783f852808f1691048007879ae506991bede9c79d912",
+  "node_tool_sha256": "a87ead78a183f86c49f031b012aea5184c5e1d52e08fb321d181ff27c2ec479c",
+  "asset_staging": "uploaded fixed release asset, independently SHA256/ELF verified; CLI network download excluded",
+  "checks": [
+    {
+      "name": "fixed-uploaded-amd64-release-sha256-and-elf",
+      "passed": true
+    },
+    {
+      "name": "own-four-port-nft-boundary-foreign-tables-preserved",
+      "passed": true
+    },
+    {
+      "name": "real-systemd-go-proxy-listeners-own-nft-non-panel-source-rejected",
+      "passed": true
+    },
+    {
+      "name": "real-panel-owned-standard-fixture-old-http-worker-already-started-node-and-machine-multibinding",
+      "passed": true
+    },
+    {
+      "name": "real-systemd-go-proxy-listeners-own-nft-non-panel-source-rejected",
+      "passed": true
+    },
+    {
+      "name": "actual-cli-selected-node-https-migration-all-bindings-kernel-data-preserved",
+      "passed": true,
+      "dual_ca": false
+    },
+    {
+      "name": "real-nodeworker-wss-active-node-fresh-go-metrics",
+      "passed": true,
+      "binding_count": 2
+    },
+    {
+      "name": "real-systemd-go-proxy-listeners-own-nft-non-panel-source-rejected",
+      "passed": true
+    },
+    {
+      "name": "actual-cli-selected-machine-https-migration-all-bindings-kernel-data-preserved",
+      "passed": true,
+      "dual_ca": true
+    },
+    {
+      "name": "real-nodeworker-wss-active-machine-fresh-go-metrics",
+      "passed": true,
+      "binding_count": 2
+    },
+    {
+      "name": "real-nodeworker-wss-active-all-fresh-go-metrics",
+      "passed": true,
+      "binding_count": 4
+    },
+    {
+      "name": "real-systemd-go-proxy-listeners-own-nft-non-panel-source-rejected",
+      "passed": true
+    },
+    {
+      "name": "cross-vm-real-proxy-rest-report-queue-user-and-each-server-db-metering",
+      "passed": true,
+      "payload_bytes_per_binding": 1048576,
+      "binding_count": 4,
+      "user_uploaded_delta": 4194304,
+      "user_downloaded_delta": 4194304,
+      "user_stat_uploaded_delta": 4194304,
+      "user_stat_downloaded_delta": 4194304,
+      "per_binding_server_stats": [
+        {
+          "node_id": 1,
+          "u": 1048576,
+          "d": 1048576
+        },
+        {
+          "node_id": 2,
+          "u": 1048576,
+          "d": 1048576
+        },
+        {
+          "node_id": 3,
+          "u": 1048576,
+          "d": 1048576
+        },
+        {
+          "node_id": 4,
+          "u": 1048576,
+          "d": 1048576
+        }
+      ]
+    },
+    {
+      "name": "real-systemd-go-proxy-listeners-own-nft-non-panel-source-rejected",
+      "passed": true
+    },
+    {
+      "name": "real-nodeworker-wss-active-all-fresh-go-metrics",
+      "passed": true,
+      "binding_count": 4
+    },
+    {
+      "name": "real-go-reconnected-changed-panel-certificate-existing-trust-unchanged",
+      "passed": true,
+      "leaf_sha256": "d9db9c87c3fe1fa01429b668d5917a474797760844917506cfa843f5055cdb90",
+      "leaf_changed": true
+    },
+    {
+      "name": "real-systemd-go-proxy-listeners-own-nft-non-panel-source-rejected",
+      "passed": true
+    },
+    {
+      "name": "real-nodeworker-wss-active-all-fresh-go-metrics",
+      "passed": true,
+      "binding_count": 4
+    },
+    {
+      "name": "real-go-reconnected-existing-panel-certificate-existing-trust-unchanged",
+      "passed": true,
+      "leaf_sha256": "d9db9c87c3fe1fa01429b668d5917a474797760844917506cfa843f5055cdb90",
+      "leaf_changed": false
+    },
+    {
+      "name": "real-systemd-go-proxy-listeners-own-nft-non-panel-source-rejected",
+      "passed": true
+    },
+    {
+      "name": "real-nodeworker-wss-active-all-fresh-go-metrics",
+      "passed": true,
+      "binding_count": 4
+    },
+    {
+      "name": "fixture-only-new-pinned-root-trust-replacement-real-go-wss-old-root-removed",
+      "passed": true,
+      "current_root_sha256": "6bd7e8281cef5cb84f3878d62b0fc20d6c0d069f5266a97dd96e4657a9eaee04"
+    },
+    {
+      "name": "real-nodeworker-wss-active-all-fresh-go-metrics",
+      "passed": true,
+      "binding_count": 4
+    },
+    {
+      "name": "owned-units-pids-standard-layout-echo-network-cleaned-protected-services-unchanged",
+      "passed": true
+    }
+  ],
+  "check_count": 24,
+  "cleanup_failures": [],
+  "evidence_run": "run003",
+  "failure_reason": "redis_full_sync_new_uuid_not_applied",
+  "safe_cleanup_verified": true,
+  "private_evidence_retained": true,
+  "limitation": {
+    "id": "upstream-xray-same-id-uuid-fullsync",
+    "status": "OBSERVED_LIMITATION",
+    "exclusive_go_ws_user_event_binding_count": 4,
+    "ws_disconnect_or_rest_reconciliation_observed": false,
+    "xray_add_user_failure_count": 2,
+    "duplicate_or_existing_user_error_count": 2,
+    "source": "internal/kernel/kernel.go:124 UserDiff adds a changed UUID for the same ID but only removes IDs missing from the new list; internal/kernel/xray/xray.go:468 removes the returned list before adding users. The unchanged email remains registered and AddUser reports duplicate/already exists.",
+    "effect": "After genuine Redis/WSS full user sync, the new UUID did not authenticate on Xray within the bounded wait. No Go source or binary was modified.",
+    "separate_static_boundary": "internal/panel/ws.go:396 rejects raw sync.users empty lists; empty-list full-sync removal was not live-tested."
+  }
+}

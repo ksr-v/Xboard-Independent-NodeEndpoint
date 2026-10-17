@@ -1,0 +1,38 @@
+test_http_include_context_and_quoted_comment (__main__.NginxUnitTests.test_http_include_context_and_quoted_comment) ... ok
+test_loaded_dump_and_listeners (__main__.NginxUnitTests.test_loaded_dump_and_listeners) ... ok
+test_only_loopback_literal_upstreams (__main__.NginxUnitTests.test_only_loopback_literal_upstreams) ... ok
+test_precise_route_and_websocket_configuration (__main__.NginxUnitTests.test_precise_route_and_websocket_configuration) ... ok
+test_route_profile_is_exact (__main__.NginxUnitTests.test_route_profile_is_exact) ... ok
+test_unknown_trust_proxy_profile_refused (__main__.NginxUnitTests.test_unknown_trust_proxy_profile_refused) ... ok
+test_actual_verified_tls_http_and_ws (__main__.PKITests.test_actual_verified_tls_http_and_ws) ... ok
+test_ca_extensions_and_encrypted_key (__main__.PKITests.test_ca_extensions_and_encrypted_key) ... ok
+test_dns_ipv6_and_renewal_under_same_ca (__main__.PKITests.test_dns_ipv6_and_renewal_under_same_ca) ... ok
+test_dual_ca_rotation_real_chain (__main__.PKITests.test_dual_ca_rotation_real_chain) ... ok
+test_expired_and_future_refused (__main__.PKITests.test_expired_and_future_refused) ... ok
+test_leaf_extensions_ip_san (__main__.PKITests.test_leaf_extensions_ip_san) ... ok
+test_offline_export_validation_and_renewal (__main__.PKITests.test_offline_export_validation_and_renewal) ... ok
+test_reminders_180_90_30 (__main__.PKITests.test_reminders_180_90_30) ... ok
+test_ten_year_dates_aligned (__main__.PKITests.test_ten_year_dates_aligned) ... ok
+test_wrong_ca_refused (__main__.PKITests.test_wrong_ca_refused) ... ok
+test_wrong_san_refused (__main__.PKITests.test_wrong_san_refused) ... ok
+test_claim_new_state_and_repeat_preserves_marker (__main__.StateOwnershipUnitTests.test_claim_new_state_and_repeat_preserves_marker) ... ok
+test_copied_state_marker_refused (__main__.StateOwnershipUnitTests.test_copied_state_marker_refused) ... ok
+test_existing_private_object_must_be_directory (__main__.StateOwnershipUnitTests.test_existing_private_object_must_be_directory) ... ok
+test_foreign_directory_refused_before_chmod (__main__.StateOwnershipUnitTests.test_foreign_directory_refused_before_chmod) ... ok
+test_secure_config_below_writable_ancestor_refused (__main__.StateOwnershipUnitTests.test_secure_config_below_writable_ancestor_refused) ... ok
+test_secure_symlink_target_cannot_hide_replaceable_original_path (__main__.StateOwnershipUnitTests.test_secure_symlink_target_cannot_hide_replaceable_original_path) ... ok
+test_corrupt_late_backup_file_does_not_partially_restore (__main__.TransactionUnitTests.test_corrupt_late_backup_file_does_not_partially_restore) ... ok
+test_external_config_change_refused (__main__.TransactionUnitTests.test_external_config_change_refused) ... ok
+test_failed_reload_restores_config_metadata_and_certificate_pointer (__main__.TransactionUnitTests.test_failed_reload_restores_config_metadata_and_certificate_pointer) ... ok
+test_failed_rollback_and_rescue_preserve_recovery_marker (__main__.TransactionUnitTests.test_failed_rollback_and_rescue_preserve_recovery_marker) ... ok
+test_install_repeat_uninstall_and_restore_preserve_original (__main__.TransactionUnitTests.test_install_repeat_uninstall_and_restore_preserve_original) ... ok
+test_noop_manual_backup_and_failure_preserve_last_change_rollback (__main__.TransactionUnitTests.test_noop_manual_backup_and_failure_preserve_last_change_rollback) ... ok
+test_uninstalled_application_still_protected_from_private_export (__main__.TransactionUnitTests.test_uninstalled_application_still_protected_from_private_export) ... ok
+test_bad_hosts (__main__.ValidationTests.test_bad_hosts) ... ok
+test_bare_addresses (__main__.ValidationTests.test_bare_addresses) ... ok
+test_calendar_ten_years (__main__.ValidationTests.test_calendar_ten_years) ... ok
+
+----------------------------------------------------------------------
+Ran 33 tests in 8.970s
+
+OK

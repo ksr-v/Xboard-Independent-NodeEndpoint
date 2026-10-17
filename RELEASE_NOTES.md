@@ -1,0 +1,33 @@
+# NodeEndpoint v1.0.0 发布说明
+
+为现有 Xboard 增加独立 IP/域名 HTTPS 节点通讯入口，默认端口 8443。原生插件管理页与 Root/Node 工具配合使用，保留原网站及已有面板数据。
+
+## 发行附件
+
+- `NodeEndpoint-1.0.0.zip`：在 Xboard 原生插件管理中上传、安装、启用。
+- `node-endpoint-tools-1.0.0.zip`：面板 Root 入口/PKI 管理与 Node 新装、选择迁移、回滚。
+- `xb-node-endpoint-1.0.0-source.zip`：源码、测试和文档。
+- `SHA256SUMS`、`release.json` 和 `final-package-results.json`：同次构建的摘要及验包结果。GitHub 自动生成的 Source code 归档不能替代原生插件 ZIP。
+
+README 包含空服务器安装 Xboard、已有原版面板保留数据接入、插件安装、独立入口、CA 分发及 Node 对接步骤。已有面板不运行全新安装器、不删除 `.env`、不重建数据库，也不通过重装 Node 迁移地址。
+
+## 主要能力
+
+- 独立管理页、管理员鉴权和作用域 handshake，不覆盖 Admin bundle 或其他插件资源。
+- 独立 Nginx HTTPS/REST/WSS 入口；双十年私有 CA/服务器证书、加密导出、同 CA 换钥、双 CA 分阶段轮换及回滚。
+- 固定独立 Go Node 版本及资产 SHA-256；新实例准备/安装、已审计标准 systemd 多实例的定向 URL 迁移，保持业务身份、凭据与固定数据目录。
+- 入口、Node 迁移及插件恢复状态拥有独立归属检查和卸载流程。
+
+## 验收与限制
+
+实际两台授权虚拟机完成冷启动认证、四绑定代理及数据库计量、原生 Admin 属性更新/恢复、设备断连清理、CA 轮换、定向迁移和逆向回滚。测试资源、合成记录及临时认证已清理，原节点备份已恢复。证据见 `FULL_E2E_TEST_REPORT.md`。
+
+本版本是隔离环境验收版本，不能标作所有联测通过：
+
+- 固定 Go 的 Xray 同 ID UUID 全量更新失败；单用户 UUID 增量更新会因移除唯一用户而停止内核，随后添加失败。未修改 Go/代理内核。
+- CLI 模型 UUID 保存未观测到预期 Observer 事件，原因未定位；已通过的 Admin HTTP 属性更新保持 UUID 不变，不能覆盖此缺口。
+- 外部 VM 恢复改变初始 PID、节点外来 nft 快照及 9 个原站文件元数据；清理保留原文件字节及恢复后状态，差异已记录。
+- ARM64 执行、其他部署布局、公网/IPv6、实际旧 DNS 故障、生产不中断和 Independent overlay 等范围仍需独立验收。空机 Xboard 安装步骤未在本轮重新完整执行。
+- V1 不提供 CRL/OCSP、自动撤除旧 CA 或自动迁移 FlowScope。加密 CA 导出不等同于物理离线保管。
+
+部署前阅读 `README.md`、`SECURITY.md` 和 `PRODUCTION_DEPLOYMENT.md`，备份数据库、`.env`、原站配置、插件及 Node 配置/数据。最终附件的精确 SHA-256、成员清单、两平台验包和秘密排除结果以同次发行元数据为准。

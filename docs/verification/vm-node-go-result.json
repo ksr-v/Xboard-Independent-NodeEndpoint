@@ -1,0 +1,93 @@
+{
+  "schema": 1,
+  "passed": true,
+  "checks": [
+    {
+      "name": "uploaded-native-amd64-release-pin",
+      "passed": true
+    },
+    {
+      "name": "node-xray:real-systemd-kernel-rest-wss-proxy",
+      "passed": true,
+      "proxy_bytes": 47104,
+      "mode": "node",
+      "kernel": "xray",
+      "node_ids": [
+        11101
+      ],
+      "proxy_protocols": [
+        "vless"
+      ],
+      "wss_runtime_evidence": "authenticated live application pong and node.status"
+    },
+    {
+      "name": "node-xray:stopped-authenticated-wss-probe",
+      "passed": true
+    },
+    {
+      "name": "node-xray:same-ca-server-rekey-no-trust-change",
+      "passed": true
+    },
+    {
+      "name": "machine-singbox:real-systemd-kernel-rest-wss-proxy",
+      "passed": true,
+      "proxy_bytes": 92160,
+      "mode": "machine",
+      "kernel": "singbox",
+      "node_ids": [
+        11201,
+        11209
+      ],
+      "proxy_protocols": [
+        "socks",
+        "socks"
+      ],
+      "wss_runtime_evidence": "authenticated live application pong"
+    },
+    {
+      "name": "machine-singbox:non-loopback-network-refused-real-connect",
+      "passed": true
+    },
+    {
+      "name": "machine-singbox:stopped-authenticated-wss-probe",
+      "passed": true
+    },
+    {
+      "name": "machine-singbox:dual-ca-new-chain-real-go",
+      "passed": true
+    },
+    {
+      "name": "standard-multibinding-selected-migration-real-go",
+      "passed": true
+    },
+    {
+      "name": "standard-migration-explicit-rollback-real-systemd",
+      "passed": true
+    },
+    {
+      "name": "fixture-resources-cleaned-and-protected-services-unchanged",
+      "passed": true
+    }
+  ],
+  "failure": null,
+  "cleanup_failures": [],
+  "failed_checks": [],
+  "scope": "real native AMD64 pinned Go binary, systemd, TLS REST/WSS, both unchanged embedded kernels, synthetic VLESS/SOCKS5 loopback traffic",
+  "preparation": "production prepare without network download, then explicitly stage uploaded SHA-256-pinned release asset; own Singbox unit gains a tested localhost-only systemd IP filter; real install-new",
+  "network_boundary": "panel/echo/Xray bind loopback; locked Singbox binds :: but our random service cgroup permits localhost only, verified by real rejected non-loopback connections; standard fixture starts both instances as Xray with no kernel changes; no latest/geodata URLs are used; Xray may perform its optional credential-free public-IP observation",
+  "not_tested": [
+    "real Xboard database/controller/worker integration",
+    "real subscription/client protocol deployments",
+    "native ARM64 execution",
+    "public network and production continuity",
+    "CRL/OCSP revocation"
+  ],
+  "release": {
+    "version": "v1.13-orphan.4",
+    "source_commit": "8dbee14fb2f32a4f9324929fc24828cea6e29b38",
+    "architecture": "amd64",
+    "binary_sha256": "2b37ea5fdfeb721d08b53330134b7a2e072447c10913620da13ceba600d7b772"
+  },
+  "fixture_sha256": "efdcbacef453dc0cdf39a0c271ac25f89e379be8326f52bf2990c0cdba2bf3a3",
+  "production_node_tool_sha256": "a87ead78a183f86c49f031b012aea5184c5e1d52e08fb321d181ff27c2ec479c"
+}

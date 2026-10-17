@@ -1,0 +1,254 @@
+{
+  "schema_version": 1,
+  "passed": true,
+  "scope": "Owned panel cleanup after externally restored/rebooted VMs; original config bytes verified, resumed file metadata and protected processes pinned before/after cleanup. Initial PIDs and initial metadata are not claimed preserved across VM restoration.",
+  "results": {
+    "root_uninstall": {
+      "installed": false,
+      "endpoint": {
+        "host": null,
+        "port": null,
+        "https": null
+      },
+      "ca": {
+        "sha256": "6bd7e8281cef5cb84f3878d62b0fc20d6c0d069f5266a97dd96e4657a9eaee04",
+        "subject": "CN = NodeEndpoint Root d1de9af765b7ca34",
+        "issuer": "CN = NodeEndpoint Root d1de9af765b7ca34",
+        "serial": "98E4DC54F3D737A945E15CD8F64A61F4",
+        "not_before": "2026-10-10T06:44:40+00:00",
+        "not_after": "2036-10-10T06:49:40+00:00",
+        "remaining_days": 3646,
+        "san": "",
+        "status": "valid",
+        "reminder_days": null
+      },
+      "server": {
+        "sha256": "d9db9c87c3fe1fa01429b668d5917a474797760844917506cfa843f5055cdb90",
+        "subject": "CN = 192.168.128.128",
+        "issuer": "CN = NodeEndpoint Root d1de9af765b7ca34",
+        "serial": "815FB150A7A8E65463518B0AFAC87940",
+        "not_before": "2026-10-10T06:44:40+00:00",
+        "not_after": "2036-10-10T06:49:40+00:00",
+        "remaining_days": 3646,
+        "san": "IP Address:192.168.128.128",
+        "status": "valid",
+        "reminder_days": null
+      },
+      "checks": {},
+      "trust": [
+        {
+          "sha256": "6bd7e8281cef5cb84f3878d62b0fc20d6c0d069f5266a97dd96e4657a9eaee04",
+          "subject": "CN = NodeEndpoint Root d1de9af765b7ca34",
+          "issuer": "CN = NodeEndpoint Root d1de9af765b7ca34",
+          "serial": "98E4DC54F3D737A945E15CD8F64A61F4",
+          "not_before": "2026-10-10T06:44:40+00:00",
+          "not_after": "2036-10-10T06:49:40+00:00",
+          "remaining_days": 3646,
+          "san": "",
+          "status": "valid",
+          "reminder_days": null
+        }
+      ],
+      "rotation": null,
+      "ca_key_online": false
+    },
+    "firewall_close": {
+      "owned_firewall_rule_removed": true,
+      "original_firewall_listing_restored": true
+    },
+    "bridge": {
+      "bridge_removed": true,
+      "original_serverblock_bytes_and_expected_service_guards_verified": true
+    },
+    "ws": {
+      "service": "node-endpoint-e2e-ws-20261010.service",
+      "stopped_and_unit_removed": true,
+      "original_config_bytes_and_expected_service_guards_verified": true
+    },
+    "worker_files": {
+      "original_worker_log_and_pid_files_restored": true,
+      "private_final_log_evidence_retained": true
+    },
+    "queue": {
+      "service": "node-endpoint-e2e-queue-20261010.service",
+      "stopped_and_unit_removed": true,
+      "original_config_bytes_and_expected_service_guards_verified": true
+    }
+  },
+  "original_nginx_file_bytes_preserved": true,
+  "resumed_nginx_file_metadata_preserved": true,
+  "external_restore_metadata_changes": [
+    {
+      "path": "/www/server/panel/vhost/nginx/0.default.conf",
+      "before": [
+        0,
+        0,
+        420
+      ],
+      "resumed": [
+        0,
+        0,
+        384
+      ]
+    },
+    {
+      "path": "/www/server/panel/vhost/nginx/0.fastcgi_cache.conf",
+      "before": [
+        1001,
+        1001,
+        420
+      ],
+      "resumed": [
+        0,
+        0,
+        384
+      ]
+    },
+    {
+      "path": "/www/server/panel/vhost/nginx/0.site_total_log_format.conf",
+      "before": [
+        0,
+        0,
+        420
+      ],
+      "resumed": [
+        0,
+        0,
+        384
+      ]
+    },
+    {
+      "path": "/www/server/panel/vhost/nginx/0.websocket.conf",
+      "before": [
+        0,
+        0,
+        420
+      ],
+      "resumed": [
+        0,
+        0,
+        384
+      ]
+    },
+    {
+      "path": "/www/server/panel/vhost/nginx/192.168.128.128.conf",
+      "before": [
+        0,
+        0,
+        420
+      ],
+      "resumed": [
+        0,
+        0,
+        384
+      ]
+    },
+    {
+      "path": "/www/server/panel/vhost/nginx/extension/192.168.128.128/site_total.conf",
+      "before": [
+        0,
+        0,
+        420
+      ],
+      "resumed": [
+        0,
+        0,
+        384
+      ]
+    },
+    {
+      "path": "/www/server/panel/vhost/rewrite/192.168.128.128.conf",
+      "before": [
+        0,
+        0,
+        420
+      ],
+      "resumed": [
+        0,
+        0,
+        384
+      ]
+    },
+    {
+      "path": "/www/server/panel/vhost/nginx/phpfpm_status.conf",
+      "before": [
+        0,
+        0,
+        420
+      ],
+      "resumed": [
+        0,
+        0,
+        384
+      ]
+    },
+    {
+      "path": "/www/server/panel/vhost/nginx/waf2monitor_data.conf",
+      "before": [
+        0,
+        0,
+        420
+      ],
+      "resumed": [
+        0,
+        0,
+        384
+      ]
+    }
+  ],
+  "original_worker_files_restored": true,
+  "current_protected_processes_preserved": true,
+  "initial_process_pids_preserved_across_external_vm_restore": false,
+  "external_vm_restore_user_confirmed": true,
+  "current_process_identities": [
+    {
+      "pid": 1925,
+      "start": "1812",
+      "uid": 0,
+      "executable": "/www/server/panel/webserver/sbin/webserver",
+      "exe_dev": 64512,
+      "exe_ino": 1709463
+    },
+    {
+      "pid": 977,
+      "start": "1259",
+      "uid": 0,
+      "executable": "/www/server/nginx/sbin/nginx",
+      "exe_dev": 64512,
+      "exe_ino": 1728799
+    },
+    {
+      "pid": 1473,
+      "start": "1530",
+      "uid": 0,
+      "executable": "/www/server/php/83/sbin/php-fpm",
+      "exe_dev": 64512,
+      "exe_ino": 1728918
+    },
+    {
+      "pid": 1787,
+      "start": "1610",
+      "uid": 1002,
+      "executable": "/www/server/mysql/bin/mariadbd",
+      "exe_dev": 64512,
+      "exe_ino": 1729368
+    },
+    {
+      "pid": 1103,
+      "start": "1390",
+      "uid": 1001,
+      "executable": "/www/server/php/83/bin/php",
+      "exe_dev": 64512,
+      "exe_ino": 1728895
+    },
+    {
+      "pid": 1080,
+      "start": "1352",
+      "uid": 1003,
+      "executable": "/usr/bin/redis-check-rdb",
+      "exe_dev": 64512,
+      "exe_ino": 1192324
+    }
+  ],
+  "original_private_control_snapshot_retained": true
+}

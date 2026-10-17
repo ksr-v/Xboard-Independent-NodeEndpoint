@@ -1,0 +1,23 @@
+{
+  "version": "1.0.0",
+  "artifacts": [
+    {
+      "file": "NodeEndpoint-1.0.0.zip",
+      "version": "1.0.0",
+      "bytes": 610985,
+      "sha256": "31d623285a4af044192c9638f1144e38b74c9a886b6e817d48631904dff8092c"
+    },
+    {
+      "file": "node-endpoint-tools-1.0.0.zip",
+      "version": "1.0.0",
+      "bytes": 586934,
+      "sha256": "42f2893938c294646c44e351a5c251cfea9f6a30156d67c345bc476307ea89e2"
+    },
+    {
+      "file": "xb-node-endpoint-1.0.0-source.zip",
+      "version": "1.0.0",
+      "bytes": 784398,
+      "sha256": "64226328193ff28662e35d3ef80a96df3710128630e8dd59876141795169b9ea"
+    }
+  ]
+}

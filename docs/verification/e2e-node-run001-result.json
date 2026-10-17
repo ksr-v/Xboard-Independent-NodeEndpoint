@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "run_id": "e2e-20261010",
+  "evidence_run": "run001",
+  "result": "FAIL",
+  "failure_reason": "non_panel_proxy_source_not_refused",
+  "binary_sha256": "2b37ea5fdfeb721d08b53330134b7a2e072447c10913620da13ceba600d7b772",
+  "upstream_version": "v1.13-orphan.4",
+  "source_commit": "8dbee14fb2f32a4f9324929fc24828cea6e29b38",
+  "runner_sha256_at_last_stored_report": "4f7c21e15790618d6b34a52d46733a6d6d6fd41a1cabba33c1ee02b5609779b5",
+  "checks": [
+    {
+      "name": "fixed-uploaded-amd64-release-sha256-and-elf",
+      "passed": true
+    },
+    {
+      "name": "own-four-port-nft-boundary-foreign-tables-preserved",
+      "passed": true
+    },
+    {
+      "name": "owned-units-pids-standard-layout-echo-network-cleaned-protected-services-unchanged",
+      "passed": true
+    }
+  ],
+  "check_count": 3,
+  "cleanup_failures": [],
+  "safe_cleanup_verified": true,
+  "private_evidence_retained": true,
+  "explanation": "The fixture initially treated all loopback-interface traffic as localhost. Its real negative test correctly rejected that assumption; source-address rules were corrected before run002. All owned resources were safely cleaned."
+}

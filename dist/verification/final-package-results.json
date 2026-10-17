@@ -1,0 +1,97 @@
+{
+  "schema": 1,
+  "date": "2026-10-17",
+  "timezone": "Asia/Shanghai",
+  "version": "1.0.0",
+  "native_zip_sha256": "31d623285a4af044192c9638f1144e38b74c9a886b6e817d48631904dff8092c",
+  "windows": {
+    "result": "PASS",
+    "checks": 6,
+    "files_verified": 80,
+    "fixture": "tests/integration/work/package-20261017-042140-be5f16",
+    "scope": "Exact final native ZIP upload/install/enable, component page/API/handshake and foreign-resource guards; isolated Laravel fixture."
+  },
+  "ubuntu_vm": {
+    "result": "PASS",
+    "checks": 6,
+    "files_verified": 80,
+    "fixture": "/opt/node-endpoint-lab-20261010/tests/integration/work/package-20261017-042233-280205",
+    "scope": "Same SHA256 final ZIP and all members, isolated original native component fixture; separate from the historical real-panel baseline ZIP installation."
+  },
+  "repeat_build_byte_identical": true,
+  "release_artifacts": [
+    {
+      "file": "NodeEndpoint-1.0.0.zip",
+      "version": "1.0.0",
+      "bytes": 610985,
+      "sha256": "31d623285a4af044192c9638f1144e38b74c9a886b6e817d48631904dff8092c"
+    },
+    {
+      "file": "node-endpoint-tools-1.0.0.zip",
+      "version": "1.0.0",
+      "bytes": 586934,
+      "sha256": "42f2893938c294646c44e351a5c251cfea9f6a30156d67c345bc476307ea89e2"
+    },
+    {
+      "file": "xb-node-endpoint-1.0.0-source.zip",
+      "version": "1.0.0",
+      "bytes": 784398,
+      "sha256": "64226328193ff28662e35d3ef80a96df3710128630e8dd59876141795169b9ea"
+    }
+  ],
+  "member_manifest_crc_and_private_file_exclusion": [
+    {
+      "file": "NodeEndpoint-1.0.0.zip",
+      "members": 80,
+      "sha256": "31d623285a4af044192c9638f1144e38b74c9a886b6e817d48631904dff8092c",
+      "result": "PASS"
+    },
+    {
+      "file": "node-endpoint-tools-1.0.0.zip",
+      "members": 64,
+      "sha256": "42f2893938c294646c44e351a5c251cfea9f6a30156d67c345bc476307ea89e2",
+      "result": "PASS"
+    },
+    {
+      "file": "xb-node-endpoint-1.0.0-source.zip",
+      "members": 115,
+      "sha256": "64226328193ff28662e35d3ef80a96df3710128630e8dd59876141795169b9ea",
+      "result": "PASS"
+    }
+  ],
+  "privacy_checks": {
+    "node_vm_historical_test_values": {
+      "result": "PASS",
+      "secret_value_count": 6,
+      "packages": 3,
+      "all_values_absent": true,
+      "member_counts": [
+        80,
+        64,
+        115
+      ]
+    },
+    "panel_vm_owned_sanctum_and_test_values": {
+      "result": "PASS",
+      "exact_value_count": 7,
+      "current_and_retired_sanctum_secret_digest_count": 4,
+      "packages": 3,
+      "all_values_absent": true,
+      "member_counts": [
+        80,
+        64,
+        115
+      ]
+    },
+    "scanner_synthetic_positive_negative_regressions": 4
+  },
+  "six_reference_git_worktrees_clean": true,
+  "actual_two_vm_testing": "FULL_E2E_TEST_REPORT.md",
+  "actual_owned_cleanup_report": "docs/verification/e2e-final-cleanup-result.json",
+  "whole_end_to_end_pass": false,
+  "limitations": "Upstream Xray full/sole-user delta UUID updates failed; CLI UUID-save-only Observer delivery unresolved. External VM restoration changed PIDs, original config metadata and foreign nft snapshot; cleanup preserved resumed state. No Go/kernel modification or production deployment.",
+  "documentation_update": "Fresh-server pinned Xboard/FPM installation, existing original-panel data-preserving integration, Root/CA/node migration steps and RELEASE_NOTES.md included in all artifacts.",
+  "github_repository": "https://github.com/ksr-v/Xboard-Independent-NodeEndpoint",
+  "release_tag": "v1.0.0",
+  "release_channel": "prerelease: isolated-environment acceptance version with documented known limitations"
+}

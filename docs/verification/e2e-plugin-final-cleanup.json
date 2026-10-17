@@ -1,0 +1,15 @@
+{
+  "status": "CLEANED",
+  "run": "e2e-20261010",
+  "checks": {
+    "public_admin_unchanged": true,
+    "foreign_plugin_files_unchanged": true,
+    "foreign_database_rows_unchanged": true
+  },
+  "native_uninstall_preserved_settings_and_public_ca_before_explicit_purge": true,
+  "own_settings_table_migration_marker_and_public_ca_purged": true,
+  "own_plugin_source_and_public_assets_removed": true,
+  "ephemeral_tokens_removed": true,
+  "root_entry_and_pki_touched": false,
+  "passed": true
+}
