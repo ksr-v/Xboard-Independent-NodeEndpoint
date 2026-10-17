@@ -22,19 +22,20 @@ final class NativeMachineInstall
         $key = $create ? 'install_command' : 'command';
         if (!is_array($data['data'] ?? null) || !is_string($data['data'][$key] ?? null)) { return $response; }
         $id = $create ? ($data['data']['id'] ?? 0) : $request->input('id');
+        $machine = ServerMachine::find((int) $id);
+        if (!$machine) { return $response; }
+        $panelUrl = rtrim((string) (admin_setting('app_url') ?: $request->getSchemeAndHttpHost()), '/');
+        $data['data'][$key] = MachineInstallCommand::buildDomain($panelUrl, (int) $machine->id, (string) $machine->token);
         $options = ['owner' => 'node_endpoint', 'schema' => 1,
             'domain' => ['available' => true, 'command' => $data['data'][$key]],
             'endpoint' => ['available' => false, 'message' => '独立 IP 对接尚未就绪，请启用 HTTPS 独立入口并同步公共 CA。']];
         try {
-            // Endpoint readiness must never prevent the original command or machine creation.
+            // Private-CA readiness must never prevent domain installation or machine creation.
             $context = MachineInstallCommand::context(Settings::read());
-            $machine = ServerMachine::find((int) $id);
-            if ($machine) {
-                $options['endpoint'] = ['available' => true,
-                    'command' => MachineInstallCommand::build($context, (int) $machine->id, (string) $machine->token)];
-            }
+            $options['endpoint'] = ['available' => true,
+                'command' => MachineInstallCommand::build($context, (int) $machine->id, (string) $machine->token)];
         } catch (\Throwable) {
-            // Keep the native response and expose only a fixed, non-sensitive readiness message.
+            // Keep domain installation available and expose only a fixed readiness message.
         }
         $data['data']['install_options'] = $options;
         $response->setData($data);

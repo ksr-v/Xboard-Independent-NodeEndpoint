@@ -72,11 +72,14 @@ const assert=require('node:assert/strict');
     assert.equal(await radio('domain').isChecked(),true);
     assert.equal(await radio('endpoint').isEnabled(),true);
     assert.equal(await preview().inputValue(),currentCommand.command);
-    assert.ok(currentCommand.command.includes('cedar2025/xboard-node/dev/install.sh'));
+    assert.ok(currentCommand.command.includes('ksr-v/Xboard-Independent/nodeendpoint-native-v1.0.0/node-installer/install.sh'));
+    assert.ok(currentCommand.command.includes('https://old.panel.example'));
+    assert.ok(!currentCommand.command.includes('cedar2025') && !currentCommand.command.includes('--endpoint-ca'));
+    assert.equal(await card().getByText('域名对接（独立部署）',{exact:true}).count(),1);
     assert.equal(await page.locator('[data-ne-install-hidden="node_endpoint"]').count(),2);
     record('native details show two choices and hide both original copy controls');
     await copyMatches(currentCommand.install_options.domain.command);
-    record('original domain option copies unchanged native command');
+    record('domain option copies independent deployment command using the existing website');
     await page.evaluate(()=>navigator.clipboard.writeText('CHOICE_FIXTURE_SENTINEL'));
     await radio('endpoint').check();
     assert.equal(await preview().inputValue(),currentCommand.install_options.endpoint.command);
@@ -99,7 +102,7 @@ const assert=require('node:assert/strict');
     await close();
     assert.equal(await page.evaluate(()=>navigator.clipboard.readText()),'CHOICE_FIXTURE_SENTINEL');
     await open('Second choice fixture');
-    assert.ok(currentCommand.command.includes('--machine-id 2'));
+    assert.ok(/['"]--machine-id['"] ['"]2['"]/.test(currentCommand.command));
     await radio('endpoint').check(); await copyMatches(currentCommand.install_options.endpoint.command);
     record('closing never copies and switching machines cannot reuse earlier identity');
     const fetchData=await page.evaluate(async token=>{
@@ -136,6 +139,8 @@ const assert=require('node:assert/strict');
     }
     assert.ok(created?.id>2);
     assert.equal(await preview().inputValue(),created.install_command);
+    assert.ok(!created.install_command.includes('cedar2025') && !created.install_command.includes('--endpoint-ca'));
+    await copyMatches(created.install_options.domain.command);
     assert.equal(await page.getByText(created.token,{exact:true}).count(),1);
     await radio('endpoint').check(); await copyMatches(created.install_options.endpoint.command);
     assert.ok((await preview().inputValue()).includes("'--machine-id' '"+created.id+"'") ||

@@ -1,4 +1,4 @@
-/* NodeEndpoint 1.0.2: reversible native machine installation choices.
+/* NodeEndpoint 1.0.3: reversible native machine installation choices.
  * Observe only native, same-origin machine responses. Never read auth storage,
  * modify React state, or replace the browser clipboard implementation. */
 (() => {
@@ -252,7 +252,7 @@
       label.append(input, text); fieldset.append(label);
       return input;
     }
-    const domain = choice('domain', '原版：域名对接', '使用面板域名和原版安装命令');
+    const domain = choice('domain', '域名对接（独立部署）', '使用面板域名和独立部署安装命令');
     const endpoint = choice('endpoint', '新版：IP + 私有证书', '使用独立 IP 入口并自动配置公共 CA 信任');
     const address = element('p', 'ne-install-address');
     const unavailable = element('p', 'ne-install-unavailable');

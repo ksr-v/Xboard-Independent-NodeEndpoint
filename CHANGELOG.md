@@ -1,5 +1,13 @@
 # 变更记录
 
+## 1.0.3 — 域名选项改为独立部署安装命令
+
+- 默认域名选项改名为“域名对接（独立部署）”，使用原面板 app_url 和 ksr-v 独立固定安装源；默认使用系统 / 公有 CA 信任，不携带 NodeEndpoint 私有 CA。IP 选项继续使用配置的 IP / 端口并嵌入公共 CA 与指纹。
+- 两种选项均固定 nodeendpoint-native-v1.0.0 安装源及 v1.13-orphan.4 Node / xbctl；本次不更新节点安装器或 Go 二进制。默认 command / install_command 改为独立域名命令，与 install_options.domain.command 一致，原机器身份保留。
+- IP 入口或 CA 未就绪不影响独立域名命令、新建机器；禁用 NodeEndpoint 插件本身后恢复宿主原生行为。界面仍通过插件动态资源加载，不修改 Xboard 核心或 Admin bundle。
+- 从 1.0.0 / 1.0.1 / 1.0.2 上传 NodeEndpoint-1.0.3.zip 升级、确认启用并刷新；保留设置与 CA，无需卸载其他插件、升级 Xboard 或重装 Root 入口。
+- 本轮验证范围见 [NATIVE_DOMAIN_TEST_REPORT.md](NATIVE_DOMAIN_TEST_REPORT.md)；1.0.2 及更早报告保留，历史 UUID / Observer 限制继续保留。
+
 ## 1.0.2 — 原生机器安装命令提供域名 / IP 双选
 
 - 机器详情的安装区与新建后的 Token 弹窗同时提供“原版：域名对接”（默认）和“新版：IP + 私有证书”。原版完整保留宿主 app_url、cedar2025 来源及机器身份；新版使用独立 ksr-v 固定安装源、插件配置 IP 与自动公共 CA 信任。

@@ -1,0 +1,101 @@
+{
+  "schema": 1,
+  "date": "2026-10-17",
+  "version": "1.0.3",
+  "artifact": {
+    "file": "NodeEndpoint-1.0.3.zip",
+    "version": "1.0.3",
+    "bytes": 653975,
+    "sha256": "8863e19642823336ddb170670836a47c9b8507b551f1634021e47672fd121481"
+  },
+  "behavior": {
+    "default": "Independent domain deployment using original app_url",
+    "choices": [
+      "Independent domain deployment",
+      "Independent IP with private CA public trust"
+    ],
+    "original_website_url_and_machine_identity_preserved": true,
+    "native_command_fields_unchanged": false,
+    "top_level_matches_domain_option": true,
+    "both_options_use_independent_fixed_installer": true,
+    "domain_omits_private_ca_parameters": true,
+    "domain_default_system_public_ca_trust": true,
+    "domain_extra_binary_sha_check": false,
+    "unready_ip_does_not_block_domain_or_creation": true,
+    "new_machine_popup_supported": true,
+    "disabled_plugin_restores_host_behavior": true
+  },
+  "tests": {
+    "windows": {
+      "php": "8.2.33",
+      "native_components_passed": 36,
+      "admin_views_and_composer_orders_passed": 6,
+      "native_zip_upload_passed": 6
+    },
+    "linux_vm": {
+      "php": "8.3",
+      "native_components_passed": 36,
+      "admin_views_and_composer_orders_passed": 6,
+      "native_zip_upload_passed": 6
+    },
+    "chrome": {
+      "passed": 14,
+      "real_audited_admin_bundle": true,
+      "bundle_sha256": "0cfb12e1ec9afee9e439744671de2c14cb1af1b3118c291f0a87348492948666",
+      "native_command_and_create_api": "Real Laravel/Sanctum SQLite fixture",
+      "mocked": [
+        "user display information",
+        "plugin list",
+        "machine list",
+        "node list",
+        "history graphs"
+      ],
+      "coverage": [
+        "both choices and original controls hidden",
+        "independent domain source, existing website, no private CA parameters, exact domain/IP clipboard",
+        "no auto-copy on switch or close",
+        "switch back",
+        "active command cache expiry",
+        "machine identity switch",
+        "fetch and XHR observation",
+        "cached detail reopen",
+        "new machine popup copies both independent domain and IP commands",
+        "390px responsive selection",
+        "unavailable IP leaves domain working",
+        "401/403 and SPA sign-in clear commands",
+        "disabled restores native controls",
+        "no runtime errors"
+      ]
+    },
+    "archive": {
+      "members": 93,
+      "manifest_and_safe_paths": "PASS",
+      "reproducible_build": "PASS"
+    }
+  },
+  "privacy": {
+    "auth_storage_read": false,
+    "react_fiber_read": false,
+    "native_requests_or_responses_modified": false,
+    "clipboard_implementation_replaced": false,
+    "commands_persisted_to_storage_or_logs": false,
+    "command_cache_max_entries": 20,
+    "inactive_cache_minutes": 10,
+    "logout_auth_failure_disable_cleanup": true
+  },
+  "unchanged": {
+    "xboard_core": true,
+    "compiled_admin_bundle": true,
+    "root_entry_and_ca": true,
+    "node_installer_tag": "nodeendpoint-native-v1.0.0",
+    "node_binary_version": "v1.13-orphan.4",
+    "production_servers_accessed": false
+  },
+  "limits": [
+    "Audited Admin DOM only; other themes/builds retain original UI when unmatched",
+    "FlowScope PHP wrapper both orders verified; browser did not load FlowScope JS runtime",
+    "Refresh Admin after endpoint/CA/Token changes to clear native query cache",
+    "No real Node/proxy/traffic/UUID/WSS/CA-rotation rerun this round; known fixed-Go issues remain",
+    "No-CA domain path uses fixed independent Release but does not enable private-CA branch binary SHA verification"
+  ]
+}

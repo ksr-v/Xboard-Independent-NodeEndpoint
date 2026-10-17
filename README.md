@@ -1,18 +1,18 @@
-# NodeEndpoint 1.0.2
+# NodeEndpoint 1.0.3
 
 为正在运行的 Xboard 增加独立的 IP / 域名节点通讯入口。插件标识 `node_endpoint`，默认 HTTPS TCP 8443，双 10 年私有 CA / 服务器证书策略。面板网页域名、`app_url`、登录、订阅、原 443 站点和其他插件的配置保持原有设置。
 
 当前交付为**隔离环境验收版本**。Windows 与专用 Ubuntu VM 的真实 Nginx、Linux 权限、Root CLI / 独立 PHP-FPM 验证见 [TEST_REPORT.md](TEST_REPORT.md) 和 [VM_TEST_REPORT.md](VM_TEST_REPORT.md)。原生 AMD64 Go Node 在合成面板上完成新装、双内核、WSS、换证、标准多实例迁移与 CLI 回滚的 11 项检查。两 VM Xboard / NodeWorker / Go 实机验收及清理恢复已完成，已测冷启动认证、设备清理、四绑定计量、CA 轮换和选择迁移/回滚通过；固定 Go 的 Xray 全量及单用户增量 UUID 更新失败，CLI UUID save 的 Observer 触发仍有未定位缺口；实际 Admin HTTP 属性更新及恢复通过，不能称全部联测通过。详见 [FULL_E2E_TEST_REPORT.md](FULL_E2E_TEST_REPORT.md)。范围为所列宝塔 PHP-FPM / IPv4 / AMD64 与协议组合，生产环境仍需独立验收。
 
-## 新机器安装命令：域名或 IP 双选（1.0.2）
+## 新机器安装命令：域名或 IP 双选（1.0.3）
 
-已有 1.0.0 / 1.0.1 用户：备份插件设置，在原生插件管理上传 [NodeEndpoint-1.0.2.zip](https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/download/v1.0.2/NodeEndpoint-1.0.2.zip) 升级并确认启用，然后刷新面板页面。无需卸载 NodeEndpoint 或其他插件，无需升级 Xboard 主程序、重装 Root 入口或重新生成 CA。原生升级会保留已保存的通讯 IP、端口、公共 CA 和机器 Token；常驻 worker 按宿主流程 reload。
+已有 1.0.0 / 1.0.1 / 1.0.2 用户：备份插件设置，在原生插件管理上传 [NodeEndpoint-1.0.3.zip](https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/download/v1.0.3/NodeEndpoint-1.0.3.zip) 升级并确认启用，然后刷新面板页面。无需卸载 NodeEndpoint 或其他插件，无需升级 Xboard 主程序、重装 Root 入口或重新生成 CA。原生升级会保留已保存的通讯 IP、端口、公共 CA 和机器 Token；常驻 worker 按宿主流程 reload。
 
 原生 **机器管理 / 服务器管理 → 服务器详情 → 安装 xboard-node**，以及新建机器后的 Token 弹窗，都提供两个选项：
 
 | 选项 | 对接地址与安装源 | 证书信任 |
 | --- | --- | --- |
-| **原版：域名对接**（默认） | 完整保留宿主原生命令：原面板 app_url 与 cedar2025 安装源 | 使用原版安装流程，不加入私有 CA |
+| **域名对接（独立部署）**（默认） | 使用原面板 app_url 与 ksr-v 独立固定安装源 | 默认使用系统 / 公有 CA 信任，不携带 NodeEndpoint 私有 CA |
 | **新版：IP + 私有证书** | 使用 NodeEndpoint 保存的独立 IP / 端口与 ksr-v 独立固定安装源 | 自动带入私有 CA 的公共证书及指纹，安装时配置节点服务信任 |
 
 要让新机器通过 IP 接入：
@@ -22,22 +22,24 @@
 3. 选择 **新版：IP + 私有证书**，核对显示的对接地址，再点 **复制安装命令**。
 4. 在新的 Node 服务器 SSH 终端执行命令，菜单选择 **1 安装**。地址、机器 ID、Token 和 CA 已带入，无需重复填写或手工传 CA。
 
-独立入口未启用、尚未导入有效 CA 或配置为 HTTP 时，仅禁用新版 IP 选项并显示原因；原版域名命令与新建机器仍正常可用。更改通讯设置、导入或轮换公共 CA 后，刷新面板页面再复制命令，清除原生 React Query 的旧命令缓存。
+域名选项也使用你的独立部署安装源，保留原面板 app_url、机器 ID 和 Token。选择该选项后直接复制并执行，无需配置 NodeEndpoint 的 IP 入口或导入私有 CA。
 
-新版命令的下载源仍固定为 [Xboard-Independent/nodeendpoint-native-v1.0.0](https://github.com/ksr-v/Xboard-Independent/tree/nodeendpoint-native-v1.0.0/node-installer)，节点二进制仍固定为独立源码仓库的 v1.13-orphan.4；本次 1.0.2 不更新节点安装器或 Go 二进制。后端保留原生 command / install_command 字符串，仅追加 install_options 双选数据。插件通过动态 View composer 加载 extensionless 外链资源，在原生安装区展示选择；不改 Xboard 核心或编译后的 Admin bundle，可与 FlowScope 的动态模板包装共存。
+独立入口未启用、尚未导入有效 CA 或配置为 HTTP 时，仅禁用新版 IP 选项并显示原因；独立域名命令与新建机器仍正常可用。更改通讯设置、导入或轮换公共 CA 后，刷新面板页面再复制命令，清除原生 React Query 的旧命令缓存。禁用 NodeEndpoint 插件本身后，宿主原生安装命令行为恢复。
 
-两种原生机器命令都沿用原有 Token 参数方式，属于敏感命令，不要公开粘贴或提交日志。新版命令内的公共 CA 和指纹来自管理员已导入的信任；安装器验证指纹、CA 用途和 HTTPS 主机名，再将 Root-only 信任文件写入节点服务，通过 SSL_CERT_FILE 使用。升级、失败回滚与卸载均处理这份信任。
+两种命令的下载源均固定为 [Xboard-Independent/nodeendpoint-native-v1.0.0](https://github.com/ksr-v/Xboard-Independent/tree/nodeendpoint-native-v1.0.0/node-installer)，Node / xbctl 仍固定为独立源码仓库的 v1.13-orphan.4；本次 1.0.3 不更新节点安装器或 Go 二进制。后端默认 command / install_command 改为独立域名命令，与 install_options.domain.command 一致，并提供 install_options 双选数据。插件通过动态 View composer 加载 extensionless 外链资源，在原生安装区展示选择；不改 Xboard 核心或编译后的 Admin bundle，可与 FlowScope 的动态模板包装共存。
 
-这条安装流程适用于新机器。检测到旧安装时会要求 REPLACE，替换本机全部旧对接；已有生产节点仍按下文的实例迁移流程处理。CA 轮换仍需为已有节点安排双信任更新，新机器会带入面板当时已导入的 CA。1.0.2 双选验证见 [NATIVE_INSTALL_CHOICES_TEST_REPORT.md](NATIVE_INSTALL_CHOICES_TEST_REPORT.md)，独立节点安装器的原有测试范围见 [NATIVE_MACHINE_TEST_REPORT.md](NATIVE_MACHINE_TEST_REPORT.md)；历史 UUID / Observer 限制继续保留。
+两种原生机器命令都沿用原有 Token 参数方式，属于敏感命令，不要公开粘贴或提交日志。IP 命令内的公共 CA 和指纹来自管理员已导入的信任；安装器验证指纹、CA 用途和 HTTPS 主机名，再将 Root-only 信任文件写入节点服务，通过 SSL_CERT_FILE 使用。升级、失败回滚与卸载均处理这份信任。域名命令不传入这些私有 CA 参数。
+
+这条安装流程适用于新机器。检测到旧安装时会要求 REPLACE，替换本机全部旧对接；已有生产节点仍按下文的实例迁移流程处理。CA 轮换仍需为已有节点安排双信任更新，新机器选择 IP 方式时会带入面板当时已导入的 CA。1.0.3 独立域名命令验证见 [NATIVE_DOMAIN_TEST_REPORT.md](NATIVE_DOMAIN_TEST_REPORT.md)；1.0.2 双选验证保留于 [NATIVE_INSTALL_CHOICES_TEST_REPORT.md](NATIVE_INSTALL_CHOICES_TEST_REPORT.md)，独立节点安装器的原有测试范围见 [NATIVE_MACHINE_TEST_REPORT.md](NATIVE_MACHINE_TEST_REPORT.md)；历史 UUID / Observer 限制继续保留。
 
 ## 交付物
 
-- [v1.0.2 Release](https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/tag/v1.0.2)：当前原生插件 NodeEndpoint-1.0.2.zip、SHA256SUMS、版本记录及测试报告，本地构建输出在 dist/v1.0.2/。
-- `dist/NodeEndpoint-1.0.0.zip`：原始历史上传包，已发布的 1.0.0 / 1.0.1 文件保留；新装或升级使用 1.0.2。
+- [v1.0.3 Release](https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/tag/v1.0.3)：当前原生插件 NodeEndpoint-1.0.3.zip、SHA256SUMS、版本记录及测试报告，本地构建输出在 dist/v1.0.3/。
+- `dist/NodeEndpoint-1.0.0.zip`：原始历史上传包，已发布的 1.0.0 / 1.0.1 / 1.0.2 文件保留；新装或升级使用 1.0.3。
 - `dist/node-endpoint-tools-1.0.0.zip`：独立 SSH 工具包，解压后包含 `tools/panel/`、`tools/node/` 和说明文档。
 - `dist/xb-node-endpoint-1.0.0-source.zip`：源码和测试；不包含参考仓库、开发运行器、vendor、凭据或生成的私钥。
 - `dist/SHA256SUMS`、`dist/release.json`：版本与 SHA-256。
-- 面板 Root 入口使用下方短命令：[root-installer-v1.0.3](https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/tag/root-installer-v1.0.3)，内含 tools 1.0.2 的本机 CA 自动导入及 Nginx 解析兼容修复，与插件 1.0.2 兼容。
+- 面板 Root 入口使用下方短命令：[root-installer-v1.0.3](https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/tag/root-installer-v1.0.3)，内含 tools 1.0.2 的本机 CA 自动导入及 Nginx 解析兼容修复，与插件 1.0.3 兼容。
 
 ## Root 一键安装独立入口
 
@@ -183,7 +185,7 @@ location = /ws {
 
 ### 1. 下载并核对发行包
 
-从 [v1.0.2 Release](https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/tag/v1.0.2) 下载 **NodeEndpoint-1.0.2.zip** 和 **SHA256SUMS**，核对摘要后上传原生插件。GitHub 自动生成的 “Source code” 压缩包不是原生插件上传包：
+从 [v1.0.3 Release](https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/tag/v1.0.3) 下载 **NodeEndpoint-1.0.3.zip** 和 **SHA256SUMS**，核对摘要后上传原生插件。GitHub 自动生成的 “Source code” 压缩包不是原生插件上传包：
 
 ```bash
 sha256sum -c SHA256SUMS
@@ -242,7 +244,7 @@ sudo bash tools/panel/node-endpoint-panel.sh --nginx /www/server/nginx/sbin/ngin
 
 ### 4. 接入节点
 
-**新增 machine 机器推荐使用原生机器管理的一键命令，并选择“新版：IP + 私有证书”**，步骤见本文开头；新版命令已带入 IP 与公共 CA，不需要以下手工分发步骤。默认“原版：域名对接”保留原安装流程；传统 node 模式或已有实例的工具迁移仍按下面流程准备 CA。
+**新增 machine 机器可使用原生机器管理的一键命令**，步骤见本文开头。默认“域名对接（独立部署）”使用原面板 app_url 和系统 / 公有 CA 信任；选择“新版：IP + 私有证书”时，命令已带入 IP 与公共 CA，不需要以下手工分发步骤。两种方式均使用同一独立固定安装源；传统 node 模式或已有实例的工具迁移仍按下面流程准备 CA。
 
 从可信 SSH 渠道取得上述公共证书和 `status` 显示的 CA SHA-256 指纹，在管理页核对导入；指纹须独立确认。只传公共证书，私钥留在受保护的 Root/离线保管位置。
 
@@ -278,7 +280,7 @@ FlowScope 采集器有独立 `panel_url` 与证书信任；需单独审计迁移
 
 禁用/升级不删除 Root 入口或任何私钥；旧网站和旧节点行为不受作用域 middleware 影响。禁用会停止 NodeEndpoint 对新入口 handshake 的地址重写，因此已迁移节点需要先确认 REST fallback / 原生 WS 地址可用，再禁用。不能仅凭 HTTPS 监听仍在断言 WSS 不受影响。
 
-升级前备份自己的设置与工具状态；从 1.0.0 / 1.0.1 升级时上传 NodeEndpoint-1.0.2.zip 并确认启用，无需先卸载 NodeEndpoint 或其他插件，也无需升级 Xboard 核心或重做 Root CA。相同版本的重复包会被宿主原生上传器拒绝。刷新面板后，在机器详情安装区或新建后的弹窗选择域名 / IP 方式；更新通讯设置或 CA 后同样刷新，避免原生 React Query 缓存旧命令。常驻 Octane 环境按宿主管理流程 reload 应用 worker，确认路由与资产加载。
+升级前备份自己的设置与工具状态；从 1.0.0 / 1.0.1 / 1.0.2 升级时上传 NodeEndpoint-1.0.3.zip 并确认启用，无需先卸载 NodeEndpoint 或其他插件，也无需升级 Xboard 核心、重装 Root 入口或重做 CA。相同版本的重复包会被宿主原生上传器拒绝。刷新面板后，在机器详情安装区或新建后的弹窗选择域名 / IP 方式；更新通讯设置或 CA 后同样刷新，避免原生 React Query 缓存旧命令。常驻 Octane 环境按宿主管理流程 reload 应用 worker，确认路由与资产加载。
 
 原生卸载停止插件 API 与 handshake 修改，保留 `node_endpoint_settings` 和已导入公共 CA 供恢复。宿主迁移回滚器存在全局最后 batch 限制，插件选择一致保留自己的恢复设置。若明确不再需要，先备份，作为应用运行用户执行：
 
@@ -290,6 +292,6 @@ php tools/plugin/purge.php --app=/已核对的/Xboard根目录 --confirm=PURGE_N
 
 ## 开发、构建与参考
 
-`python3 tools/build/build.py --plugin-only` 在 `dist/v1.0.2/` 构建当前原生插件 ZIP 和摘要；`python3 tools/build/verify.py --plugin-only` 核对其 SHA-256、路径、逐文件清单和私钥排除。原始三包构建模式固定用于 1.0.0，后续插件单独构建，保留已发布历史文件。每个包内含 `MANIFEST.sha256`，解压后可在对应根目录运行 `sha256sum -c MANIFEST.sha256`。双选测试见 [NATIVE_INSTALL_CHOICES_TEST_REPORT.md](NATIVE_INSTALL_CHOICES_TEST_REPORT.md)，既有工具测试见 [TEST_REPORT.md](TEST_REPORT.md)。架构见 [ARCHITECTURE.md](ARCHITECTURE.md)，生产部署与故障恢复见 [PRODUCTION_DEPLOYMENT.md](PRODUCTION_DEPLOYMENT.md)。
+`python3 tools/build/build.py --plugin-only` 在 `dist/v1.0.3/` 构建当前原生插件 ZIP 和摘要；`python3 tools/build/verify.py --plugin-only` 核对其 SHA-256、路径、逐文件清单和私钥排除。原始三包构建模式固定用于 1.0.0，后续插件单独构建，保留已发布历史文件。每个包内含 `MANIFEST.sha256`，解压后可在对应根目录运行 `sha256sum -c MANIFEST.sha256`。独立域名命令测试见 [NATIVE_DOMAIN_TEST_REPORT.md](NATIVE_DOMAIN_TEST_REPORT.md)，历史双选测试见 [NATIVE_INSTALL_CHOICES_TEST_REPORT.md](NATIVE_INSTALL_CHOICES_TEST_REPORT.md)，既有工具测试见 [TEST_REPORT.md](TEST_REPORT.md)。架构见 [ARCHITECTURE.md](ARCHITECTURE.md)，生产部署与故障恢复见 [PRODUCTION_DEPLOYMENT.md](PRODUCTION_DEPLOYMENT.md)。
 
 全部六个指定仓库的审计 commit、扩展点与共存审计见 [docs/SOURCE_AUDIT.md](docs/SOURCE_AUDIT.md)。Independent 提供的是恢复资料，最新独立 PHP overlay 不在该仓库中；不能据其资料宣称运行 overlay 已通过兼容测试。开发和验收未访问或修改生产服务器。

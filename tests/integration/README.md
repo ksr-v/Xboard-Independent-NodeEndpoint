@@ -1,5 +1,7 @@
 # Native component integration
 
+NodeEndpoint 1.0.3: Windows and Linux each pass 36 component checks, including independent domain-source generation, original URL/fallback, and shell-sensitive credentials; the 14 Chrome choice checks now verify both domain and IP commands use the independent installer. See [NATIVE_DOMAIN_TEST_REPORT.md](../../NATIVE_DOMAIN_TEST_REPORT.md). The 1.0.2 baseline below remains historical.
+
 2026-10-17, NodeEndpoint 1.0.2: Windows and Linux each pass 34 native component checks and 6 dynamic Admin view/resource checks. The actual audited Admin build passes 14 Chrome checks for domain/IP choices, clipboard accuracy, native query cache, creation, mobile layouts, authentication and disabling. See [NATIVE_INSTALL_CHOICES_TEST_REPORT.md](../../NATIVE_INSTALL_CHOICES_TEST_REPORT.md) for mocks and scope.
 
 ```powershell

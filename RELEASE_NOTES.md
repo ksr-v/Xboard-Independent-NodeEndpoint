@@ -1,4 +1,17 @@
-# NodeEndpoint v1.0.2 发布说明
+# NodeEndpoint v1.0.3 发布说明
+
+默认域名选项现为 **域名对接（独立部署）**，也使用你的 ksr-v 独立部署安装源。两个选项分别为：
+
+- **域名对接（独立部署）**（默认）：对接原面板 app_url，默认使用系统 / 公有 CA 信任，不携带 NodeEndpoint 私有 CA。
+- **新版：IP + 私有证书**：对接 NodeEndpoint 保存的 IP / 端口，自动携带已导入的公共 CA 和指纹。
+
+两种命令均使用 [Xboard-Independent/nodeendpoint-native-v1.0.0](https://github.com/ksr-v/Xboard-Independent/tree/nodeendpoint-native-v1.0.0/node-installer) 固定安装源，Node / xbctl 均固定 v1.13-orphan.4。默认 command / install_command 也改为独立域名命令，与 install_options.domain.command 一致。IP 入口或 CA 未就绪只影响 IP 选项，域名复制与新建机器仍可用。禁用 NodeEndpoint 插件本身后，宿主原生安装命令行为恢复。
+
+从 [v1.0.3 Release](https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/tag/v1.0.3) 下载 **NodeEndpoint-1.0.3.zip** 和同次 **SHA256SUMS**。备份设置，上传 ZIP 原生升级、确认启用并刷新面板，然后重新复制安装命令。升级保留原有通讯设置和 CA；无需先卸载 NodeEndpoint 或其他插件、升级 Xboard 主程序、重装 Root 入口或重新生成 CA。
+
+本次仅更新插件，不更新节点安装器或 Go 二进制。两种原生机器命令仍含 Token 参数，请勿公开命令或 Shell 历史。IP 私有 CA 分支保持原有证书与二进制摘要校验；无私有 CA 的域名分支采用独立源固定版本下载流程。验证范围见 [NATIVE_DOMAIN_TEST_REPORT.md](NATIVE_DOMAIN_TEST_REPORT.md)，不替代代理 / 计量 / UUID 的完整联测，历史 UUID / Observer 限制继续保留。
+
+## v1.0.2 历史发行说明
 
 原生机器管理的详情安装区和新建后的 Token 弹窗增加两种安装方式：
 

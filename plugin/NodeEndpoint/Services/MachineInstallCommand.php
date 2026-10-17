@@ -23,12 +23,25 @@ final class MachineInstallCommand
         $verified = Certificates::import($pem, $pins);
         return ['url' => Endpoint::urls($settings)['url'], 'pem' => $verified['pem'], 'fingerprints' => $pins];
     }
+    public static function buildDomain(string $panelUrl, int $id, string $token): string
+    {
+        return self::command(self::arguments($panelUrl, $id, $token));
+    }
     public static function build(array $context, int $id, string $token): string
     {
-        if ($id < 1 || $token === '') { throw new InvalidArgumentException('机器身份无效。'); }
-        $args = ['--mode', 'machine', '--panel', $context['url'], '--token', $token, '--machine-id', (string) $id,
-                 '--version', 'v1.13-orphan.4', '--endpoint-ca-base64', base64_encode($context['pem']),
-                 '--endpoint-ca-fingerprint', implode(',', $context['fingerprints'])];
+        return self::command(array_merge(self::arguments($context['url'], $id, $token), [
+            '--endpoint-ca-base64', base64_encode($context['pem']),
+            '--endpoint-ca-fingerprint', implode(',', $context['fingerprints']),
+        ]));
+    }
+    private static function arguments(string $panelUrl, int $id, string $token): array
+    {
+        if ($id < 1 || $token === '' || $panelUrl === '') { throw new InvalidArgumentException('机器身份或面板地址无效。'); }
+        return ['--mode', 'machine', '--panel', $panelUrl, '--token', $token, '--machine-id', (string) $id,
+            '--version', 'v1.13-orphan.4'];
+    }
+    private static function command(array $args): string
+    {
         return 'curl -fsSL ' . escapeshellarg(self::INSTALLER) . ' | sudo bash -s -- '
             . implode(' ', array_map('escapeshellarg', $args));
     }

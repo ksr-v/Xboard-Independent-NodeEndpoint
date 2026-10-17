@@ -34,7 +34,7 @@ test('real Sanctum anonymous and ordinary-user tokens cannot use Admin API', fun
     eq(requestFixture('https://old.panel.example/api/v1/node-endpoint/settings', 'GET', [], $GLOBALS['userToken'])->getStatusCode(), 403);
     $r = requestFixture('https://old.panel.example/api/v1/node-endpoint/settings', 'GET', [], $GLOBALS['adminToken']);
     eq($r->getStatusCode(), 200, $r->getContent());
-    eq(jsonResponse($r)['data']['version'], '1.0.2');
+    eq(jsonResponse($r)['data']['version'], '1.0.3');
 });
 test('native generic config save cannot bypass the isolated endpoint settings API', function (): void {
     (new App\Services\Plugin\PluginConfigService())->updateConfig('node_endpoint', ['management_url' => '/attempted-change', 'enabled' => true, 'host' => 'evil.example', 'https' => false, 'http_acknowledged' => true]);
@@ -198,14 +198,17 @@ test('two independently pinned CA roots support dual trust and reject duplicate 
 });
 function nativeInstallOptions(array $data, string $key, App\Models\ServerMachine $machine, bool $endpointReady): array
 {
-    $original = 'curl -fsSL https://raw.githubusercontent.com/cedar2025/xboard-node/dev/install.sh'
-        . ' | sudo bash -s -- --mode machine --panel ' . escapeshellarg((string) admin_setting('app_url'))
-        . ' --token ' . escapeshellarg($machine->token) . ' --machine-id ' . $machine->id;
-    eq($data[$key], $original, 'Original native command changed.');
+    $domain = $data[$key];
+    ok(str_contains($domain, 'ksr-v/Xboard-Independent/nodeendpoint-native-v1.0.0/node-installer/install.sh'), 'Domain installer is not independently maintained.');
+    ok(!str_contains($domain, 'cedar2025') && !str_contains($domain, '--endpoint-ca'), 'Domain used official installer or private CA arguments.');
+    foreach (['--panel'=>rtrim((string)admin_setting('app_url'),'/'), '--machine-id'=>(string)$machine->id,
+        '--token'=>$machine->token, '--version'=>'v1.13-orphan.4'] as $arg=>$value) {
+        ok(str_contains($domain, escapeshellarg($arg).' '.escapeshellarg($value)), 'Domain argument differs: '.$arg);
+    }
     $options = $data['install_options'];
     eq($options['owner'], 'node_endpoint');
     eq($options['schema'], 1);
-    eq($options['domain'], ['available' => true, 'command' => $original]);
+    eq($options['domain'], ['available' => true, 'command' => $domain]);
     eq($options['endpoint']['available'], $endpointReady);
     if ($endpointReady) {
         $command = $options['endpoint']['command'];
@@ -220,7 +223,7 @@ function nativeInstallOptions(array $data, string $key, App\Models\ServerMachine
     return $options;
 }
 
-test('native machine commands require Admin and offer original domain plus independently pinned IP commands', function (): void {
+test('native machine commands require Admin and use independent installation sources for domain and IP', function (): void {
     $url = 'https://old.panel.example/api/v2/admin/server/machine/installCommand';
     eq(requestFixture($url, 'GET', ['id' => $GLOBALS['machine']->id])->getStatusCode(), 403);
     eq(requestFixture($url, 'GET', ['id' => $GLOBALS['machine']->id], $GLOBALS['userToken'])->getStatusCode(), 403);
@@ -391,13 +394,45 @@ test('both installation options use the current token after the native reset rou
     ok(!str_contains($r->getContent(), 'fixture-prior-token'), 'Stale credential remained in an installation option.');
 });
 
-test('native plugin upgrade from 1.0.1 to 1.0.2 preserves settings, CA, machine credentials and enabled state', function (): void {
+test('domain installation preserves the website URL and uses request origin only as its native fallback', function (): void {
+    $before=$GLOBALS['testSettings']['app_url'];
+    try {
+        foreach (['https://old.panel.example:9443///'=>'https://old.panel.example:9443',
+            ''=>'https://fallback.panel.example:9443'] as $website=>$expected) {
+            $GLOBALS['testSettings']['app_url']=$website;
+            $r=requestFixture('https://fallback.panel.example:9443/api/v2/admin/server/machine/installCommand',
+                'GET',['id'=>$GLOBALS['machine']->id],$GLOBALS['adminToken']);
+            eq($r->getStatusCode(),200,$r->getContent());
+            $data=jsonResponse($r)['data'];
+            eq($data['command'],$data['install_options']['domain']['command']);
+            ok(str_contains($data['command'],escapeshellarg('--panel').' '.escapeshellarg($expected)),'Wrong domain/fallback origin.');
+            ok(!str_contains($data['command'],'cedar2025'),'Fallback used the official installer.');
+            eq(admin_setting('app_url'),$website,'Command generation changed global website setting.');
+        }
+    } finally {$GLOBALS['testSettings']['app_url']=$before;}
+});
+
+test('independent domain and IP commands preserve shell-sensitive machine credentials', function (): void {
+    $machine=$GLOBALS['machine']->fresh();
+    $previous=$machine->token;
+    try {
+        $machine->token='fixture quote \' space ; $(fixture) & end';
+        $machine->save();
+        $r=requestFixture('https://old.panel.example/api/v2/admin/server/machine/installCommand','GET',
+            ['id'=>$machine->id],$GLOBALS['adminToken']);
+        eq($r->getStatusCode(),200,$r->getContent());
+        $options=nativeInstallOptions(jsonResponse($r)['data'],'command',$machine,true);
+        ok($options['domain']['command']!==$options['endpoint']['command'],'Distinct targets lost.');
+    } finally {$machine->token=$previous;$machine->save();}
+});
+
+test('native plugin upgrade from 1.0.2 to 1.0.3 preserves settings, CA, machine credentials and enabled state', function (): void {
     $before = Settings::read();
     $ca = file_get_contents(Settings::caPath());
     $token = $GLOBALS['machine']->fresh()->token;
-    App\Models\Plugin::where('code', 'node_endpoint')->update(['version' => '1.0.1']);
+    App\Models\Plugin::where('code', 'node_endpoint')->update(['version' => '1.0.2']);
     eq(app(PluginManager::class)->update('node_endpoint'), true);
-    eq(App\Models\Plugin::where('code', 'node_endpoint')->value('version'), '1.0.2');
+    eq(App\Models\Plugin::where('code', 'node_endpoint')->value('version'), '1.0.3');
     eq((bool) App\Models\Plugin::where('code', 'node_endpoint')->value('is_enabled'), true);
     eq(Settings::read(), $before);
     eq(file_get_contents(Settings::caPath()), $ca);
