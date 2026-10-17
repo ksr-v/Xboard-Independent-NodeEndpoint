@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build tools 1.0.1 from the pinned 1.0.0 ZIP, replacing two panel modules only."""
+"""Build supplementary tools from the pinned original ZIP without replacing it."""
 import argparse
 import hashlib
 import io
@@ -10,9 +10,10 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[2]
 BASE_SHA256 = '42f2893938c294646c44e351a5c251cfea9f6a30156d67c345bc476307ea89e2'
 REPLACEMENTS = ('tools/panel/nginx.py', 'tools/panel/manager.py')
+ADDITIONS = {'1.0.1': (), '1.0.2': ('tools/panel/panel_ca.py', 'tools/panel/sync_panel_ca.php')}
 
 
-def build(base, output):
+def build(base, output, version='1.0.2'):
     data = Path(base).read_bytes()
     if hashlib.sha256(data).hexdigest() != BASE_SHA256:
         raise ValueError('Base tools ZIP differs from the published v1.0.0 SHA-256')
@@ -27,13 +28,17 @@ def build(base, output):
         if name not in members:
             raise ValueError('Missing base module: ' + name)
         members[name] = (ROOT / name).read_bytes()
+    for name in ADDITIONS[version]:
+        if name in members:
+            raise ValueError('Expected a new tool module: ' + name)
+        members[name] = (ROOT / name).read_bytes()
     members['MANIFEST.sha256'] = ''.join(
         hashlib.sha256(data).hexdigest() + '  ' + name + '\n'
         for name, data in sorted(members.items()) if name != 'MANIFEST.sha256'
     ).encode()
     output = Path(output)
     output.mkdir(parents=True, exist_ok=True)
-    destination = output / 'node-endpoint-tools-1.0.1.zip'
+    destination = output / ('node-endpoint-tools-' + version + '.zip')
     with zipfile.ZipFile(destination, 'w', zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
         for name, content in sorted(members.items()):
             entry = zipfile.ZipInfo(name, (2026, 10, 17, 0, 0, 0))
@@ -42,12 +47,14 @@ def build(base, output):
             entry.compress_type = zipfile.ZIP_DEFLATED
             archive.writestr(entry, content)
     return {'file': destination.name, 'sha256': hashlib.sha256(destination.read_bytes()).hexdigest(),
-            'bytes': destination.stat().st_size, 'base_sha256': BASE_SHA256, 'replaced_modules': list(REPLACEMENTS)}
+            'bytes': destination.stat().st_size, 'base_sha256': BASE_SHA256, 'replaced_modules': list(REPLACEMENTS),
+            'tools_version': version, 'added_modules': list(ADDITIONS[version])}
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--base', type=Path, default=ROOT / 'dist/node-endpoint-tools-1.0.0.zip')
-    parser.add_argument('--output', type=Path, default=ROOT / '.runtime/tools-1.0.1')
+    parser.add_argument('--output', type=Path)
+    parser.add_argument('--version', choices=sorted(ADDITIONS), default='1.0.2')
     args = parser.parse_args()
-    print(json.dumps(build(args.base, args.output)))
+    print(json.dumps(build(args.base, args.output or ROOT / ('.runtime/tools-' + args.version), args.version)))

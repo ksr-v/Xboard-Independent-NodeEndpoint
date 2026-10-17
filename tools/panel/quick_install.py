@@ -17,8 +17,8 @@ import urllib.parse
 import urllib.request
 import zipfile
 
-TOOLS_URL = 'https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/download/root-installer-v1.0.2/node-endpoint-tools-1.0.1.zip'
-TOOLS_SHA256 = 'e7de5e40074051e4b90ab9dc516c231e8023746fae8c3283374e521c7bdd01ad'
+TOOLS_URL = 'https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/download/root-installer-v1.0.3/node-endpoint-tools-1.0.2.zip'
+TOOLS_SHA256 = 'ddef146228b8796e6ee1ce7bb28512bfb50e064f93672c4e10fb2e4f6100953a'
 CACHE = Path('/opt/nodeendpoint-quick') / TOOLS_SHA256
 
 
@@ -75,7 +75,8 @@ def verified_members(data, expected=TOOLS_SHA256):
             manifest[name] = digest
         require(set(manifest) == set(result) - {'MANIFEST.sha256'}, '工具包清单不完整')
         require(all(hashlib.sha256(result[name]).hexdigest() == digest for name, digest in manifest.items()), '成员摘要不匹配')
-        require({'tools/panel/manager.py', 'tools/panel/nginx.py', 'tools/panel/pki.py'} <= set(result), '缺少管理器')
+        require({'tools/panel/manager.py', 'tools/panel/nginx.py', 'tools/panel/pki.py',
+                 'tools/panel/panel_ca.py', 'tools/panel/sync_panel_ca.php'} <= set(result), '缺少管理器或 CA 导入工具')
         return result
 
 
@@ -193,20 +194,27 @@ def main():
     parser.add_argument('--package-file', help='Offline ZIP; the same built-in SHA256 pin still applies')
     parser.add_argument('--nginx')
     parser.add_argument('--detect-only', action='store_true', help='Prepare verified tool cache and inspect; do not install endpoint')
+    parser.add_argument('--sync-ca', action='store_true', help='Import public CA from existing Root state into this panel; do not reinstall endpoint')
     args = parser.parse_args()
     require(sys.platform == 'linux' and os.geteuid() == 0, '请在面板服务器以 Root 运行')
     require(sys.version_info >= (3, 10), '需要 Python 3.10+')
     import pwd
     os.umask(0o077)
-    require(args.detect_only or sys.stdin.isatty(), '安装需要 SSH 交互终端，不要将脚本通过管道执行')
+    require(not (args.detect_only and args.sync_ca), '--detect-only 与 --sync-ca 不可同时使用')
+    require(args.detect_only or args.sync_ca or sys.stdin.isatty(), '安装需要 SSH 交互终端，不要将脚本通过管道执行')
     for name in ('openssl', 'ss', 'runuser'):
         require(shutil.which(name), '缺少依赖：' + name + '，请先通过本机包管理器安装')
-    print('校验固定 tools v1.0.1（Nginx 解析修复）；不更新 Xboard、Node 或系统软件。')
+    print('校验固定 tools v1.0.2（CA 本机自动导入）；不更新 Xboard、Node 或系统软件。')
     data = Path(args.package_file).read_bytes() if args.package_file else download()
     directory = install_cache(verified_members(data))
     sys.dont_write_bytecode = True
     sys.path.insert(0, str(directory / 'tools/panel'))
     import manager
+    if args.sync_ca:
+        from panel_ca import sync_panel_ca
+        result = sync_panel_ca()
+        print('CA 公共证书已自动导入面板，请刷新插件页面：' + json.dumps(result, ensure_ascii=False))
+        return
     selected_nginx = args.nginx
     if not selected_nginx and Path('/www/server/nginx/sbin/nginx').is_file():
         selected_nginx = '/www/server/nginx/sbin/nginx'
@@ -242,7 +250,16 @@ def main():
         argv[argv.index('install')] = 'modify'
     print('接下来由已校验管理器核对站点/路由/监听并展示计划，要求输入 INSTALL 地址:端口 和隐藏 CA 口令。')
     manager.execute(manager.parser().parse_args(argv))
-    print('入口安装完成。防火墙/云安全组请按需要放行该端口；将公共 CA 和独立指纹导入插件页并分发给 Node。')
+    print('入口安装完成。正在通过本机非 Root 应用用户自动导入 CA 公共证书。')
+    from panel_ca import sync_panel_ca
+    try:
+        result = sync_panel_ca()
+        print('CA 公共证书已自动导入面板，请刷新插件页面：' + json.dumps(result, ensure_ascii=False))
+    except (RuntimeError, OSError, ValueError) as error:
+        print('入口已安装，CA 自动导入未完成：' + str(error), file=sys.stderr)
+        print('修正原因后使用同一短命令加 bash -s -- --sync-ca 单独重试；不会重新生成证书。', file=sys.stderr)
+        raise SystemExit(2)
+    print('防火墙/云安全组请按需要放行该端口；Node 端仍需分发并核对公共 CA。')
     print('公共 CA：/var/lib/node-endpoint/pki/trust-bundle.pem；状态：/var/lib/node-endpoint/public-status.json')
     print('已有 Node 尚未自动迁移，请先验证新测试身份，再按维护窗口逐个迁移。')
 

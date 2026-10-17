@@ -20,7 +20,7 @@ spec.loader.exec_module(quick)
 
 
 def bundle(extra=None, symlink=False):
-    files = {'tools/panel/' + name: b'# fixture\n' for name in ('manager.py', 'nginx.py', 'pki.py')}
+    files = {'tools/panel/' + name: b'# fixture\n' for name in ('manager.py', 'nginx.py', 'pki.py', 'panel_ca.py', 'sync_panel_ca.php')}
     if extra:
         files.update(extra)
     manifest = ''.join(hashlib.sha256(data).hexdigest() + '  ' + name + '\n' for name, data in files.items())
@@ -46,7 +46,7 @@ class BootstrapTests(unittest.TestCase):
 
     def test_pinned_members_and_manifest_verified(self):
         raw, pin = bundle()
-        self.assertEqual(len(quick.verified_members(raw, pin)), 4)
+        self.assertEqual(len(quick.verified_members(raw, pin)), 6)
         changed = bytearray(raw)
         changed[-1] ^= 1
         with self.assertRaises(ValueError):

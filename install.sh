@@ -24,11 +24,11 @@ nodeendpoint_bootstrap() (
         (( (8#${permissions} & 0022) == 0 )) || fail "Directory permits group/other writes: $directory"
     done
 
-    detect_only=0
+    noninteractive=0
     for argument in "$@"; do
-        [[ $argument != --detect-only ]] || detect_only=1
+        case $argument in --detect-only|--sync-ca) noninteractive=1 ;; esac
     done
-    if (( ! detect_only )); then
+    if (( ! noninteractive )); then
         # curl | bash consumes stdin; the Python wizard must read the SSH TTY.
         { true </dev/tty; } 2>/dev/null || fail 'An interactive SSH terminal is required (ssh -t).'
     fi
@@ -45,13 +45,13 @@ nodeendpoint_bootstrap() (
     printf '%s\n' 'Downloading the pinned installer; private root files use 0700/0600.'
     curl --fail --show-error --silent --location --proto '=https' --proto-redir '=https' \
         --tlsv1.2 --connect-timeout 15 --max-time 180 \
-        'https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/download/root-installer-v1.0.2/quick_install.py' \
+        'https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/download/root-installer-v1.0.3/quick_install.py' \
         --output "$work/quick_install.py"
-    printf '%s  %s\n' 'eba5fb0f3c9b38a47a67298ae646c80471ae958078b3713a34cba96b513bbc5e' "$work/quick_install.py" | sha256sum --check --status \
+    printf '%s  %s\n' '19cf979c0195c9235248f8ceca6e981511df406b00d4daafb5bf5e65627db631' "$work/quick_install.py" | sha256sum --check --status \
         || fail 'Installer SHA-256 mismatch; nothing was executed.'
     chmod 600 "$work/quick_install.py"
     cd /
-    if (( detect_only )); then
+    if (( noninteractive )); then
         python3 -I "$work/quick_install.py" "$@"
     else
         python3 -I "$work/quick_install.py" "$@" </dev/tty

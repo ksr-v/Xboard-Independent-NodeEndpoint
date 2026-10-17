@@ -1,0 +1,53 @@
+{
+  "result": "PASS",
+  "single_ca_import": true,
+  "repeat_idempotent": true,
+  "native_controller_sees_ca": true,
+  "non_root_file_uid": 1001,
+  "ca_file_mode": "0600",
+  "ca_directory_mode": "0700",
+  "private_key_unreadable_by_app": true,
+  "private_key_unchanged": true,
+  "wrong_pin_rejected": true,
+  "endpoint_mismatch_rejected": true,
+  "disabled_plugin_rejected": true,
+  "symlink_target_preserved": true,
+  "dual_ca_import": true,
+  "foreign_plugin_row_preserved": true,
+  "production_database_used": false,
+  "linux_unit_tests": 8,
+  "php_syntax": "PASS",
+  "original_panel_config_and_state_unchanged": true,
+  "source_sha256": {
+    "tools/panel/panel_ca.py": "da6723feae483a0b4687e02053e71bf879b39449d8fedee7d6c33bf1288de88b",
+    "tools/panel/sync_panel_ca.php": "4173e38ad615f5eba4bd91855280075f2d8b9764858bcb184ed9fa6f4a9c8891",
+    "tools/panel/manager.py": "9b3c1608de6d63ee328e22911f90fc397eb9319072cbdebb6fafc3eb0674f4a1",
+    "tools/panel/nginx.py": "91b6422f88d92a71930723a1e656dd690d95bd45ce1de4d00b9840979479537c",
+    "tools/panel/pki.py": "006aadb8a413fa2c04dac75040ee318ea248aab1a082b181458e03afd5c3c5c2",
+    "tests/panel/test_panel_ca.py": "c1b5778d9a274f4d1d65a46e0c359d60a80a4d4e8bc2ea86ca100c024fd2beb1",
+    "tests/panel/ca_sync_live.py": "6c6bce772dd2ee41b49f0874475ad03b39ef87e0dd5cbd6d67fd7402424009de",
+    "tests/panel/ca_fixture_bootstrap.php": "713d8f3491b41f27537ee2c1d340fde999e72097473efc8a20dd90a4946d9c59",
+    "plugin/NodeEndpoint/Services/Certificates.php": "5f49cada41f7651b9ae1074836ab5b2cec7e10e00a6350e2c78f6c6c88c6b70e",
+    "plugin/NodeEndpoint/Services/Settings.php": "ce722c621a6f666f764d4683302c7564d90741a060d4a484f390e92b4489d0b4",
+    "plugin/NodeEndpoint/Services/Endpoint.php": "47d7be327d3c5d7af7ba97d491dc525ead0efd2aadeacd871b7c6f760c845b0c",
+    "plugin/NodeEndpoint/Controllers/SettingsController.php": "9ad11239e9d64a3e0dbf4fa9768d6e2a453c0ad9dd19c48aa5443bdf6b2b7a58"
+  },
+  "final_tools_sha256": "ddef146228b8796e6ee1ce7bb28512bfb50e064f93672c4e10fb2e4f6100953a",
+  "final_installer_sha256": "19cf979c0195c9235248f8ceca6e981511df406b00d4daafb5bf5e65627db631",
+  "final_package_detect_only": "PASS",
+  "installer_linux_tests": 8,
+  "missing_installation_sync_does_not_install": true,
+  "tools_added": [
+    "tools/panel/panel_ca.py",
+    "tools/panel/sync_panel_ca.php"
+  ],
+  "tools_changed": [
+    "MANIFEST.sha256",
+    "tools/panel/manager.py",
+    "tools/panel/nginx.py"
+  ],
+  "full_endpoint_installation_retested": false,
+  "windows_payload_tests": 8,
+  "windows_installer_tests": 8,
+  "scope": "Root bridge verified using actual PHP/Laravel/native plugin classes in isolated SQLite fixture. No production database, credentials, or production access; full endpoint installation not repeated."
+}
