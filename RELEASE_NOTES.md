@@ -1,4 +1,12 @@
-# NodeEndpoint v1.0.0 发布说明
+# NodeEndpoint v1.0.1 发布说明
+
+原生机器管理的新建/复制安装命令自动使用你的独立固定安装源、通讯 IP/端口和已导入公共 CA，保留原有机器身份。节点端自动校验证书、预检 HTTPS 并配置单服务信任。独立 Node 安装源同步升级，二进制仍是固定 v1.13-orphan.4。
+
+附件：NodeEndpoint-1.0.1.zip、SHA256SUMS、release.json、native-machine-install-results.json。上传 ZIP 原生升级，确认启用；无需先卸载插件、升级面板主程序或重新生成 Root CA。升级后重新复制原生机器安装命令，在新 Node 服务器执行并选择 1 安装即可。
+
+本轮 30 项原生组件、19 项 Bash（另 1 项隔离路径跳过）、7 项 Linux Root CA 通过；真实两 VM 的 IP HTTPS/NodeWorker WSS 认证、新装、升级保留 CA、故障回滚和卸载通过。测试机器没有业务节点绑定，历史 UUID/Observer 限制继续保留，详见 NATIVE_MACHINE_TEST_REPORT.md。原生机器命令沿用 Token 参数，请勿公开命令或历史。原生产节点未进行操作。
+
+## v1.0.0 历史发行说明
 
 为现有 Xboard 增加独立 IP/域名 HTTPS 节点通讯入口，默认端口 8443。原生插件管理页与 Root/Node 工具配合使用，保留原网站及已有面板数据。
 

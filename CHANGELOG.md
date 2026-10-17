@@ -1,5 +1,12 @@
 # 变更记录
 
+## 1.0.1 — 原生机器命令自动携带独立 IP / CA
+
+- 在插件 API middleware 中按原生 MachineController action 处理新建机器和复制安装命令；采用独立维护的固定安装源、已保存的 IP/端口、公共 CA 和指纹。缺少信任时在创建机器之前停止。保留原生管理员权限、机器 Token 和命令参数语义。
+- 不更改 Xboard 核心或 Admin bundle；原生升级保留 1.0.0 的设置及 CA，Root 入口与 PKI 不重装。关闭独立入口后恢复宿主原生行为。
+- 独立 Node 安装器增加 CA 校验、实际 HTTPS 身份预检、固定二进制摘要、单服务 SSL_CERT_FILE 信任、升级保留及失败回滚/卸载处理；Go 二进制维持 v1.13-orphan.4。
+- 30 项 Laravel 原生组件通过；Bash 20 项中 19 通过、1 因隔离目录无发行镜像跳过；Linux Root CA 7 项通过。专用两 VM 实测原生机器生成命令、IP HTTPS、新装、NodeWorker WSS auth.success、升级保留 CA、故障恢复和卸载清理。新建机器无业务节点绑定，本轮未复测代理/流量/UUID；历史失败继续保留。详见 NATIVE_MACHINE_TEST_REPORT.md。
+
 ## 同机公共 CA 自动导入 — root-installer-v1.0.3 / tools 1.0.2
 
 - 新安装完成后自动导入公共 CA；已有入口可通过 `--sync-ca` 单独执行，无需重新上传插件、输入管理员 Token 或重新生成证书。

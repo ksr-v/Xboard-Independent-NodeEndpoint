@@ -105,7 +105,7 @@ if ($fresh) {
 Schema::create('v2_plugins', function (Blueprint $t): void { $t->id(); $t->string('code')->unique(); $t->string('name'); $t->string('version'); $t->string('type')->default('feature'); $t->boolean('is_enabled')->default(false); $t->text('config')->nullable(); $t->timestamp('installed_at')->nullable(); $t->timestamps(); });
 Schema::create('users', function (Blueprint $t): void { $t->id(); $t->string('name'); $t->string('email')->unique(); $t->string('password'); $t->boolean('is_admin')->default(false); $t->timestamps(); });
 Schema::create('personal_access_tokens', function (Blueprint $t): void { $t->id(); $t->morphs('tokenable'); $t->string('name'); $t->string('token', 64)->unique(); $t->text('abilities')->nullable(); $t->timestamp('last_used_at')->nullable(); $t->timestamp('expires_at')->nullable(); $t->timestamps(); });
-Schema::create('v2_server_machine', function (Blueprint $t): void { $t->id(); $t->string('name'); $t->string('token'); $t->boolean('is_active')->default(true); $t->unsignedBigInteger('last_seen_at')->nullable(); $t->timestamps(); });
+Schema::create('v2_server_machine', function (Blueprint $t): void { $t->id(); $t->string('name'); $t->text('notes')->nullable(); $t->string('token'); $t->boolean('is_active')->default(true); $t->unsignedBigInteger('last_seen_at')->nullable(); $t->timestamps(); });
 Schema::create('production_evidence', function (Blueprint $t): void { $t->id(); $t->string('kind'); $t->text('value'); });
 DB::table('production_evidence')->insert(['kind' => 'business records', 'value' => 'users,nodes,machine tokens,traffic,subscriptions,certificates']);
 $admin = FixtureUser::create(['name' => 'Fixture admin', 'email' => 'admin@fixture.invalid', 'password' => 'not-a-login-password', 'is_admin' => true]);
@@ -122,6 +122,8 @@ file_put_contents($fixture . '/fixture-auth.json', json_encode(['admin_token' =>
 }
 Route::middleware(['api', 'server.v2'])->match(['GET', 'POST'], 'api/v2/server/handshake', [App\Http\Controllers\V2\Server\ServerController::class, 'handshake']);
 Route::middleware('api')->get('api/fixture/other', fn () => response()->json(['websocket' => ['enabled' => true, 'ws_url' => 'wss://other.example/ws']]));
+Route::middleware(['api', 'admin'])->get('api/v2/admin/server/machine/installCommand', [App\Http\Controllers\V2\Admin\Server\MachineController::class, 'installCommand']);
+Route::middleware(['api', 'admin'])->post('api/v2/admin/server/machine/save', [App\Http\Controllers\V2\Admin\Server\MachineController::class, 'save']);
 Route::get('fixture-admin', fn () => view('admin', ['title' => 'Fixture', 'version' => 'fixture', 'logo' => '', 'secure_path' => 'fixture-admin']));
 
 function requestFixture(string $url, string $method = 'GET', array $data = [], ?string $bearer = null, array $server = []): Symfony\Component\HttpFoundation\Response

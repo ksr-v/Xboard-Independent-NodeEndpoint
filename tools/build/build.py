@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Deterministic local releases; no network, publishing or credentials."""
+import argparse
 import hashlib
 import json
 from pathlib import Path
@@ -8,15 +9,15 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[2]
 VERSION = '1.0.0'
 DOCS = ['README.md', 'ARCHITECTURE.md', 'SECURITY.md', 'IMPLEMENTATION_PLAN.md',
-        'TEST_REPORT.md', 'VM_TEST_REPORT.md', 'FULL_E2E_TEST_REPORT.md', 'PRODUCTION_DEPLOYMENT.md', 'CHANGELOG.md', 'RELEASE_NOTES.md', 'LICENSE']
+        'TEST_REPORT.md', 'VM_TEST_REPORT.md', 'FULL_E2E_TEST_REPORT.md', 'NATIVE_MACHINE_TEST_REPORT.md', 'PRODUCTION_DEPLOYMENT.md', 'CHANGELOG.md', 'RELEASE_NOTES.md', 'LICENSE']
 
 def files(directory):
     return sorted(p for p in directory.rglob('*') if p.is_file()
                   and not any(x in ('__pycache__', 'vendor', 'runtime', 'work', 'node_modules', '.pytest_cache') for x in p.parts)
                   and p.suffix not in ('.pyc', '.sqlite', '.log'))
 
-def archive(name, members):
-    destination = ROOT / 'dist' / name
+def archive(name, members, output=None, version=VERSION):
+    destination = (output or ROOT / 'dist') / name
     targets = [target for _, target in members]
     if len(set(targets)) != len(targets) or any(target.startswith('/') or '..' in target.split('/') for target in targets):
         raise RuntimeError('Unsafe or duplicate archive path')
@@ -40,22 +41,39 @@ def archive(name, members):
     with zipfile.ZipFile(destination) as bundle:
         if bundle.testzip():
             raise RuntimeError('Archive CRC verification failed')
-    return {'file': name, 'version': VERSION, 'bytes': destination.stat().st_size,
+    return {'file': name, 'version': version, 'bytes': destination.stat().st_size,
             'sha256': hashlib.sha256(destination.read_bytes()).hexdigest()}
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--plugin-only', action='store_true', help='Build current native plugin in a versioned dist directory; preserve old releases')
+    args = parser.parse_args()
     (ROOT / 'dist').mkdir(exist_ok=True)
     for name in DOCS:
         if not (ROOT / name).is_file():
             raise RuntimeError('Missing required delivery document: ' + name)
     plugin_root = ROOT / 'plugin' / 'NodeEndpoint'
     config = json.loads((plugin_root / 'config.json').read_text('utf-8'))
-    assert config['version'] == VERSION and config['code'] == 'node_endpoint'
+    assert config['code'] == 'node_endpoint'
     plugin = [(p, 'NodeEndpoint/' + p.relative_to(plugin_root).as_posix()) for p in files(plugin_root)]
     toolset = [(p, p.relative_to(ROOT).as_posix()) for p in files(ROOT / 'tools')]
     documents = [(ROOT / name, name) for name in DOCS] + [(p, p.relative_to(ROOT).as_posix()) for p in files(ROOT / 'docs')]
     # Include Root/Node tools and documents in the native upload package as well.
     plugin += [(p, 'NodeEndpoint/' + name) for p, name in toolset + documents]
+    if args.plugin_only:
+        version = config['version']
+        import re
+        if not re.fullmatch(r'\d+\.\d+\.\d+', version):
+            raise RuntimeError('Invalid plugin release version')
+        output = ROOT / 'dist' / ('v' + version)
+        output.mkdir(exist_ok=True)
+        report = archive('NodeEndpoint-' + version + '.zip', plugin, output, version)
+        (output / 'SHA256SUMS').write_text(report['sha256'] + '  ' + report['file'] + '\n', encoding='utf-8')
+        (output / 'release.json').write_text(json.dumps({'version': version, 'artifacts': [report]}, indent=2) + '\n', encoding='utf-8')
+        print(json.dumps(report, indent=2))
+        return
+    if config['version'] != VERSION:
+        raise RuntimeError('Legacy three-package build is fixed to 1.0.0; use --plugin-only for a newer native plugin')
     sources = [(p, p.relative_to(ROOT).as_posix()) for p in files(ROOT / 'plugin')] + toolset + documents
     sources += [(p, p.relative_to(ROOT).as_posix()) for p in files(ROOT / 'tests')
                 if not any(x in ('fixture', 'tmp', 'preview') for x in p.relative_to(ROOT / 'tests').parts)]

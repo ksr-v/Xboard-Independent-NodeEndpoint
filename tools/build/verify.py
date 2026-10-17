@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Verify local release hashes, archive safety and every member manifest."""
+import argparse
 import hashlib
 import json
 from pathlib import Path, PurePosixPath
@@ -11,13 +12,19 @@ EXPECTED = {'NodeEndpoint-1.0.0.zip', 'node-endpoint-tools-1.0.0.zip', 'xb-node-
 
 
 def main():
-    release = json.loads((ROOT / 'dist/release.json').read_text('utf-8'))
-    if release.get('version') != '1.0.0' or {row['file'] for row in release['artifacts']} != EXPECTED:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--plugin-only', action='store_true', help='Verify current versioned native-plugin release')
+    args = parser.parse_args()
+    version = json.loads((ROOT / 'plugin/NodeEndpoint/config.json').read_text('utf-8'))['version'] if args.plugin_only else '1.0.0'
+    directory = ROOT / 'dist' / ('v' + version) if args.plugin_only else ROOT / 'dist'
+    expected = {'NodeEndpoint-' + version + '.zip'} if args.plugin_only else EXPECTED
+    release = json.loads((directory / 'release.json').read_text('utf-8'))
+    if release.get('version') != version or {row['file'] for row in release['artifacts']} != expected:
         raise RuntimeError('Release identity differs')
     reports = []
     sums = []
     for row in release['artifacts']:
-        artifact = ROOT / 'dist' / row['file']
+        artifact = directory / row['file']
         actual = hashlib.sha256(artifact.read_bytes()).hexdigest()
         if actual != row['sha256'] or artifact.stat().st_size != row['bytes'] or row['version'] != release['version']:
             raise RuntimeError('Artifact metadata/hash differs: ' + row['file'])
@@ -51,10 +58,10 @@ def main():
                     raise RuntimeError('Member SHA-256 differs')
             if prefix:
                 config = json.loads(bundle.read(prefix + 'config.json'))
-                if config['code'] != 'node_endpoint' or config['version'] != '1.0.0':
+                if config['code'] != 'node_endpoint' or config['version'] != version:
                     raise RuntimeError('Native plugin metadata differs')
             reports.append({'file': row['file'], 'members': len(names), 'sha256': actual, 'result': 'PASS'})
-    if (ROOT / 'dist/SHA256SUMS').read_text('utf-8') != ''.join(sums):
+    if (directory / 'SHA256SUMS').read_text('utf-8') != ''.join(sums):
         raise RuntimeError('SHA256SUMS differs from release metadata')
     print(json.dumps(reports, indent=2))
 

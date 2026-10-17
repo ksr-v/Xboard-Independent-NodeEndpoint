@@ -27,13 +27,14 @@ test('repeated native enable and per-request boot do not duplicate api middlewar
     requestFixture('https://old.panel.example/api/v1/node-endpoint/settings', 'GET', [], $GLOBALS['adminToken']);
     $count = count(array_filter(app('router')->getMiddlewareGroups()['api'], fn ($v) => $v === Plugin\NodeEndpoint\Middleware\ScopedHandshake::class));
     eq($count, 1);
+    eq(count(array_filter(app('router')->getMiddlewareGroups()['api'], fn ($v) => $v === Plugin\NodeEndpoint\Middleware\NativeMachineInstall::class)), 1);
 });
 test('real Sanctum anonymous and ordinary-user tokens cannot use Admin API', function (): void {
     eq(requestFixture('https://old.panel.example/api/v1/node-endpoint/settings')->getStatusCode(), 403);
     eq(requestFixture('https://old.panel.example/api/v1/node-endpoint/settings', 'GET', [], $GLOBALS['userToken'])->getStatusCode(), 403);
     $r = requestFixture('https://old.panel.example/api/v1/node-endpoint/settings', 'GET', [], $GLOBALS['adminToken']);
     eq($r->getStatusCode(), 200, $r->getContent());
-    eq(jsonResponse($r)['data']['version'], '1.0.0');
+    eq(jsonResponse($r)['data']['version'], '1.0.1');
 });
 test('native generic config save cannot bypass the isolated endpoint settings API', function (): void {
     (new App\Services\Plugin\PluginConfigService())->updateConfig('node_endpoint', ['management_url' => '/attempted-change', 'enabled' => true, 'host' => 'evil.example', 'https' => false, 'http_acknowledged' => true]);
@@ -123,16 +124,6 @@ test('native disable makes retained routes inert and preserves Root-owned eviden
     eq(file_get_contents(storage_path('app/node_endpoint/root-owned-evidence.txt')), 'root-owned: preserve');
     app(PluginManager::class)->enable('node_endpoint');
 });
-test('native version upgrade preserves endpoint settings and schema', function (): void {
-    $path = base_path('plugins/NodeEndpoint/config.json');
-    $manifest = json_decode(file_get_contents($path), true, 512, JSON_THROW_ON_ERROR);
-    $manifest['version'] = '1.0.1';
-    file_put_contents($path, json_encode($manifest));
-    app(PluginManager::class)->update('node_endpoint');
-    eq(App\Models\Plugin::where('code', 'node_endpoint')->value('version'), '1.0.1');
-    eq(Settings::read()['host'], '192.0.2.10');
-    ok(Schema::hasTable('node_endpoint_settings'), 'Upgrade removed settings table.');
-});
 test('public Root status import validates schema, excludes credentials and cannot change endpoint configuration', function (): void {
     $url = 'https://old.panel.example/api/v1/node-endpoint/status-import';
     $status = ['schema_version' => 1, 'version' => '1.0.0', 'installed' => true,
@@ -205,6 +196,81 @@ test('two independently pinned CA roots support dual trust and reject duplicate 
     eq(requestFixture($url, 'POST', ['pem' => $first['pem'] . $first['pem'], 'fingerprints' => [$first['fingerprint'], $first['fingerprint']]], $GLOBALS['adminToken'])->getStatusCode(), 422);
     eq(file_get_contents(Settings::caPath()), $stored);
 });
+test('native machine commands require Admin and carry the independent source, IP and public dual CA', function (): void {
+    $url = 'https://old.panel.example/api/v2/admin/server/machine/installCommand';
+    eq(requestFixture($url, 'GET', ['id' => $GLOBALS['machine']->id])->getStatusCode(), 403);
+    eq(requestFixture($url, 'GET', ['id' => $GLOBALS['machine']->id], $GLOBALS['userToken'])->getStatusCode(), 403);
+    $r = requestFixture($url, 'GET', ['id' => $GLOBALS['machine']->id], $GLOBALS['adminToken']);
+    eq($r->getStatusCode(), 200, $r->getContent());
+    $command = jsonResponse($r)['data']['command'];
+    ok(str_contains($command, Plugin\NodeEndpoint\Services\MachineInstallCommand::INSTALLER), 'Independent installer absent.');
+    ok(!str_contains($command, 'cedar2025') && !str_contains($command, 'old.panel.example'), 'Original source or website leaked into new target.');
+    ok(str_contains($command, "'--panel' 'https://192.0.2.10:8443'"), 'Configured IP absent.');
+    ok(str_contains($command, "'--machine-id' '" . $GLOBALS['machine']->id . "'"), 'Identity changed.');
+    ok(str_contains($command, "'--token' 'fixture-machine-token'"), 'Native machine credential semantics changed.');
+    ok(str_contains($command, "'--endpoint-ca-base64' '" . base64_encode(file_get_contents(Settings::caPath())) . "'"), 'Public CA not embedded.');
+    ok(str_contains($command, "'--endpoint-ca-fingerprint' '" . $GLOBALS['fixtureCa']['fingerprint'] . ',' . $GLOBALS['fixtureCa2']['fingerprint'] . "'"), 'Independent pins absent.');
+    ok(str_contains($r->headers->get('Cache-Control'), 'no-store'), 'Sensitive command cacheable.');
+    eq(admin_setting('app_url'), 'https://old.panel.example');
+});
+
+test('native new machine creation returns its own independent install command and updates remain native', function (): void {
+    $url = 'https://old.panel.example/api/v2/admin/server/machine/save';
+    $r = requestFixture($url, 'POST', ['name' => 'Native new fixture', 'notes' => 'preserved'], $GLOBALS['adminToken']);
+    eq($r->getStatusCode(), 200, $r->getContent());
+    $data = jsonResponse($r)['data'];
+    $machine = App\Models\ServerMachine::findOrFail($data['id']);
+    eq($data['token'], $machine->token);
+    eq($machine->notes, 'preserved');
+    ok(str_contains($data['install_command'], "'--machine-id' '" . $machine->id . "'"), 'Created identity absent.');
+    ok(str_contains($data['install_command'], Plugin\NodeEndpoint\Services\MachineInstallCommand::INSTALLER), 'Creation fell back to original installer.');
+    eq(jsonResponse(requestFixture($url, 'POST', ['id' => $machine->id, 'name' => 'Renamed'], $GLOBALS['adminToken']))['data'], true);
+});
+
+test('missing CA and non-HTTPS entry refuse native command creation before changing machines', function (): void {
+    $before = Settings::read();
+    $pem = file_get_contents(Settings::caPath());
+    $count = App\Models\ServerMachine::count();
+    unlink(Settings::caPath());
+    try {
+        foreach (['installCommand', 'save'] as $action) {
+            $r = requestFixture('https://old.panel.example/api/v2/admin/server/machine/' . $action,
+                $action === 'save' ? 'POST' : 'GET', ['name' => 'Must not create', 'id' => $action === 'save' ? null : $GLOBALS['machine']->id], $GLOBALS['adminToken']);
+            eq($r->getStatusCode(), 422, $r->getContent());
+        }
+        eq(App\Models\ServerMachine::count(), $count);
+    } finally { file_put_contents(Settings::caPath(), $pem); }
+    Settings::write(array_replace($before, ['https' => false, 'http_acknowledged' => true]));
+    try {
+        eq(requestFixture('https://old.panel.example/api/v2/admin/server/machine/installCommand', 'GET',
+            ['id' => $GLOBALS['machine']->id], $GLOBALS['adminToken'])->getStatusCode(), 422);
+    } finally { Settings::write($before); }
+});
+
+test('disabled independent entry preserves native command behavior', function (): void {
+    $before = Settings::read();
+    Settings::write(array_replace($before, ['enabled' => false]));
+    try {
+        $r = requestFixture('https://old.panel.example/api/v2/admin/server/machine/installCommand', 'GET',
+            ['id' => $GLOBALS['machine']->id], $GLOBALS['adminToken']);
+        eq($r->getStatusCode(), 200, $r->getContent());
+        ok(str_contains(jsonResponse($r)['data']['command'], 'cedar2025/xboard-node/dev/install.sh'), 'Disabled behavior changed.');
+    } finally { Settings::write($before); }
+});
+
+test('native plugin upgrade from 1.0.0 preserves settings, CA, machine credentials and enabled state', function (): void {
+    $before = Settings::read();
+    $ca = file_get_contents(Settings::caPath());
+    $token = $GLOBALS['machine']->fresh()->token;
+    App\Models\Plugin::where('code', 'node_endpoint')->update(['version' => '1.0.0']);
+    eq(app(PluginManager::class)->update('node_endpoint'), true);
+    eq(App\Models\Plugin::where('code', 'node_endpoint')->value('version'), '1.0.1');
+    eq((bool) App\Models\Plugin::where('code', 'node_endpoint')->value('is_enabled'), true);
+    eq(Settings::read(), $before);
+    eq(file_get_contents(Settings::caPath()), $ca);
+    eq($GLOBALS['machine']->fresh()->token, $token);
+});
+
 test('command generation supports complete mode/kernel/architecture matrix without Token argv', function (): void {
     foreach (['node', 'machine'] as $mode) foreach (['singbox', 'xray'] as $kernelType) foreach (['amd64', 'arm64'] as $architecture) {
         $params = ['mode' => $mode, 'kernel' => $kernelType, 'architecture' => $architecture, 'instance' => 'fixture-instance', 'identity_id' => 7, 'node_type' => 'shadowsocks'];

@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "date": "2026-10-17",
+  "version": "1.0.1",
+  "scope": "Native machine installation command and independent IP/public-CA trust; not a complete proxy/traffic/UUID retest",
+  "plugin": {
+    "file": "NodeEndpoint-1.0.1.zip",
+    "version": "1.0.1",
+    "bytes": 636335,
+    "sha256": "24f7e2f3a188815b3ab60f1bd3ba86897858e3cc01baeb097220540136fb1652"
+  },
+  "installer": {
+    "tag": "nodeendpoint-native-v1.0.0",
+    "bytes": 47029,
+    "sha256": "25e0713ac1a714a42c0376e3eafaceae5e508e0234c6ef4094df736f23f32590",
+    "source_commit": "17cd9f0af2815beeb20c24aa8a845e1fb6207c5e",
+    "distribution_commit": "82a7dad0677d68ba74dc1012042052fad35d738c",
+    "source_and_two_distribution_copies_identical": true
+  },
+  "tests": {
+    "laravel_native_components": {
+      "passed": 30,
+      "framework": "12.69.3"
+    },
+    "native_zip_upload": {
+      "passed": 6,
+      "files_verified": 87
+    },
+    "linux_bash": {
+      "passed": 19,
+      "skipped": 1,
+      "skip_reason": "Distribution mirror absent in isolated fixture; compared separately before publication"
+    },
+    "linux_root_ca": {
+      "passed": 7
+    },
+    "windows_bash": {
+      "passed": 19,
+      "skipped": 1
+    },
+    "windows_root_ca": {
+      "skipped": 7,
+      "reason": "Linux Root ownership semantics required"
+    }
+  },
+  "two_vm": {
+    "platform": "aaPanel PHP-FPM 8.3 / Linux AMD64 systemd",
+    "native_machine_generated_command": true,
+    "https_ip_certificate_and_identity_preflight": true,
+    "real_nodeworker_wss_auth_success": true,
+    "root_only_0600": true,
+    "upgrade_preserves_ca": true,
+    "injected_upgrade_failure_restores_config_ca_and_unit_bytes": true,
+    "service_healthy_after_rollback": true,
+    "uninstall_removes_owned_active_trust_retains_recovery": true,
+    "panel_snapshot_restored": true,
+    "test_machine_removed": true,
+    "test_nginx_nodeworker_and_firewall_rule_removed": true,
+    "offline_pinned_assets": true,
+    "isolated_paths_and_service_wrapper": true,
+    "business_nodes_bound": 0
+  },
+  "unchanged": {
+    "node_binary_version": "v1.13-orphan.4",
+    "xboard_core_modified": false,
+    "admin_bundle_modified": false,
+    "production_servers_accessed": false,
+    "existing_v1_0_0_zip_hashes_verified": true
+  },
+  "limits": [
+    "ARM64/IPv6/public production not tested this round",
+    "Interactive menu covered by Bash fixtures; real installation explicitly used --yes",
+    "Known fixed-Go Xray UUID full/incremental and CLI Observer issues remain; see FULL_E2E_TEST_REPORT.md",
+    "Existing nodes need an explicit trust update during CA rotation",
+    "Native command retains original machine Token argument semantics"
+  ]
+}

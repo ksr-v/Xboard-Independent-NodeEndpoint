@@ -2,13 +2,16 @@
 namespace Plugin\NodeEndpoint;
 use App\Services\Plugin\AbstractPlugin;
 use Plugin\NodeEndpoint\Middleware\ScopedHandshake;
+use Plugin\NodeEndpoint\Middleware\NativeMachineInstall;
 class Plugin extends AbstractPlugin
 {
     public function boot(): void
     {
         $router = app('router');
-        if (!in_array(ScopedHandshake::class, $router->getMiddlewareGroups()['api'] ?? [], true)) {
-            $router->pushMiddlewareToGroup('api', ScopedHandshake::class);
+        foreach ([ScopedHandshake::class, NativeMachineInstall::class] as $middleware) {
+            if (!in_array($middleware, $router->getMiddlewareGroups()['api'] ?? [], true)) {
+                $router->pushMiddlewareToGroup('api', $middleware);
+            }
         }
     }
     public function install(): void {}

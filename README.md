@@ -1,20 +1,37 @@
-# NodeEndpoint 1.0.0
+# NodeEndpoint 1.0.1
 
 为正在运行的 Xboard 增加独立的 IP / 域名节点通讯入口。插件标识 `node_endpoint`，默认 HTTPS TCP 8443，双 10 年私有 CA / 服务器证书策略。面板网页域名、`app_url`、登录、订阅、原 443 站点和其他插件的配置保持原有设置。
 
 当前交付为**隔离环境验收版本**。Windows 与专用 Ubuntu VM 的真实 Nginx、Linux 权限、Root CLI / 独立 PHP-FPM 验证见 [TEST_REPORT.md](TEST_REPORT.md) 和 [VM_TEST_REPORT.md](VM_TEST_REPORT.md)。原生 AMD64 Go Node 在合成面板上完成新装、双内核、WSS、换证、标准多实例迁移与 CLI 回滚的 11 项检查。两 VM Xboard / NodeWorker / Go 实机验收及清理恢复已完成，已测冷启动认证、设备清理、四绑定计量、CA 轮换和选择迁移/回滚通过；固定 Go 的 Xray 全量及单用户增量 UUID 更新失败，CLI UUID save 的 Observer 触发仍有未定位缺口；实际 Admin HTTP 属性更新及恢复通过，不能称全部联测通过。详见 [FULL_E2E_TEST_REPORT.md](FULL_E2E_TEST_REPORT.md)。范围为所列宝塔 PHP-FPM / IPv4 / AMD64 与协议组合，生产环境仍需独立验收。
 
+## 新机器一键对接 IP（1.0.1）
+
+已有 1.0.0 用户：备份插件设置，在原生插件管理上传 [NodeEndpoint-1.0.1.zip](https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/download/v1.0.1/NodeEndpoint-1.0.1.zip) 升级并确认启用。无需卸载 NodeEndpoint 或其他插件，无需升级 Xboard 主程序、重装 Root 入口或重新生成 CA。原生升级会保留已保存的通讯 IP、端口、公共 CA 和机器 Token；常驻 worker 按宿主流程 reload。
+
+完成一次面板独立 HTTPS 入口安装与公共 CA 同步后：
+
+1. 在 NodeEndpoint 页面保存通讯 IP / 端口 / HTTPS，并确认公共 CA 已导入。
+2. 回到原生 **机器管理**，新建机器或复制该机器的安装命令。
+3. 在新的 Node 服务器 SSH 终端执行命令，菜单选择 **1 安装**。地址、机器 ID、Token 和 CA 已带入，无需重复填写或手工传 CA。
+
+生成命令的下载源是你维护的固定版本 [Xboard-Independent/nodeendpoint-native-v1.0.0](https://github.com/ksr-v/Xboard-Independent/tree/nodeendpoint-native-v1.0.0/node-installer)，节点二进制使用独立源码仓库的固定 v1.13-orphan.4 Release；连接地址取插件保存的 HTTPS IP，面板网页域名继续用于网页管理。原版 cedar2025 安装命令本身不会自动改变，须在插件升级后重新复制面板命令。
+
+原生机器命令沿用原有 Token 参数方式，属于敏感命令，不要公开粘贴或提交日志。命令内的公共 CA 和指纹来自管理员已导入的信任；安装器验证指纹、CA 用途和 HTTPS 主机名，再将 Root-only 信任文件写入节点服务，通过 SSL_CERT_FILE 使用。升级、失败回滚与卸载均处理这份信任。缺少 CA 或使用 HTTP 时会拒绝生成自动安装命令；关闭独立入口后恢复宿主原有命令行为。
+
+这条安装流程适用于新机器。检测到旧安装时会要求 REPLACE，替换本机全部旧对接；已有生产节点仍按下文的实例迁移流程处理。CA 轮换仍需为已有节点安排双信任更新，新机器会带入面板当时已导入的 CA。测试范围与结果见 [NATIVE_MACHINE_TEST_REPORT.md](NATIVE_MACHINE_TEST_REPORT.md)。
+
 ## 交付物
 
-- `dist/NodeEndpoint-1.0.0.zip`：Xboard 原生上传包，唯一根目录 `NodeEndpoint/`，内含插件、工具和文档。
+- [v1.0.1 Release](https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/tag/v1.0.1)：当前原生插件 NodeEndpoint-1.0.1.zip、SHA256SUMS、版本记录及测试报告，本地构建输出在 dist/v1.0.1/。
+- `dist/NodeEndpoint-1.0.0.zip`：原始历史上传包，已发布文件保留；新装或升级使用 1.0.1。
 - `dist/node-endpoint-tools-1.0.0.zip`：独立 SSH 工具包，解压后包含 `tools/panel/`、`tools/node/` 和说明文档。
 - `dist/xb-node-endpoint-1.0.0-source.zip`：源码和测试；不包含参考仓库、开发运行器、vendor、凭据或生成的私钥。
 - `dist/SHA256SUMS`、`dist/release.json`：版本与 SHA-256。
-- SSH 安装推荐使用下方最新短命令：[root-installer-v1.0.3](https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/tag/root-installer-v1.0.3) 内含 tools 1.0.2 的本机 CA 自动导入及 Nginx 解析兼容修复；面板原生插件仍为 1.0.0。
+- 面板 Root 入口使用下方短命令：[root-installer-v1.0.3](https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/tag/root-installer-v1.0.3)，内含 tools 1.0.2 的本机 CA 自动导入及 Nginx 解析兼容修复，与插件 1.0.1 兼容。
 
 ## Root 一键安装独立入口
 
-**NodeEndpoint-1.0.0.zip 已经上传、安装并启用后**，在面板服务器以 Root 登录交互 SSH，直接粘贴下面这一行，即可下载 tools 并进入后续安装向导。需要 Python 3.10+、curl、OpenSSL、`ss` 和 `runuser`；不会自动升级系统、Xboard 或 Node。
+**NodeEndpoint 插件已安装并启用后**，在面板服务器以 Root 登录交互 SSH，直接粘贴下面这一行，即可下载 tools 并进入后续安装向导。需要 Python 3.10+、curl、OpenSSL、`ss` 和 `runuser`；不会自动升级系统、Xboard 或 Node。
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.3/install.sh | bash
@@ -156,16 +173,20 @@ location = /ws {
 
 ### 1. 下载并核对发行包
 
-从 [v1.0.0 Release](https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/tag/v1.0.0) 下载 **NodeEndpoint-1.0.0.zip**、**node-endpoint-tools-1.0.0.zip** 和同一 Release 的 **SHA256SUMS**。GitHub 自动生成的 “Source code” 压缩包不是原生插件上传包。通过可信渠道核对摘要，然后在下载目录检查：
+从 [v1.0.1 Release](https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/tag/v1.0.1) 下载 **NodeEndpoint-1.0.1.zip** 和 **SHA256SUMS**，核对摘要后上传原生插件。GitHub 自动生成的 “Source code” 压缩包不是原生插件上传包：
 
 ```bash
-# 若下载了完整三件套，可使用 sha256sum -c SHA256SUMS；仅下载两包时：
-sha256sum --ignore-missing -c SHA256SUMS
+sha256sum -c SHA256SUMS
+```
 
+面板 Root 部署优先使用本文开头的一键命令。需要手工部署时，从 [root-installer-v1.0.3](https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/tag/root-installer-v1.0.3) 下载 **node-endpoint-tools-1.0.2.zip** 及该 Release 的 SHA256SUMS，在单独的下载目录核对：
+
+```bash
+sha256sum --ignore-missing -c SHA256SUMS
 # 解压工具到新建的专用目录；不要解压覆盖原 Xboard 目录。
-install -d -m 700 /root/node-endpoint-1.0.0
-unzip node-endpoint-tools-1.0.0.zip -d /root/node-endpoint-1.0.0
-cd /root/node-endpoint-1.0.0
+install -d -m 700 /root/node-endpoint-1.0.2
+unzip node-endpoint-tools-1.0.2.zip -d /root/node-endpoint-1.0.2
+cd /root/node-endpoint-1.0.2
 sha256sum -c MANIFEST.sha256
 ```
 
@@ -189,7 +210,7 @@ sha256sum -c MANIFEST.sha256
 以下以宝塔原生 FPM 为例；所有占位符先用 `detect` 和实际网站配置核对。使用一个未被占用且可从 Node 访问的 IP/域名和 TCP 8443，域名方式先正确解析；本机防火墙和云安全组由管理员放行所需来源。
 
 ```bash
-cd /root/node-endpoint-1.0.0
+cd /root/node-endpoint-1.0.2
 sudo bash tools/panel/node-endpoint-panel.sh --nginx /www/server/nginx/sbin/nginx detect
 
 sudo bash tools/panel/node-endpoint-panel.sh --nginx /www/server/nginx/sbin/nginx install \
@@ -209,14 +230,16 @@ sudo bash tools/panel/node-endpoint-panel.sh --nginx /www/server/nginx/sbin/ngin
 
 安装时确认展示的计划，输入 `INSTALL 地址:8443`，再隐藏输入至少 16 字符的 CA 口令。插件页面的 host/port/HTTPS/WS 模式必须与此配置一致。默认 Root 状态位于 `/var/lib/node-endpoint`；公共证书 bundle 为 `/var/lib/node-endpoint/pki/trust-bundle.pem`，公共状态为 `/var/lib/node-endpoint/public-status.json`。
 
-### 4. 分发 CA，再接入节点
+### 4. 接入节点
+
+**新增 machine 机器推荐使用原生机器管理的一键命令**，步骤见本文开头；命令已带入 IP 与公共 CA，不需要以下手工分发步骤。传统 node 模式或已有实例的工具迁移仍按下面流程准备 CA。
 
 从可信 SSH 渠道取得上述公共证书和 `status` 显示的 CA SHA-256 指纹，在管理页核对导入；指纹须独立确认。只传公共证书，私钥留在受保护的 Root/离线保管位置。
 
 在 Node 服务器将收到的公共证书放到 `/root/received-node-endpoint-ca.pem`，先验证并创建工具命令约定的信任文件：
 
 ```bash
-cd /root/node-endpoint-1.0.0
+cd /root/node-endpoint-1.0.2
 sudo python3 tools/node/node_endpoint.py ca-import \
   --ca-file /root/received-node-endpoint-ca.pem \
   --ca-fingerprint '独立确认的64位SHA256指纹' \
@@ -245,7 +268,7 @@ FlowScope 采集器有独立 `panel_url` 与证书信任；需单独审计迁移
 
 禁用/升级不删除 Root 入口或任何私钥；旧网站和旧节点行为不受作用域 middleware 影响。禁用会停止 NodeEndpoint 对新入口 handshake 的地址重写，因此已迁移节点需要先确认 REST fallback / 原生 WS 地址可用，再禁用。不能仅凭 HTTPS 监听仍在断言 WSS 不受影响。
 
-升级前备份自己的设置与工具状态，上传更高版本的同标识原生包；当前 1.0.0 的重复包会被宿主原生上传器拒绝。常驻 Octane 环境按宿主管理流程 reload 应用 worker，确认路由与资产加载。
+升级前备份自己的设置与工具状态；从 1.0.0 升级时上传 NodeEndpoint-1.0.1.zip，无需先卸载。相同版本的重复包会被宿主原生上传器拒绝。常驻 Octane 环境按宿主管理流程 reload 应用 worker，确认路由与资产加载。
 
 原生卸载停止插件 API 与 handshake 修改，保留 `node_endpoint_settings` 和已导入公共 CA 供恢复。宿主迁移回滚器存在全局最后 batch 限制，插件选择一致保留自己的恢复设置。若明确不再需要，先备份，作为应用运行用户执行：
 

@@ -1,0 +1,35 @@
+<?php
+namespace Plugin\NodeEndpoint\Services;
+use InvalidArgumentException;
+final class MachineInstallCommand
+{
+    public const INSTALLER = 'https://raw.githubusercontent.com/ksr-v/Xboard-Independent/nodeendpoint-native-v1.0.0/node-installer/install.sh';
+    public static function context(array $settings): array
+    {
+        $settings = Endpoint::validate($settings);
+        if (!$settings['enabled'] || !$settings['https']) {
+            throw new InvalidArgumentException('自动机器安装需要已启用的 HTTPS 独立入口。');
+        }
+        $path = Settings::caPath();
+        if (!is_file($path) || is_link($path) || filesize($path) > 32768) {
+            throw new InvalidArgumentException('请先用 Root 工具导入公共 CA，再生成机器安装命令。');
+        }
+        $pem = (string) file_get_contents($path);
+        preg_match_all('/-----BEGIN CERTIFICATE-----.*?-----END CERTIFICATE-----/s', $pem, $matches);
+        $pins = array_map(fn ($cert) => openssl_x509_fingerprint($cert, 'sha256'), $matches[0]);
+        if (!$pins || in_array(false, $pins, true)) {
+            throw new InvalidArgumentException('已导入的公共 CA 无效，请重新同步。');
+        }
+        $verified = Certificates::import($pem, $pins);
+        return ['url' => Endpoint::urls($settings)['url'], 'pem' => $verified['pem'], 'fingerprints' => $pins];
+    }
+    public static function build(array $context, int $id, string $token): string
+    {
+        if ($id < 1 || $token === '') { throw new InvalidArgumentException('机器身份无效。'); }
+        $args = ['--mode', 'machine', '--panel', $context['url'], '--token', $token, '--machine-id', (string) $id,
+                 '--version', 'v1.13-orphan.4', '--endpoint-ca-base64', base64_encode($context['pem']),
+                 '--endpoint-ca-fingerprint', implode(',', $context['fingerprints'])];
+        return 'curl -fsSL ' . escapeshellarg(self::INSTALLER) . ' | sudo bash -s -- '
+            . implode(' ', array_map('escapeshellarg', $args));
+    }
+}

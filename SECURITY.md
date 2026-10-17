@@ -18,13 +18,17 @@
 
 公共 CA 可以分发，私钥绝不分发。期待指纹必须从独立可信渠道取得，例如已验证 SSH 会话或可信离线记录；从未经认证的同一下载页面抄取 CA 和指纹不能建立独立信任。管理页验证指纹与 CA 用途，Node 工具再次验证；TLS 始终检查 CA、SAN 和有效期。
 
-原生插件使用 1.0.0 固定 ZIP；Root 工具的补充版本各自固定 SHA-256。短命令的第一段 `install.sh` 通过 GitHub HTTPS 固定标签取得，需要信任该仓库和下载渠道；随后下载的 Python 安装器及工具 ZIP 在执行前分别校验内置摘要，工具成员也逐个校验。可先下载引导脚本并通过可信渠道核对摘要后在本地运行。独立 Node 发布资产使用工具内固定 `v1.13-orphan.4` 摘要；该 release 当前非 immutable，内容变更将触发摘要拒绝。摘要不等同于发布签名。
+原生插件使用相应 Release 的固定 ZIP 和 SHA256SUMS（当前 1.0.1，原 1.0.0 保留）；Root 工具的补充版本各自固定 SHA-256。短命令的第一段 `install.sh` 通过 GitHub HTTPS 固定标签取得，需要信任该仓库和下载渠道；随后下载的 Python 安装器及工具 ZIP 在执行前分别校验内置摘要，工具成员也逐个校验。可先下载引导脚本并通过可信渠道核对摘要后在本地运行。独立 Node 发布资产使用工具内固定 `v1.13-orphan.4` 摘要；该 release 当前非 immutable，内容变更将触发摘要拒绝。摘要不等同于发布签名。
 
 同机公共 CA 自动导入由用户在可信 Root SSH 会话发起：从 Root 所有的安装记录和 CA 文件建立信任，检查归属/配置摘要及面板地址，随后仅把公共 PEM 和指纹经 stdin 传给现有非 Root 应用用户的 PHP。应用再次执行插件的 CA 证书校验并原子写入自己的 0600 文件；不从远程待验证入口取得首次信任，不传私钥或口令，不给 Web sudo 或 Root 目录读取权限。该操作只同步面板信任，不代表 Node 端已经分发或完成 CA 轮换。
 
 ## Token 与日志
 
-生成命令不含长期 Token，使用隐藏输入、stdin 或 0600 文件。当前上游协议的 REST GET 和 WebSocket query 仍含 Token，这是已有协议的限制，不宣称 Token 完全不进入 URL。Root 入口关闭 access log，避免凭据 URL 被写入；现有 Node debug logging 可能打印 WS URL，工具拒绝已识别 debug 设置。所有备份、凭据、服务环境和恢复记录均应限制权限。
+NodeEndpoint 独立工具页生成的 prepare/install-new 命令不含长期 Token，使用隐藏输入、stdin 或 0600 文件。1.0.1 接入的宿主原生机器安装命令沿用原有 --token 参数，命令及 Shell 历史属于敏感内容，不要分享。当前上游协议的 REST GET 和 WebSocket query 仍含 Token，这是已有协议的限制，不宣称 Token 完全不进入 URL。Root 入口关闭 access log，避免凭据 URL 被写入；现有 Node debug logging 可能打印 WS URL，独立迁移工具拒绝已识别 debug 设置。所有备份、凭据、服务环境和恢复记录均应限制权限。
+
+原生机器命令通过已登录管理员面板携带公共 CA PEM 和 SHA-256 指纹；首次信任建立于已完成的 Root 本机 CA 同步及可信面板会话。二者位于同一命令，不是额外的带外信任证明。安装器拒绝非 HTTPS、错误指纹、私钥、弱密钥、非 CA、异常用途和无效自签名，预检时校验服务器链与 IP/DNS SAN，不降级 TLS。Node v1.13-orphan.4 和 xbctl 的 AMD64/ARM64 资产在执行前固定校验摘要；安装源固定标签仍需信任仓库和 GitHub HTTPS。
+
+节点安装器将公共 CA、合并系统公共根的信任 bundle 和归属摘要写入 /etc/xboard-node/ 下的 0600 Root 文件，通过该 systemd 服务的 SSL_CERT_FILE 使用；不修改系统全局 CA。后续升级、回滚和卸载核对归属、完整性及权限，备份保留同样的恢复材料。已有节点不会因面板 CA 变化自动更新；CA 轮换需另外安排双信任过渡。原生 Node 安装器会安装缺失的 curl、wget、ca-certificates、python3、openssl 等依赖，Root 面板入口工具的“不更新系统软件”边界不代表节点安装器不安装依赖。
 
 管理页使用同源 Xboard 登录及 Bearer Token，Token 仅在内存中，密码提交后清空。每个管理请求都要求原生 `is_admin`，路径保密不作为权限。公网 IP 检测只向固定 HTTPS 服务请求，不自动改设置；连接 probe 只检查已保存的管理员指定入口，且不发送身份 Token、不跟随重定向。
 
