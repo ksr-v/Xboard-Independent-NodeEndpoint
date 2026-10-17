@@ -17,8 +17,8 @@ import urllib.parse
 import urllib.request
 import zipfile
 
-TOOLS_URL = 'https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/download/v1.0.0/node-endpoint-tools-1.0.0.zip'
-TOOLS_SHA256 = '42f2893938c294646c44e351a5c251cfea9f6a30156d67c345bc476307ea89e2'
+TOOLS_URL = 'https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/download/root-installer-v1.0.2/node-endpoint-tools-1.0.1.zip'
+TOOLS_SHA256 = 'e7de5e40074051e4b90ab9dc516c231e8023746fae8c3283374e521c7bdd01ad'
 CACHE = Path('/opt/nodeendpoint-quick') / TOOLS_SHA256
 
 
@@ -120,7 +120,7 @@ def discover(environment, manager):
     """Use the same expanded Nginx AST and literal backends as the manager."""
     candidates = []
     for filename, text in environment.files.items():
-        for site in manager.expanded(manager.parse(text), environment.files, environment.prefix):
+        for site in manager.expanded(manager.parse(text, filename), environment.files, environment.prefix):
             if site.words != ['server']:
                 continue
             roots = manager.values(site.children, 'root')
@@ -201,7 +201,7 @@ def main():
     require(args.detect_only or sys.stdin.isatty(), '安装需要 SSH 交互终端，不要将脚本通过管道执行')
     for name in ('openssl', 'ss', 'runuser'):
         require(shutil.which(name), '缺少依赖：' + name + '，请先通过本机包管理器安装')
-    print('校验固定 v1.0.0 工具包；不更新 Xboard、Node 或系统软件。')
+    print('校验固定 tools v1.0.1（Nginx 解析修复）；不更新 Xboard、Node 或系统软件。')
     data = Path(args.package_file).read_bytes() if args.package_file else download()
     directory = install_cache(verified_members(data))
     sys.dont_write_bytecode = True

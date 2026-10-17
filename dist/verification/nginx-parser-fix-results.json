@@ -1,0 +1,42 @@
+{
+  "result": "PASS",
+  "linux_tests": {
+    "test_panel.py": 36,
+    "test_quick_install.py": 8,
+    "test_nginx_syntax.py": 10
+  },
+  "nginx_T_valid_fixture": true,
+  "legacy_failure_reproduced": "Malformed Nginx block",
+  "fixed_fixture_parse": "PASS",
+  "lua_nginx_T_oracle": "PASS",
+  "actual_panel_detect_only": "PASS",
+  "actual_panel_candidate_count": 1,
+  "original_nginx_files_and_permissions_unchanged": true,
+  "endpoint_state_unchanged": true,
+  "full_installation_performed": false,
+  "source_sha256": {
+    "tools/panel/nginx.py": "91b6422f88d92a71930723a1e656dd690d95bd45ce1de4d00b9840979479537c",
+    "tools/panel/manager.py": "9b3c1608de6d63ee328e22911f90fc397eb9319072cbdebb6fafc3eb0674f4a1",
+    "tools/panel/pki.py": "006aadb8a413fa2c04dac75040ee318ea248aab1a082b181458e03afd5c3c5c2",
+    "tests/panel/test_panel.py": "93f3e55434b64df1c8910164482691bff045f443c2e2dd5397d843f6e041d22d",
+    "tests/panel/test_quick_install.py": "cdce827e98bb25131ded92e3c5b1ef46eb1fc6481209bc54c475c1e8cde924fc",
+    "tests/panel/test_nginx_syntax.py": "c496c085f731718a1fa876a03fa726faabb72f1af33f411fbb20d8c1b0e82add"
+  },
+  "final_tools_sha256": "e7de5e40074051e4b90ab9dc516c231e8023746fae8c3283374e521c7bdd01ad",
+  "final_tools_member_changes": [
+    "MANIFEST.sha256",
+    "tools/panel/manager.py",
+    "tools/panel/nginx.py"
+  ],
+  "final_installer_sha256": "eba5fb0f3c9b38a47a67298ae646c80471ae958078b3713a34cba96b513bbc5e",
+  "final_installer_linux_tests": 8,
+  "final_package_detect_only": "PASS",
+  "old_cache_unchanged": true,
+  "windows_tests": {
+    "test_panel.py": 36,
+    "test_quick_install.py": 8,
+    "test_nginx_syntax.py": 10
+  },
+  "production_triggering_directive_identified": false,
+  "scope": "Reproduced same legacy parser failure on valid isolated real Nginx configurations (including Lua); actual lab panel discovery only. No production access and no full endpoint installation."
+}

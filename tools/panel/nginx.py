@@ -5,7 +5,6 @@ import fnmatch
 import hashlib
 from pathlib import Path, PurePosixPath
 import re
-import shlex
 import posixpath
 from urllib.parse import urlsplit
 from pki import SafetyError, validate_host
@@ -44,61 +43,160 @@ class Directive:
     children: list | None = None
 
 
-def parse(text):
-    """Handle quoted strings/comments; refuse unsupported escapes or malformed AST."""
-    pattern = r'''\s+|\#[^\n]*|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|[{};]|[^\s{};"'\#]+'''
-    tokens = []
-    position = 0
-    for match in re.finditer(pattern, text):
-        if match.start() != position:
-            raise SafetyError('Unsupported Nginx syntax')
-        position = match.end()
-        token = match.group()
-        if token.isspace() or token.startswith('#'):
-            continue
-        literal = token.startswith(('"', "'"))
-        if literal:
-            token = shlex.split(token)[0]
-        # Quoted JSON log fragments such as '{', '}' and ';' are arguments,
-        # even when their decoded value equals a structural punctuation token.
-        tokens.append((token, literal))
-    if position != len(text):
-        raise SafetyError('Unsupported Nginx syntax')
-    cursor = 0
+LUA_BLOCKS = {name + '_by_lua_block' for name in (
+    'init', 'init_worker', 'exit_worker', 'set', 'rewrite', 'server_rewrite',
+    'access', 'content', 'header_filter', 'body_filter', 'log', 'balancer',
+    'ssl_certificate', 'ssl_session_fetch', 'ssl_session_store', 'ssl_client_hello',
+)}
 
-    def block(nested=False):
+
+def parse(text, source='<nginx>'):
+    """Inspect Nginx tokens, not shell tokens. Never evaluate embedded Lua.
+
+    Follow ngx_conf_read_token: #/quotes/} are special at a word boundary,
+    ${...} stays within an argument, and unknown backslash escapes survive.
+    Only known Lua block directives use Lua string/comment/brace scanning;
+    their bodies are opaque and cannot introduce Nginx listeners/includes.
+    """
+    cursor = 0
+    whitespace = ' \t\r\n'
+
+    def error(reason, position):
+        line = text.count('\n', 0, position) + 1
+        column = position - text.rfind('\n', 0, position)
+        # Do not include configuration lines or argument values (may be secrets).
+        raise SafetyError(f'{reason} ({source}:{line}:{column})')
+
+    def decode(raw):
+        return re.sub(r'\\(["\'\\trn])', lambda m: {'t': '\t', 'r': '\r', 'n': '\n'}.get(m[1], m[1]), raw)
+
+    def long_string(position):
+        match = re.match(r'\[(=*)\[', text[position:])
+        if not match:
+            return None
+        closing = ']' + match[1] + ']'
+        end = text.find(closing, position + match.end())
+        if end < 0:
+            error('Unterminated Lua long string/comment', position)
+        return end + len(closing)
+
+    def lua_body(opening):
         nonlocal cursor
-        result, words = [], []
-        while cursor < len(tokens):
-            token, literal = tokens[cursor]
+        depth = 1
+        while cursor < len(text):
+            position = cursor
+            char = text[cursor]
+            if text.startswith('--', cursor):
+                end = long_string(cursor + 2)
+                if end is None:
+                    end = text.find('\n', cursor + 2)
+                    end = len(text) if end < 0 else end + 1
+                cursor = end
+            elif char in ('"', "'"):
+                cursor += 1
+                while cursor < len(text) and text[cursor] != char:
+                    cursor += 2 if text[cursor] == '\\' else 1
+                if cursor >= len(text):
+                    error('Unterminated Lua quoted string', position)
+                cursor += 1
+            elif char == '[' and (end := long_string(cursor)) is not None:
+                cursor = end
+            else:
+                cursor += 1
+                if char == '{':
+                    depth += 1
+                elif char == '}':
+                    depth -= 1
+                    if depth == 0:
+                        return
+        error('Unterminated Lua block', opening)
+
+    def token():
+        nonlocal cursor
+        while cursor < len(text):
+            if text[cursor] in whitespace:
+                cursor += 1
+            elif text[cursor] == '#':
+                end = text.find('\n', cursor)
+                cursor = len(text) if end < 0 else end + 1
+            else:
+                break
+        start = cursor
+        if cursor == len(text):
+            return None, False, start
+        char = text[cursor]
+        if char in '{};':
             cursor += 1
-            if token == '}' and not literal:
-                if words or not nested:
-                    raise SafetyError('Malformed Nginx block')
+            return char, False, start
+        if char in ('"', "'"):
+            cursor += 1
+            begin = cursor
+            while cursor < len(text) and text[cursor] != char:
+                cursor += 2 if text[cursor] == '\\' else 1
+            if cursor >= len(text):
+                error('Unterminated Nginx quoted string', start)
+            raw = text[begin:cursor]
+            cursor += 1
+            if cursor < len(text) and text[cursor] not in whitespace + ';{)':
+                error('Expected separator after Nginx quoted string', cursor)
+            return decode(raw), True, start
+        variable = False
+        while cursor < len(text):
+            char = text[cursor]
+            if char == '\\':
+                if cursor + 1 >= len(text):
+                    error('Unterminated Nginx escape', cursor)
+                cursor += 2
+                variable = False
+                continue
+            if char == '{' and variable:
+                cursor += 1
+                continue
+            variable = char == '$'
+            if char in whitespace + ';{':
+                break
+            cursor += 1
+        return decode(text[start:cursor]), True, start
+
+    def block(nested=False, depth=0):
+        if depth > 128:
+            error('Nginx nesting limit exceeded', cursor)
+        result, words = [], []
+        while True:
+            word, literal, position = token()
+            if word is None:
+                if words or nested:
+                    error('Unterminated Nginx directive/block', position)
                 return result
-            if token == ';' and not literal:
+            if not literal and word == '}':
+                if words or not nested:
+                    error('Malformed Nginx block', position)
+                return result
+            if not literal and word == ';':
                 if not words:
-                    raise SafetyError('Empty Nginx directive')
+                    error('Empty Nginx directive', position)
                 result.append(Directive(words))
                 words = []
-            elif token == '{' and not literal:
+            elif not literal and word == '{':
                 if not words:
-                    raise SafetyError('Unnamed Nginx block')
-                result.append(Directive(words, block(True)))
+                    error('Unnamed Nginx block', position)
+                if words[0] in LUA_BLOCKS:
+                    lua_body(position)
+                    children = []
+                else:
+                    children = block(True, depth + 1)
+                result.append(Directive(words, children))
                 words = []
             else:
-                words.append(token)
-        if words or nested:
-            raise SafetyError('Unterminated Nginx directive')
-        return result
+                words.append(word)
     return block()
 
 
 def dump_files(text):
-    matches = list(re.finditer(r'^# configuration file (.+):\s*$', text, re.M))
+    matches = list(re.finditer(r'^# configuration file ([^\r\n]+):[ \t]*\r?$', text, re.M))
     if not matches:
         raise SafetyError('nginx -T did not report loaded configuration files')
-    return {m.group(1): text[m.end(): matches[i + 1].start() if i + 1 < len(matches) else len(text)]
+    return {m.group(1): text[m.end() + (text[m.end():m.end() + 1] == '\n'): matches[i + 1].start() if i + 1 < len(matches) else len(text)]
             for i, m in enumerate(matches)}
 
 
@@ -119,7 +217,7 @@ def expanded(nodes, files, prefix, stack=()):
                 if fnmatch.fnmatchcase(filename, pattern):
                     if filename in stack:
                         raise SafetyError('Recursive Nginx include')
-                    result += expanded(parse(text), files, prefix, (*stack, filename))
+                    result += expanded(parse(text, filename), files, prefix, (*stack, filename))
         else:
             result.append(Directive(node.words, expanded(node.children, files, prefix, stack)
                                     if node.children is not None else None))
@@ -135,7 +233,7 @@ def http_include_patterns(nodes, prefix, files, context=(), seen=()):
                 result.append(pattern)
             for name, text in files.items():
                 if fnmatch.fnmatchcase(name, pattern) and name not in seen:
-                    result += http_include_patterns(parse(text), prefix, files, context, (*seen, name))
+                    result += http_include_patterns(parse(text, name), prefix, files, context, (*seen, name))
         elif node.children is not None:
             result += http_include_patterns(node.children, prefix, files, (*context, node.words[0]), seen)
     return result

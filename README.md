@@ -10,16 +10,19 @@
 - `dist/node-endpoint-tools-1.0.0.zip`：独立 SSH 工具包，解压后包含 `tools/panel/`、`tools/node/` 和说明文档。
 - `dist/xb-node-endpoint-1.0.0-source.zip`：源码和测试；不包含参考仓库、开发运行器、vendor、凭据或生成的私钥。
 - `dist/SHA256SUMS`、`dist/release.json`：版本与 SHA-256。
+- SSH 安装推荐使用下方最新短命令：[root-installer-v1.0.2](https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/tag/root-installer-v1.0.2) 内含 tools 1.0.1 的 Nginx 解析兼容修复；面板原生插件仍为 1.0.0。
 
 ## Root 一键安装独立入口
 
 **NodeEndpoint-1.0.0.zip 已经上传、安装并启用后**，在面板服务器以 Root 登录交互 SSH，直接粘贴下面这一行，即可下载 tools 并进入后续安装向导。需要 Python 3.10+、curl、OpenSSL、`ss` 和 `runuser`；不会自动升级系统、Xboard 或 Node。
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.1/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.2/install.sh | bash
 ```
 
-该命令通过 HTTPS 取得固定标签的 `install.sh`；入口下载完整 Python 安装器并核对内置 SHA-256，然后再下载、校验已验收 **v1.0.0 工具包**的固定摘要和全部成员清单。原发行 ZIP 和 Python 安装器不变。[root-installer-v1.0.1](https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/tag/root-installer-v1.0.1) 仅增加这个简短入口。
+该命令通过 HTTPS 取得固定标签的 `install.sh`；入口下载完整 Python 安装器并核对内置 SHA-256，然后下载、校验 **tools 1.0.1 工具包**的固定摘要和全部成员清单。该工具包以原 v1.0.0 ZIP 为固定摘要基线，仅替换面板侧 Nginx 解析器及错误定位调用，不要求重新上传面板插件。原 v1.0.0 ZIP 和旧安装器的已发布文件保留。
+
+如果旧命令报 `Malformed Nginx block`，使用上面的 v1.0.2 命令重试。新版修复合法的 `${变量}`、Nginx 转义、词内 `#`、带引号参数及已知 Lua 配置块的误解析；Lua 正文仅作字符串/注释/括号扫描，不执行代码或把其中内容当作 Nginx 指令。仍不支持的语法会显示配置文件、行号和列号，不打印配置正文。新版使用不同摘要的 Root 私有缓存，旧缓存无需手动清理。
 
 入口自动检查 Root 身份及 `/root` 的属主/权限，设置 `umask 077`，临时目录 `0700`、脚本 `0600`，结束后清理临时文件。工具缓存放在 `/opt/nodeendpoint-quick/` 的专用版本目录，只有 Root 可访问；遇到外来文件、符号链接或可被其他用户写入的路径即停止。无需额外 `chmod +x`，不会对 Xboard 整站执行 `chown` 或 `chmod`。使用管道下载时会从 `/dev/tty` 读取后续交互；应用检查仍由原运行用户执行。
 
@@ -32,7 +35,7 @@ curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoi
 
 脚本不读取管理员 Token、不自动迁移已有节点，也不配置防火墙。多站点不会盲选；无法确认的参数会询问。Docker/Octane 或特殊配置转入已有交互菜单，仍需核对真实后端；不承诺自动识别所有布局。已有入口须确认后才进入修改。CA 私钥仍按 [安全说明](SECURITY.md) 导出、验证并离线保管。
 
-Python 安装器在 Windows/Linux 各完成 8 项校验/发现测试。新增短入口在实际测试面板通过真实下载、只读 FPM 检测、Root/非 Root 校验、0700/0600 权限、管道到 SSH TTY 交互及 Ctrl+C 清理检查，原站配置字节、权限和入口状态保持不变。尚未重新执行新增向导的完整交互安装验收；底层使用原先已实测的固定工具。源码见 `install.sh`、`tools/panel/quick_install.py`，手工部署方式保留在下文。
+Windows/Linux 均通过 36 项面板回归、8 项安装器校验/发现和 10 项 Nginx 语法回归。真实宝塔 Nginx 的隔离 `-T` 配置（含 Lua）复现旧错误、新解析器通过，原面板只读 FPM 发现通过；这些检查未修改原站配置或安装独立入口。短入口另经真实下载、Root/非 Root 校验、0700/0600 权限、管道到 SSH TTY 交互及 Ctrl+C 清理检查。尚未重新执行新增向导的完整交互安装验收；生产此次错误的具体配置指令未取得，重试若仍报错可凭文件/行号继续定位。源码见 `install.sh`、`tools/panel/quick_install.py`，手工部署方式保留在下文。
 
 ## 选择安装路线
 

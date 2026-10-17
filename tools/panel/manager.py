@@ -219,8 +219,8 @@ class Environment:
         trusted_file(self.main)
         # Nginx resolves relative includes against the main configuration directory.
         self.prefix = str(Path(self.main).parent)
-        self.nodes = expanded(parse(self.files[self.main]), self.files, self.prefix, (self.main,))
-        self.includes = http_include_patterns(parse(self.files[self.main]), self.prefix, self.files, seen=(self.main,))
+        self.nodes = expanded(parse(self.files[self.main], self.main), self.files, self.prefix, (self.main,))
+        self.includes = http_include_patterns(parse(self.files[self.main], self.main), self.prefix, self.files, seen=(self.main,))
         self.ss, _, _ = command(['ss', '-H', '-ltnp'])
         self.unix, _, _ = command(['ss', '-H', '-lxnp'])
 
@@ -240,7 +240,7 @@ class Environment:
                 docker = out.splitlines()
         candidates = []
         for name, text in self.files.items():
-            for node in parse(text):
+            for node in parse(text, name):
                 if node.words == ['server']:
                     entry = {'config': name, 'server_names': values(node.children, 'server_name'),
                              'listeners': values(node.children, 'listen'), 'document_roots': values(node.children, 'root'),
@@ -276,13 +276,13 @@ class Environment:
         if own and (target.is_symlink() or sha256(target.read_bytes()) != installed.get('config_sha256')):
             raise SafetyError('Managed configuration was changed externally; inspect it before proceeding')
         without_own = {name: text for name, text in self.files.items() if name != str(target)}
-        nodes = expanded(parse(without_own[self.main]), without_own, self.prefix)
+        nodes = expanded(parse(without_own[self.main], self.main), without_own, self.prefix)
         check_port(port, nodes, self.ss, own_config=own and installed.get('plan', {}).get('port') == port)
         site_path = str(Path(args.site_config).absolute())
         if site_path not in self.files:
             raise SafetyError('Selected source site is not loaded by active Nginx')
         trusted_file(site_path)
-        site_nodes = expanded(parse(self.files[site_path]), self.files, self.prefix)
+        site_nodes = expanded(parse(self.files[site_path], site_path), self.files, self.prefix)
         sites = [x for x in site_nodes if x.words == ['server'] and
                  any(args.site_name in names for names in values(x.children, 'server_name'))]
         if len(sites) != 1:
