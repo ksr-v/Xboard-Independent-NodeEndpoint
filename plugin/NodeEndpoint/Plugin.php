@@ -3,10 +3,13 @@ namespace Plugin\NodeEndpoint;
 use App\Services\Plugin\AbstractPlugin;
 use Plugin\NodeEndpoint\Middleware\ScopedHandshake;
 use Plugin\NodeEndpoint\Middleware\NativeMachineInstall;
+use Plugin\NodeEndpoint\Services\AdminIntegration;
 class Plugin extends AbstractPlugin
 {
+    public const VERSION = '1.0.2';
     public function boot(): void
     {
+        app(AdminIntegration::class)->register();
         $router = app('router');
         foreach ([ScopedHandshake::class, NativeMachineInstall::class] as $middleware) {
             if (!in_array($middleware, $router->getMiddlewareGroups()['api'] ?? [], true)) {

@@ -1,4 +1,19 @@
-# NodeEndpoint v1.0.1 发布说明
+# NodeEndpoint v1.0.2 发布说明
+
+原生机器管理的详情安装区和新建后的 Token 弹窗增加两种安装方式：
+
+- **原版：域名对接**（默认）：完整保留宿主原生 app_url、cedar2025 安装命令和机器身份。
+- **新版：IP + 私有证书**：使用 ksr-v 独立固定安装源和 NodeEndpoint 配置的 IP / 端口，自动携带私有 CA 的公共证书及指纹，并在节点安装时配置服务信任。
+
+IP 入口未启用、公共 CA 无效或使用 HTTP 时，仅禁用新版选项，原版复制与新建机器仍可用。后端保留原生 command / install_command，仅追加 install_options；动态 View composer 加载 extensionless 外链资源，不修改 Xboard 核心或 Admin bundle，可与 FlowScope 的动态模板包装共存。
+
+从 [v1.0.2 Release](https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/tag/v1.0.2) 下载 NodeEndpoint-1.0.2.zip 和同次 SHA256SUMS。原生上传升级、确认启用并刷新面板即可；无需先卸载 NodeEndpoint 或其他插件、升级面板主程序或重新生成 Root CA。此后在安装区选定方式再复制。修改通讯设置、导入或轮换 CA 后也应刷新面板，避免原生 React Query 使用旧命令。
+
+本次只更新插件；独立安装源仍为 nodeendpoint-native-v1.0.0，Node / xbctl 仍固定 v1.13-orphan.4。两种原生机器命令均保留 Token 参数，请勿公开命令或 Shell 历史；私钥不进入面板或命令。
+
+Windows / Linux 的 34 项原生组件与 6 项视图、资源和 FlowScope 共存检查通过；浏览器结果及测试边界单列于 [NATIVE_INSTALL_CHOICES_TEST_REPORT.md](NATIVE_INSTALL_CHOICES_TEST_REPORT.md)。这次双选验证不替代代理 / 计量 / UUID 的完整联测，固定 Go 的 UUID 更新与 Observer 历史限制继续保留。生产服务器未操作。
+
+## v1.0.1 历史发行说明
 
 原生机器管理的新建/复制安装命令自动使用你的独立固定安装源、通讯 IP/端口和已导入公共 CA，保留原有机器身份。节点端自动校验证书、预检 HTTPS 并配置单服务信任。独立 Node 安装源同步升级，二进制仍是固定 v1.13-orphan.4。
 

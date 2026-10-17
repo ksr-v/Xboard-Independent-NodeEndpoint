@@ -1,5 +1,13 @@
 # 变更记录
 
+## 1.0.2 — 原生机器安装命令提供域名 / IP 双选
+
+- 机器详情的安装区与新建后的 Token 弹窗同时提供“原版：域名对接”（默认）和“新版：IP + 私有证书”。原版完整保留宿主 app_url、cedar2025 来源及机器身份；新版使用独立 ksr-v 固定安装源、插件配置 IP 与自动公共 CA 信任。
+- 保留原生 command / install_command，追加 owner / schema 标记的 install_options。缺少有效 CA、独立入口禁用或使用 HTTP 时，仅禁用 IP 选项；原版命令、新建机器及原生验证错误 / 更新语义保留。
+- 动态 View composer 加载 extensionless 外链资源，不修改 Xboard 核心或编译后的 Admin bundle；与 FlowScope 的模板包装共存。浏览器被动观察原生机器响应，不读取认证 storage / Fiber、不改变请求和响应或 clipboard 实现，不持久化安装命令；最多缓存 20 条，未使用 10 分钟过期，退出 / 认证失败 / 禁用时清理。
+- 从 1.0.0 / 1.0.1 上传 NodeEndpoint-1.0.2.zip 升级并刷新；无需卸载插件、升级 Xboard 主程序或重做 Root CA。更改通讯设置 / CA 后刷新原生面板，清除旧命令缓存。
+- 本次未变更节点安装器，仍固定 nodeendpoint-native-v1.0.0 与 v1.13-orphan.4 二进制。Windows / Linux 的 34 项原生组件及 6 项视图资源 / 共存检查通过；浏览器验证与精确范围见 NATIVE_INSTALL_CHOICES_TEST_REPORT.md，历史 UUID / Observer 失败仍保留。
+
 ## 1.0.1 — 原生机器命令自动携带独立 IP / CA
 
 - 在插件 API middleware 中按原生 MachineController action 处理新建机器和复制安装命令；采用独立维护的固定安装源、已保存的 IP/端口、公共 CA 和指纹。缺少信任时在创建机器之前停止。保留原生管理员权限、机器 Token 和命令参数语义。

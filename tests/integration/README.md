@@ -1,5 +1,28 @@
 # Native component integration
 
+2026-10-17, NodeEndpoint 1.0.2: Windows and Linux each pass 34 native component checks and 6 dynamic Admin view/resource checks. The actual audited Admin build passes 14 Chrome checks for domain/IP choices, clipboard accuracy, native query cache, creation, mobile layouts, authentication and disabling. See [NATIVE_INSTALL_CHOICES_TEST_REPORT.md](../../NATIVE_INSTALL_CHOICES_TEST_REPORT.md) for mocks and scope.
+
+```powershell
+php -c .runtime/php.ini tests/integration/run.php
+php -c .runtime/php.ini tests/integration/native_views.php
+```
+
+To reproduce the native installation-choice browser run, first prepare a synthetic fixture (only a direct child of this directory's work/ is accepted), then keep the loopback server running:
+
+```powershell
+$env:NE_FIXTURE_PATH = 'D:/xb-node-endpoint/tests/integration/work/native-choice-ui'
+php -c .runtime/php.ini tests/integration/native_ui_setup.php
+php -c .runtime/php.ini -S 127.0.0.1:18744 tests/integration/serve.php
+```
+
+In another terminal with the locked tests/ui dependencies and Chrome installed:
+
+```powershell
+node tests/ui/native-install.cjs
+```
+
+Use a local PHP configuration with the required extensions on Linux. NE_UI_BASE and NE_UI_AUTH can override the loopback base and synthetic fixture-auth path. The browser uses real native command/create controllers; list/history/user display data are mocked. It does not install a Node or contact a production server.
+
 The runner loads unmodified Xboard `PluginManager`, `AbstractPlugin`, `InitializePlugins`, `Admin`, `ServerV2`, `ServerController`, models and exception handler from the audited `.audit/Xboard` checkout. It creates an isolated SQLite database and copies plugin packages/Admin assets to a new directory under `work/`. Real Sanctum personal access tokens exercise the native Admin guard. A fixture helper supplies `admin_setting` values; it does not access real panel settings or production databases.
 
 Install the locked Laravel/Sanctum dependencies here with Composer, then run from the project root:

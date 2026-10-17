@@ -16,23 +16,27 @@ final class NativeMachineInstall
             || !Settings::pluginEnabled() || !(Auth::guard('sanctum')->user()?->is_admin)) {
             return $next($request);
         }
-        $settings = Settings::read();
-        if (!($settings['enabled'] ?? false)) { return $next($request); }
-        try {
-            // Validate before a machine is created, avoiding a partial success.
-            $context = MachineInstallCommand::context($settings);
-        } catch (\Throwable) {
-            return response()->json(['message' => '独立入口的 HTTPS / 公共 CA 尚未就绪，请保存配置并同步 CA 后重试。'], 422);
-        }
         $response = $next($request);
         if (!$response instanceof JsonResponse || $response->getStatusCode() !== 200) { return $response; }
         $data = $response->getData(true);
         $key = $create ? 'install_command' : 'command';
         if (!is_array($data['data'] ?? null) || !is_string($data['data'][$key] ?? null)) { return $response; }
         $id = $create ? ($data['data']['id'] ?? 0) : $request->input('id');
-        $machine = ServerMachine::find((int) $id);
-        if (!$machine) { return $response; }
-        $data['data'][$key] = MachineInstallCommand::build($context, (int) $machine->id, (string) $machine->token);
+        $options = ['owner' => 'node_endpoint', 'schema' => 1,
+            'domain' => ['available' => true, 'command' => $data['data'][$key]],
+            'endpoint' => ['available' => false, 'message' => '独立 IP 对接尚未就绪，请启用 HTTPS 独立入口并同步公共 CA。']];
+        try {
+            // Endpoint readiness must never prevent the original command or machine creation.
+            $context = MachineInstallCommand::context(Settings::read());
+            $machine = ServerMachine::find((int) $id);
+            if ($machine) {
+                $options['endpoint'] = ['available' => true,
+                    'command' => MachineInstallCommand::build($context, (int) $machine->id, (string) $machine->token)];
+            }
+        } catch (\Throwable) {
+            // Keep the native response and expose only a fixed, non-sensitive readiness message.
+        }
+        $data['data']['install_options'] = $options;
         $response->setData($data);
         $response->headers->set('Cache-Control', 'no-store');
         return $response;

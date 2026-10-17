@@ -18,13 +18,19 @@
 
 公共 CA 可以分发，私钥绝不分发。期待指纹必须从独立可信渠道取得，例如已验证 SSH 会话或可信离线记录；从未经认证的同一下载页面抄取 CA 和指纹不能建立独立信任。管理页验证指纹与 CA 用途，Node 工具再次验证；TLS 始终检查 CA、SAN 和有效期。
 
-原生插件使用相应 Release 的固定 ZIP 和 SHA256SUMS（当前 1.0.1，原 1.0.0 保留）；Root 工具的补充版本各自固定 SHA-256。短命令的第一段 `install.sh` 通过 GitHub HTTPS 固定标签取得，需要信任该仓库和下载渠道；随后下载的 Python 安装器及工具 ZIP 在执行前分别校验内置摘要，工具成员也逐个校验。可先下载引导脚本并通过可信渠道核对摘要后在本地运行。独立 Node 发布资产使用工具内固定 `v1.13-orphan.4` 摘要；该 release 当前非 immutable，内容变更将触发摘要拒绝。摘要不等同于发布签名。
+原生插件使用相应 Release 的固定 ZIP 和 SHA256SUMS（当前 1.0.2，历史 1.0.0 / 1.0.1 保留）；Root 工具的补充版本各自固定 SHA-256。短命令的第一段 `install.sh` 通过 GitHub HTTPS 固定标签取得，需要信任该仓库和下载渠道；随后下载的 Python 安装器及工具 ZIP 在执行前分别校验内置摘要，工具成员也逐个校验。可先下载引导脚本并通过可信渠道核对摘要后在本地运行。新版 IP 选项仍使用 `nodeendpoint-native-v1.0.0` 安装源和 `v1.13-orphan.4` 独立 Node / xbctl 摘要；本次插件升级不更新这些文件。该二进制 release 当前非 immutable，内容变更将触发摘要拒绝。摘要不等同于发布签名。
 
 同机公共 CA 自动导入由用户在可信 Root SSH 会话发起：从 Root 所有的安装记录和 CA 文件建立信任，检查归属/配置摘要及面板地址，随后仅把公共 PEM 和指纹经 stdin 传给现有非 Root 应用用户的 PHP。应用再次执行插件的 CA 证书校验并原子写入自己的 0600 文件；不从远程待验证入口取得首次信任，不传私钥或口令，不给 Web sudo 或 Root 目录读取权限。该操作只同步面板信任，不代表 Node 端已经分发或完成 CA 轮换。
 
 ## Token 与日志
 
-NodeEndpoint 独立工具页生成的 prepare/install-new 命令不含长期 Token，使用隐藏输入、stdin 或 0600 文件。1.0.1 接入的宿主原生机器安装命令沿用原有 --token 参数，命令及 Shell 历史属于敏感内容，不要分享。当前上游协议的 REST GET 和 WebSocket query 仍含 Token，这是已有协议的限制，不宣称 Token 完全不进入 URL。Root 入口关闭 access log，避免凭据 URL 被写入；现有 Node debug logging 可能打印 WS URL，独立迁移工具拒绝已识别 debug 设置。所有备份、凭据、服务环境和恢复记录均应限制权限。
+NodeEndpoint 独立工具页生成的 prepare/install-new 命令不含长期 Token，使用隐藏输入、stdin 或 0600 文件。宿主原生机器的域名 / IP 两种安装命令都沿用原有 --token 参数，命令及 Shell 历史属于敏感内容，不要分享。默认域名选项完整保留宿主原生命令、app_url 和 cedar2025 安装源；新版 IP 选项采用独立安装源与已导入的公共 CA。当前上游协议的 REST GET 和 WebSocket query 仍含 Token，这是已有协议的限制，不宣称 Token 完全不进入 URL。Root 入口关闭 access log，避免凭据 URL 被写入；现有 Node debug logging 可能打印 WS URL，独立迁移工具拒绝已识别 debug 设置。所有备份、凭据、服务环境和恢复记录均应限制权限。
+
+原生双选界面通过动态 View composer 注入 extensionless 外链脚本 / 样式，不改 Xboard 核心、原始 Admin bundle 或其他插件文件；与 FlowScope 的模板包装按当前视图链组合。后端仅在原生管理员权限校验成功的机器命令 / 新建响应中追加 install_options，保留 command / install_command 和机器身份。独立入口未就绪仅禁用 IP 选项，不使原版命令或新建失败；敏感命令响应设置 no-store。
+
+浏览器扩展仅被动观察同源原生机器 API 的 fetch / XMLHttpRequest 响应：不改变原请求、原始响应或 React 状态，不读取认证 storage 或 React Fiber，也不替换浏览器 clipboard 实现。只有管理员点击扩展的复制按钮时才写入当前选中的安装命令；新建弹窗中的单独 Token 及其复制按钮继续使用宿主行为。原生面板自身的认证存储仍遵循宿主语义。
+
+扩展不把安装命令、Token 或 CA 写入 localStorage、sessionStorage、Cookie 或日志，页面内存最多缓存 20 条命令，支持原生 SPA 查询参数变化后的缓存复用；未使用的条目在 10 分钟后过期，仍显示且原生命令未变的卡片保留。退出登录、进入登录页、观察到机器 API 的 401 / 403、离开页面或检测到插件禁用时清理相应内存 / 界面；销毁时仅恢复自己包装的浏览器方法及隐藏标记。原生 React Query 可能继续持有原命令，修改通讯设置或公共 CA 后应刷新面板，再获取和复制命令。
 
 原生机器命令通过已登录管理员面板携带公共 CA PEM 和 SHA-256 指纹；首次信任建立于已完成的 Root 本机 CA 同步及可信面板会话。二者位于同一命令，不是额外的带外信任证明。安装器拒绝非 HTTPS、错误指纹、私钥、弱密钥、非 CA、异常用途和无效自签名，预检时校验服务器链与 IP/DNS SAN，不降级 TLS。Node v1.13-orphan.4 和 xbctl 的 AMD64/ARM64 资产在执行前固定校验摘要；安装源固定标签仍需信任仓库和 GitHub HTTPS。
 

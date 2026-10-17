@@ -124,6 +124,7 @@ Route::middleware(['api', 'server.v2'])->match(['GET', 'POST'], 'api/v2/server/h
 Route::middleware('api')->get('api/fixture/other', fn () => response()->json(['websocket' => ['enabled' => true, 'ws_url' => 'wss://other.example/ws']]));
 Route::middleware(['api', 'admin'])->get('api/v2/admin/server/machine/installCommand', [App\Http\Controllers\V2\Admin\Server\MachineController::class, 'installCommand']);
 Route::middleware(['api', 'admin'])->post('api/v2/admin/server/machine/save', [App\Http\Controllers\V2\Admin\Server\MachineController::class, 'save']);
+Route::middleware(['api', 'admin'])->post('api/v2/admin/server/machine/resetToken', [App\Http\Controllers\V2\Admin\Server\MachineController::class, 'resetToken']);
 Route::get('fixture-admin', fn () => view('admin', ['title' => 'Fixture', 'version' => 'fixture', 'logo' => '', 'secure_path' => 'fixture-admin']));
 
 function requestFixture(string $url, string $method = 'GET', array $data = [], ?string $bearer = null, array $server = []): Symfony\Component\HttpFoundation\Response

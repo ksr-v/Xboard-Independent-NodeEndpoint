@@ -9,7 +9,7 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[2]
 VERSION = '1.0.0'
 DOCS = ['README.md', 'ARCHITECTURE.md', 'SECURITY.md', 'IMPLEMENTATION_PLAN.md',
-        'TEST_REPORT.md', 'VM_TEST_REPORT.md', 'FULL_E2E_TEST_REPORT.md', 'NATIVE_MACHINE_TEST_REPORT.md', 'PRODUCTION_DEPLOYMENT.md', 'CHANGELOG.md', 'RELEASE_NOTES.md', 'LICENSE']
+        'TEST_REPORT.md', 'VM_TEST_REPORT.md', 'FULL_E2E_TEST_REPORT.md', 'NATIVE_MACHINE_TEST_REPORT.md', 'NATIVE_INSTALL_CHOICES_TEST_REPORT.md', 'PRODUCTION_DEPLOYMENT.md', 'CHANGELOG.md', 'RELEASE_NOTES.md', 'LICENSE']
 
 def files(directory):
     return sorted(p for p in directory.rglob('*') if p.is_file()
