@@ -1,5 +1,12 @@
 # 变更记录
 
+## Root 短命令入口 — root-installer-v1.0.1
+
+- 新增 `install.sh`，支持 Root SSH 使用 `curl … | bash` 自动下载并校验既有安装器，继续下载固定 tools、进入原向导；面板已启用的插件无需重新上传。
+- 检查 Root 身份和安全目录，临时目录/脚本使用 0700/0600，自动清理；管道启动后从 SSH TTY 读取交互，不修改整站属主或权限。
+- 原 v1.0.0 ZIP 和 root-installer-v1.0.0 Python 向导保持原字节。
+- 测试面板真实下载、只读发现、非 Root/无交互拒绝、Root 临时文件权限、管道转 TTY 与 Ctrl+C 清理通过；原 Nginx 配置字节/权限及独立入口状态不变，未执行完整安装。
+
 ## Root 一键安装器补充 — root-installer-v1.0.0
 
 - 新增独立 Root SSH 安装向导，先校验固定工具包与逐成员清单，再按原 Nginx AST 识别 FPM 站点、后端、路径及 WS；多候选交互选择，不确定布局转入手工菜单。

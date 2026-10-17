@@ -13,13 +13,15 @@
 
 ## Root 一键安装独立入口
 
-**插件已经上传、安装并启用后**，在面板服务器以 Root 登录 SSH，直接粘贴下面这一行。需要 Python 3.10+、curl、OpenSSL、`ss` 和 `runuser`；不会自动升级系统、Xboard 或 Node。
+**NodeEndpoint-1.0.0.zip 已经上传、安装并启用后**，在面板服务器以 Root 登录交互 SSH，直接粘贴下面这一行，即可下载 tools 并进入后续安装向导。需要 Python 3.10+、curl、OpenSSL、`ss` 和 `runuser`；不会自动升级系统、Xboard 或 Node。
 
 ```bash
-( f=$(mktemp /root/nodeendpoint-install.XXXXXX.py) && trap 'rm -f -- "$f"' EXIT && curl --fail --show-error --location --proto '=https' --proto-redir '=https' --tlsv1.2 'https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/download/root-installer-v1.0.0/quick_install.py' -o "$f" && printf '%s  %s\n' '07a06c08642ed487cd696ddb891603716503cf3d5fc53b1cba00b9e5a108e9df' "$f" | sha256sum -c - && python3 -I "$f" )
+curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.1/install.sh | bash
 ```
 
-这一行先核对安装器自身 SHA-256。安装器再下载并核对已验收 **v1.0.0 工具包**的固定摘要和全部成员清单，放在 Root 私有缓存目录；原发行 ZIP 不变。安装器作为独立的 [root-installer-v1.0.0 补充工具](https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/tag/root-installer-v1.0.0) 发布。
+该命令通过 HTTPS 取得固定标签的 `install.sh`；入口下载完整 Python 安装器并核对内置 SHA-256，然后再下载、校验已验收 **v1.0.0 工具包**的固定摘要和全部成员清单。原发行 ZIP 和 Python 安装器不变。[root-installer-v1.0.1](https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/tag/root-installer-v1.0.1) 仅增加这个简短入口。
+
+入口自动检查 Root 身份及 `/root` 的属主/权限，设置 `umask 077`，临时目录 `0700`、脚本 `0600`，结束后清理临时文件。工具缓存放在 `/opt/nodeendpoint-quick/` 的专用版本目录，只有 Root 可访问；遇到外来文件、符号链接或可被其他用户写入的路径即停止。无需额外 `chmod +x`，不会对 Xboard 整站执行 `chown` 或 `chmod`。使用管道下载时会从 `/dev/tty` 读取后续交互；应用检查仍由原运行用户执行。
 
 标准宝塔/PHP-FPM 布局会自动识别网站 Nginx、Xboard 目录、站点、FPM 后端、include 目录、应用用户及可识别的 WS 后端。你只需：
 
@@ -30,7 +32,7 @@
 
 脚本不读取管理员 Token、不自动迁移已有节点，也不配置防火墙。多站点不会盲选；无法确认的参数会询问。Docker/Octane 或特殊配置转入已有交互菜单，仍需核对真实后端；不承诺自动识别所有布局。已有入口须确认后才进入修改。CA 私钥仍按 [安全说明](SECURITY.md) 导出、验证并离线保管。
 
-安装器在 Windows/Linux 各完成 8 项校验/发现测试，并在实际测试面板通过只读 FPM 检测，未变更其入口。这个新增向导尚未重新执行完整交互安装验收；底层使用原先已实测的固定工具。安装器源码见 `tools/panel/quick_install.py`，手工部署方式保留在下文。
+Python 安装器在 Windows/Linux 各完成 8 项校验/发现测试。新增短入口在实际测试面板通过真实下载、只读 FPM 检测、Root/非 Root 校验、0700/0600 权限、管道到 SSH TTY 交互及 Ctrl+C 清理检查，原站配置字节、权限和入口状态保持不变。尚未重新执行新增向导的完整交互安装验收；底层使用原先已实测的固定工具。源码见 `install.sh`、`tools/panel/quick_install.py`，手工部署方式保留在下文。
 
 ## 选择安装路线
 

@@ -1,0 +1,15 @@
+{
+  "result": "PASS",
+  "bootstrap_sha256": "358e67c8c926d5aa6bb1250266d679cd97248015185cd690b60531f79711b3cd",
+  "bash_syntax": true,
+  "non_root_rejected": true,
+  "noninteractive_install_rejected": true,
+  "live_download_and_detect_only": true,
+  "interactive_pipe_uses_ssh_tty": true,
+  "temporary_directory_mode": "root:0700",
+  "temporary_script_mode": "root:0600",
+  "cancel_cleanup": true,
+  "endpoint_state_unchanged": true,
+  "original_nginx_files_and_permissions_unchanged": true,
+  "full_installation_performed": false
+}
