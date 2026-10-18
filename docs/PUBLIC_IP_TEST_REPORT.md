@@ -13,7 +13,7 @@
 | 范围 | 结果 |
 | --- | --- |
 | Windows Root 工具 Python 回归 | 138 项全部通过：原有 106 项、公网 IP 候选 16 项、地址修复 16 项 |
-| 独立后端 Python 回归 | 共 58 项；Windows 54 项通过，4 项 Linux 专属检查跳过 |
+| 独立后端 Python 回归 | Linux 58 项全部通过；Windows 54 项通过，4 项 Linux 专属检查跳过 |
 | 后端新增候选与事务顺序检查 | 11 项通过，包含在上述 58 项中 |
 | CA 口令 PHP 集成 | 18 项通过；使用真实 Laravel Crypt、SQLite 和独立 PHP CLI 子进程 |
 | 安装文档 Shell 语法 | 两仓库安装文档共 41 个 Bash 代码块通过 `bash -n`，不含可执行示例 IP 参数 |
