@@ -4,7 +4,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Plugin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
-use Plugin\NodeEndpoint\Services\{Endpoint, Settings, Certificates, Probe, CommandBuilder, CaPassphrases};
+use Plugin\NodeEndpoint\Services\{Endpoint, Settings, Certificates, Probe, CommandBuilder, CaPassphrases, RootCommandBuilder};
 final class SettingsController extends Controller
 {
     private function invalidResponse(\Throwable $error)
@@ -22,8 +22,8 @@ final class SettingsController extends Controller
                 if ($parsed) { $ca[] = Certificates::metadata($parsed, openssl_x509_fingerprint($pem, 'sha256')); }
             }
         }
-        return response()->json(['data' => ['version' => '1.0.4', 'settings' => $settings,
-            'urls' => Endpoint::urls($settings), 'ca' => $ca,
+        return response()->json(['data' => ['version' => '1.0.5', 'settings' => $settings,
+            'urls' => Endpoint::urls($settings), 'ca' => $ca, 'root_tool' => RootCommandBuilder::build($settings),
             'ca_passphrases' => CaPassphrases::metadata(array_column($ca, 'fingerprint_sha256')),
             'compatibility' => Plugin::whereIn('code', ['smart_expiry', 'qrcode_extend', 'qrcodeextend', 'flow_scope', 'flowscope'])
                 ->get(['code', 'version', 'is_enabled']),
@@ -57,7 +57,8 @@ final class SettingsController extends Controller
             $old = Settings::read();
             Settings::write(array_replace($old, $new, ['last_probe' => null]));
             return response()->json(['data' => ['settings' => $new, 'urls' => Endpoint::urls($new),
-                'note' => '仅保存插件设置。请通过 SSH 执行 Root 工具后再验证入口。']]);
+                'root_tool' => RootCommandBuilder::build($new),
+                'note' => '仅保存插件设置。请使用下方一键复制按钮，在面板服务器通过 SSH 执行 Root 工具，完成后再验证入口。']]);
         } catch (\InvalidArgumentException $error) { return $this->invalidResponse($error); }
     }
     public function importCa(Request $request)

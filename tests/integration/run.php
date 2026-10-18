@@ -34,7 +34,7 @@ test('real Sanctum anonymous and ordinary-user tokens cannot use Admin API', fun
     eq(requestFixture('https://old.panel.example/api/v1/node-endpoint/settings', 'GET', [], $GLOBALS['userToken'])->getStatusCode(), 403);
     $r = requestFixture('https://old.panel.example/api/v1/node-endpoint/settings', 'GET', [], $GLOBALS['adminToken']);
     eq($r->getStatusCode(), 200, $r->getContent());
-    eq(jsonResponse($r)['data']['version'], '1.0.4');
+    eq(jsonResponse($r)['data']['version'], '1.0.5');
 });
 test('native generic config save cannot bypass the isolated endpoint settings API', function (): void {
     (new App\Services\Plugin\PluginConfigService())->updateConfig('node_endpoint', ['management_url' => '/attempted-change', 'enabled' => true, 'host' => 'evil.example', 'https' => false, 'http_acknowledged' => true]);
@@ -426,13 +426,13 @@ test('independent domain and IP commands preserve shell-sensitive machine creden
     } finally {$machine->token=$previous;$machine->save();}
 });
 
-test('native plugin upgrade from 1.0.2 to 1.0.4 preserves settings, CA, machine credentials and enabled state', function (): void {
+test('native plugin upgrade from 1.0.2 to 1.0.5 preserves settings, CA, machine credentials and enabled state', function (): void {
     $before = Settings::read();
     $ca = file_get_contents(Settings::caPath());
     $token = $GLOBALS['machine']->fresh()->token;
     App\Models\Plugin::where('code', 'node_endpoint')->update(['version' => '1.0.2']);
     eq(app(PluginManager::class)->update('node_endpoint'), true);
-    eq(App\Models\Plugin::where('code', 'node_endpoint')->value('version'), '1.0.4');
+    eq(App\Models\Plugin::where('code', 'node_endpoint')->value('version'), '1.0.5');
     eq((bool) App\Models\Plugin::where('code', 'node_endpoint')->value('is_enabled'), true);
     eq(Settings::read(), $before);
     eq(file_get_contents(Settings::caPath()), $ca);

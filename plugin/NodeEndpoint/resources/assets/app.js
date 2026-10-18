@@ -3,6 +3,22 @@
   const el = id => document.getElementById(id);
   let token = '', generated = '', caPassphrase = '', caPassphraseTimer = null, caRevealEpoch = 0, caRevealController = null;
   let caPassphraseMetadata = [];
+  let rootTool = null, savedSettingsKey = '', settingsRevision = 0, settingsLoadEpoch = 0;
+  function settingsInput() {
+    return { enabled: el('enabled').checked, host: el('host').value, port: Number(el('port').value),
+      https: el('https').checked, http_acknowledged: el('http-ack').checked, ws_mode: el('ws-mode').value };
+  }
+  const settingsKey = s => JSON.stringify([s.enabled, s.host, s.port, s.https, s.http_acknowledged, s.ws_mode]);
+  function refreshRootTool() {
+    const dirty = settingsKey(settingsInput()) !== savedSettingsKey;
+    el('root-tool-panel').hidden = !token;
+    el('copy-root-tool').disabled = !token || dirty || !rootTool?.command;
+    el('root-tool-target').textContent = dirty ? '设置尚未保存' : rootTool?.target_url || '—';
+    el('root-tool-command').textContent = dirty ? '请先保存设置，再复制对应的 Root 工具命令。'
+      : rootTool?.command || '当前设置没有可复制的 Root 工具命令。';
+    el('root-tool-note').textContent = dirty ? '尚未保存的修改不会用于生成命令。' : rootTool?.note || '请先保存有效的 HTTPS 通讯设置。';
+  }
+  function clearRootTool() { rootTool = null; savedSettingsKey = ''; settingsLoadEpoch++; refreshRootTool(); }
   function clearCaPassphrase() {
     caRevealEpoch++;
     if (caRevealController) { caRevealController.abort(); caRevealController = null; }
@@ -41,7 +57,7 @@
     if (body !== undefined) headers['Content-Type'] = 'application/json';
     const response = await fetch('/api/v1/node-endpoint/' + path, { method: body === undefined ? 'GET' : 'POST', headers, body: body === undefined ? undefined : JSON.stringify(body), credentials: 'omit', cache: 'no-store', redirect: 'error', signal });
     if (response.status === 401 || response.status === 403) {
-      clearCaPassphrase(); token = ''; generated = '';
+      clearCaPassphrase(); token = ''; generated = ''; clearRootTool();
       el('workspace').hidden = true; el('login-panel').hidden = false;
     }
     if (raw && response.ok) return response.blob();
@@ -50,11 +66,16 @@
     return data.data;
   }
   const pretty = value => JSON.stringify(value, null, 2);
-  async function load() {
+  async function load(preserveForm = false) {
+    const revision = settingsRevision, epoch = ++settingsLoadEpoch, session = token;
     const data = await request('settings');
+    if (epoch !== settingsLoadEpoch || !token || token !== session) return;
     const s = data.settings;
-    el('enabled').checked = s.enabled; el('host').value = s.host; el('port').value = s.port;
-    el('https').checked = s.https; el('http-ack').checked = s.http_acknowledged; el('ws-mode').value = s.ws_mode;
+    if (!preserveForm && revision === settingsRevision) {
+      el('enabled').checked = s.enabled; el('host').value = s.host; el('port').value = s.port;
+      el('https').checked = s.https; el('http-ack').checked = s.http_acknowledged; el('ws-mode').value = s.ws_mode;
+    }
+    savedSettingsKey = settingsKey(s); rootTool = data.root_tool || null; refreshRootTool();
     el('cert-status').textContent = data.ca.length ? pretty(data.ca) : '尚未导入根 CA。';
     renderCaPassphrases(data.ca_passphrases);
     el('probe-result').textContent = s.last_probe ? pretty(s.last_probe) : '尚未测试。REST / WSS: NOT TESTED';
@@ -94,7 +115,7 @@
     if (!/^Bearer /i.test(token)) token = 'Bearer ' + token;
     try { await load(); message('管理员验证成功。'); } catch (error) { token = ''; throw error; }
   });
-  el('logout').addEventListener('click', () => { clearCaPassphrase(); token = ''; generated = ''; location.reload(); });
+  el('logout').addEventListener('click', () => { clearCaPassphrase(); token = ''; generated = ''; clearRootTool(); location.reload(); });
   window.addEventListener('pagehide', clearCaPassphrase);
   document.addEventListener('visibilitychange', () => { if (document.hidden) clearCaPassphrase(); });
   el('hide-ca-passphrase').addEventListener('click', clearCaPassphrase);
@@ -118,6 +139,7 @@
   });
   ['host', 'port', 'https'].forEach(id => el(id).addEventListener('input', () => { updateUrls(); clearCommand(); }));
   el('settings-form').addEventListener('change', clearCommand);
+  ['input', 'change'].forEach(event => el('settings-form').addEventListener(event, () => { settingsRevision++; refreshRootTool(); }));
   el('command-form').addEventListener('input', clearCommand);
   el('command-form').addEventListener('change', clearCommand);
   el('mode').addEventListener('change', () => { el('type-label').hidden = el('mode').value === 'machine'; el('unused-identity').checked = false; });
@@ -129,8 +151,20 @@
   });
   el('identity').addEventListener('input', () => { el('unused-identity').checked = false; });
   task('settings-form', 'submit', async () => {
-    const data = await request('settings', { enabled: el('enabled').checked, host: el('host').value, port: Number(el('port').value), https: el('https').checked, http_acknowledged: el('http-ack').checked, ws_mode: el('ws-mode').value });
-    await load(); message(data.note);
+    const revision = settingsRevision;
+    const data = await request('settings', settingsInput());
+    await load(settingsRevision !== revision); message(data.note);
+  });
+  el('copy-root-tool').addEventListener('click', async () => {
+    if (!token || settingsKey(settingsInput()) !== savedSettingsKey || !rootTool?.command) return;
+    el('copy-root-tool').disabled = true;
+    try {
+      if (!navigator.clipboard?.writeText) throw new Error('clipboard unavailable');
+      await navigator.clipboard.writeText(rootTool.command);
+      message('Root 工具命令已复制。请在面板服务器以 Root 执行，完成后再验证入口。');
+    } catch {
+      message('复制失败，请手工复制上方完整命令，在面板服务器以 Root 执行。', true);
+    } finally { refreshRootTool(); }
   });
   task('detect-ip', 'click', async () => { const data = await request('detect-ip', {}); el('detected-ip').textContent = '检测到 ' + data.detected_ip + '。' + data.note; });
   task('probe', 'click', async () => { const data = await request('probe', {}); el('probe-result').textContent = pretty(data); message('连接检查已完成；请分别查看 TLS、REST 与 WSS 的结果。'); });

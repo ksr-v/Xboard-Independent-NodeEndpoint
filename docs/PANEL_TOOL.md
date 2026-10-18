@@ -4,7 +4,7 @@
 
 ## 一键安装与防火墙
 
-先上传并启用 **NodeEndpoint-1.0.4.zip**，保存通讯地址 / 端口 / HTTPS，然后在面板服务器以 Root 登录交互 SSH：
+先上传并启用 **NodeEndpoint-1.0.5.zip**，保存通讯地址 / 端口 / HTTPS。可直接点击页面“SSH 配置入口”中的“一键复制 Root 工具命令”，在面板服务器以 Root 登录交互 SSH 后执行；命令预填已保存的 IP / 域名，端口及 WS 模式仍需在向导中核对。未保存的修改不会用于生成命令。通用安装命令也可手工执行：
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.6/install.sh | bash
@@ -34,7 +34,7 @@ curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoi
 curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.6/install.sh | bash -s -- --detect-only
 ```
 
-已有自定义防火墙策略时，一键安装可加 `-s -- --skip-firewall` 跳过本机规则步骤，管理员自行确认入口 TCP 端口可达。`--configure-firewall` 不等于 `--sync-ca`，两者不重新生成 CA。插件仍为 1.0.4，无需为工具更新重新上传同版本 ZIP、卸载其他插件或升级 Xboard 主程序。
+已有自定义防火墙策略时，一键安装可加 `-s -- --skip-firewall` 跳过本机规则步骤，管理员自行确认入口 TCP 端口可达。`--configure-firewall` 不等于 `--sync-ca`，两者不重新生成 CA。Root 工具仍兼容插件 1.0.4 及以上；新增的网页命令复制按钮需要插件 1.0.5。单独更新工具无需卸载其他插件或升级 Xboard 主程序。
 
 ## 修复已安装独立面板的通讯地址
 

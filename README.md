@@ -2,7 +2,7 @@
 
 为 Xboard 增加独立的节点通讯入口，让节点通过 **IP + 私有证书**连接面板，也保留使用原面板域名的独立部署命令。默认独立端口为 **HTTPS TCP 8443**。原网站、登录、订阅、`app_url` 和其他插件保留原有配置。
 
-当前插件为 **NodeEndpoint 1.0.4**；Root 一键入口为 **root-installer-v1.0.6 / tools 1.0.4**。新建 CA 的口令自动随机生成，并使用面板 `APP_KEY` 加密保存；管理员可在 HTTPS 管理页面按需查看和复制。已有独立面板请先升级插件到 1.0.4，再使用新版 Root 工具；无需卸载其他插件。全新独立 Xboard 用户使用 [内置插件版宝塔教程](https://github.com/ksr-v/Xboard-Custom-Source/blob/v2026.10.18.5/docs/installation/aapanel.zh-CN.md)，不必单独上传插件。
+当前插件为 **NodeEndpoint 1.0.5**；Root 一键入口为 **root-installer-v1.0.6 / tools 1.0.4**。新建 CA 的口令自动随机生成，并使用面板 `APP_KEY` 加密保存；管理员可在 HTTPS 管理页面按需查看和复制。已有独立面板请先升级插件到 1.0.5，再使用新版 Root 工具；无需卸载其他插件。全新独立 Xboard 用户使用 [内置插件版宝塔教程](https://github.com/ksr-v/Xboard-Custom-Source/blob/v2026.10.18.6/docs/installation/aapanel.zh-CN.md)，不必单独上传插件。
 
 ## 选择安装路线
 
@@ -10,7 +10,7 @@
 | --- | --- |
 | 空服务器，没有 Xboard | [先安装 Xboard](#从零安装空服务器)，再安装插件和独立入口 |
 | 已有正常运行的原版 Xboard | [保留数据接入插件](#原版-xboard-面板接入保留现有数据)，不运行面板初始化或重装脚本 |
-| 已安装旧版 NodeEndpoint | 上传 [NodeEndpoint-1.0.4.zip](https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/download/v1.0.4/NodeEndpoint-1.0.4.zip) 原生升级、启用并刷新；保留设置与 CA |
+| 已安装旧版 NodeEndpoint | 上传 [NodeEndpoint-1.0.5.zip](https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/download/v1.0.5/NodeEndpoint-1.0.5.zip) 原生升级、启用并刷新；保留设置与 CA |
 | 插件和独立 HTTPS 入口都已安装 | [只补防火墙](#已有入口只补防火墙或同步-ca)，不重装入口、不重新生成证书 |
 | 为新的节点服务器安装 xboard-node | 在原生机器管理[选择域名或 IP 命令](#新机器接入域名或-ip-双选) |
 | 将已有生产节点改为 IP 对接 | 使用[保留配置的迁移工具](#已有节点迁移保留配置)，不要执行新装命令 |
@@ -82,7 +82,7 @@ sudo -u www /www/server/php/83/bin/php artisan xboard:install
 
 ## 安装或升级 NodeEndpoint 插件
 
-从 [v1.0.4 Release](https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/tag/v1.0.4) 下载 **NodeEndpoint-1.0.4.zip** 和同次 **SHA256SUMS**，核对 ZIP 摘要。GitHub 自动生成的 “Source code” 压缩包不能用于原生插件上传。
+从 [v1.0.5 Release](https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/tag/v1.0.5) 下载 **NodeEndpoint-1.0.5.zip** 和同次 **SHA256SUMS**，核对 ZIP 摘要。GitHub 自动生成的 “Source code” 压缩包不能用于原生插件上传。
 
 1. 在 Xboard 原生插件管理上传 ZIP，安装或升级，确认 NodeEndpoint 已启用。已有 1.0.0 / 1.0.1 / 1.0.2 直接升级，不先卸载；原有设置和公共 CA 保留。
 2. 打开面板域名下的 `/node-endpoint`，以 Xboard 管理员登录。
@@ -91,7 +91,13 @@ sudo -u www /www/server/php/83/bin/php artisan xboard:install
 
 原生机器管理中的安装双选通过插件动态资源加载，不修改 Xboard 核心或编译后的 Admin bundle。常驻 Octane 环境按宿主流程 reload 应用 worker；升级后刷新浏览器页面。
 
-已是 **1.0.4** 时，无需重复上传同一个 ZIP；刷新页面后再查看新的口令托管状态。
+已是 **1.0.5** 时，无需重复上传同一个 ZIP。1.0.4 及更早版本需升级插件才能看到新增的 Root 命令复制按钮；原设置、公共 CA 和托管口令保留。
+
+### 修改通讯 IP 后复制 Root 命令
+
+保存设置后，在“SSH 配置入口”点击 **一键复制 Root 工具命令**。命令携带本次已保存的 IP / 域名，首次安装和修改已有入口均可使用。在面板服务器以 Root 登录 SSH 后粘贴执行，按向导选择站点和 PHP，核对页面所示端口及 WS 模式；已有入口需确认修改，再输入完整安装确认短语。完成后返回页面点击“验证已保存入口”。
+
+表单仍有未保存修改、保存失败或使用 HTTP 时不会提供可复制的新命令。复制失败可手工选择上方完整命令。页面不会代为执行 Root 操作；普通 HTTPS 改址沿用现有 CA，为新地址更新服务器证书。
 
 ## Root 一键安装独立入口
 
@@ -211,4 +217,4 @@ CA 轮换时，面板导入只影响后续复制的新机器命令，不会自�
 
 已有插件与安装源验证分别见 [NATIVE_DOMAIN_TEST_REPORT.md](NATIVE_DOMAIN_TEST_REPORT.md)、[NATIVE_INSTALL_CHOICES_TEST_REPORT.md](NATIVE_INSTALL_CHOICES_TEST_REPORT.md)、[NATIVE_MACHINE_TEST_REPORT.md](NATIVE_MACHINE_TEST_REPORT.md)；Root / Linux 权限历史证据见 [TEST_REPORT.md](TEST_REPORT.md) 和 [VM_TEST_REPORT.md](VM_TEST_REPORT.md)。Root 防火墙补丁的实际测试范围以同次 Release 报告为准。
 
-开发者可运行 `python3 tools/build/build.py --plugin-only` 与 `python3 tools/build/verify.py --plugin-only` 构建和核验当前插件，输出在 `dist/v1.0.4/`。Root 工具独立发布，保留已发布的插件与历史包字节。
+开发者可运行 `python3 tools/build/build.py --plugin-only` 与 `python3 tools/build/verify.py --plugin-only` 构建和核验当前插件，输出在 `dist/v1.0.5/`。Root 工具独立发布，保留已发布的插件与历史包字节。
