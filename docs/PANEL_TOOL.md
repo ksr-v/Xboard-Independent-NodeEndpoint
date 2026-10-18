@@ -94,9 +94,9 @@ bash tools/panel/node-endpoint-panel.sh status
 bash tools/panel/node-endpoint-panel.sh check-expiry
 bash tools/panel/node-endpoint-panel.sh export-ca --destination /mnt/offline/node-endpoint-ca
 bash tools/panel/node-endpoint-panel.sh verify-export \
-  --destination /mnt/offline/node-endpoint-ca --fingerprint <独立保存的CA指纹>
+  --destination /mnt/offline/node-endpoint-ca --fingerprint '替换为独立保存的64位CA指纹'
 bash tools/panel/node-endpoint-panel.sh remove-online-ca-key \
-  --destination /mnt/offline/node-endpoint-ca --fingerprint <独立保存的CA指纹>
+  --destination /mnt/offline/node-endpoint-ca --fingerprint '替换为独立保存的64位CA指纹'
 ```
 
 导出保留加密私钥，清单记录两个文件哈希及 CA 证书指纹。验证完整哈希、CA 指纹和私钥/证书匹配后，才能在再次输入 `REMOVE ONLINE CA KEY <指纹>` 后删除在线副本。工具不能证明介质已物理离线，管理员应卸载/移走并确认离线保存；SSD/COW/快照上删除不能保证擦除历史副本。CA 必须分别备份到可信离线介质。轮换旧 CA 时可使用 `--ca-id` 指定其身份。
@@ -115,9 +115,9 @@ bash tools/panel/node-endpoint-panel.sh renew --emergency --ca-key /mnt/offline/
 ```bash
 bash tools/panel/node-endpoint-panel.sh rotate-prepare
 # 将 pki/trust-bundle.pem 通过可信方式分发给所有 Node，独立核对新旧指纹
-bash tools/panel/node-endpoint-panel.sh rotate-activate --fingerprint <新CA指纹>
+bash tools/panel/node-endpoint-panel.sh rotate-activate --fingerprint '替换为独立核对的新CA指纹'
 # 检查所有指定实例 REST、WS 和服务健康，再确认移除旧信任
-bash tools/panel/node-endpoint-panel.sh rotate-finish --fingerprint <新CA指纹>
+bash tools/panel/node-endpoint-panel.sh rotate-finish --fingerprint '替换为独立核对的新CA指纹'
 ```
 
 prepare 保持旧证书在线，只生成新 CA / 新服务器证书和双信任 bundle。activate 要求输入 `ALL NODES TRUST BOTH CA <新指纹>`，成功测试并 reload 后服务切换新证书。finish 要求输入 `ALL NODES USE NEW CA <新指纹>` 才把 Root 工具分发 bundle 收敛为新 CA；节点端仍需使用迁移工具逐台更新 trust bundle。工具不会自动访问/重配现有节点。每步先备份，可回滚证书状态与配置；旧加密 CA 密钥请按离线流程单独导出和移除。
