@@ -18,7 +18,7 @@ import urllib.request
 import zipfile
 
 TOOLS_URL = 'https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/download/root-installer-v1.0.5/node-endpoint-tools-1.0.4.zip'
-TOOLS_SHA256 = 'c89b7f2d2b12e2fbc58a95e3d5dc98f06f496781db860c63b7814f6a7b587f24'
+TOOLS_SHA256 = '68603a42d62a4464508a191def80072fd4114094e8420fd1c15da1afd0d420e5'
 CACHE = Path('/opt/nodeendpoint-quick') / TOOLS_SHA256
 
 

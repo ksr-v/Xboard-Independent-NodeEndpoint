@@ -64,7 +64,7 @@ def build(base, output, version='1.0.4'):
     return {'file': destination.name, 'sha256': hashlib.sha256(destination.read_bytes()).hexdigest(),
             'bytes': destination.stat().st_size, 'base_sha256': BASE_SHA256, 'replaced_modules': list(replacements),
             'tools_version': version, 'added_modules': list(ADDITIONS[version]),
-            'added_documents': list(EXTRA_DOCS) if version in ('1.0.3', '1.0.4') else []}
+            'added_documents': (list(EXTRA_DOCS) + (['CA_PASSPHRASE_TEST_REPORT.md'] if version == '1.0.4' else [])) if version in ('1.0.3', '1.0.4') else []}
 
 
 if __name__ == '__main__':

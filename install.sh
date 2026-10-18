@@ -47,7 +47,7 @@ nodeendpoint_bootstrap() (
         --tlsv1.2 --connect-timeout 15 --max-time 180 \
         'https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/download/root-installer-v1.0.5/quick_install.py' \
         --output "$work/quick_install.py"
-    printf '%s  %s\n' '4079ce39cdee1283451c710739f682ca1deed455c2c881bfaf43cf90b6c4f690' "$work/quick_install.py" | sha256sum --check --status \
+    printf '%s  %s\n' 'a5284c1bb7bc2adc241d74e43516bf08f9fde336a310df1e95b22d3b1647ea2e' "$work/quick_install.py" | sha256sum --check --status \
         || fail 'Installer SHA-256 mismatch; nothing was executed.'
     chmod 600 "$work/quick_install.py"
     cd /
