@@ -73,6 +73,50 @@ function credentialCa(string $name): array
     if (!$certificate || !openssl_x509_export($certificate, $pem)) { throw new RuntimeException('Synthetic CA signing failed.'); }
     return ['pem' => $pem, 'fingerprint' => openssl_x509_fingerprint($pem, 'sha256')];
 }
+function credentialBridge(string $input, ?string $key = null): array
+{
+    global $project, $fixture;
+    static $prepared = false;
+    if (!$prepared) {
+        if (!is_dir($fixture . '/vendor')) { mkdir($fixture . '/vendor', 0700, true); }
+        $autoload = '<?php $loader = require ' . var_export(__DIR__ . '/vendor/autoload.php', true) . '; '
+            . '$loader->addPsr4("App\\\\", ' . var_export($project . '/.audit/Xboard/app/', true) . '); return $loader;';
+        file_put_contents($fixture . '/vendor/autoload.php', $autoload);
+        $bootstrap = file_get_contents($project . '/tests/panel/ca_fixture_bootstrap.php');
+        $bootstrap = str_replace("'key' => 'base64:' . base64_encode(str_repeat('c', 32))",
+            "'key' => getenv('NE_CREDENTIAL_TEST_APP_KEY')", $bootstrap, $keyReplacements);
+        $bootstrap = str_replace('\\Illuminate\\Cache\\CacheServiceProvider::class,',
+            '\\Illuminate\\Encryption\\EncryptionServiceProvider::class, \\Illuminate\\Cache\\CacheServiceProvider::class,',
+            $bootstrap, $providerReplacements);
+        ok($keyReplacements === 1 && $providerReplacements === 1, 'CLI fixture bootstrap no longer matches its explicit test overrides.');
+        file_put_contents($fixture . '/bootstrap/app.php', $bootstrap);
+        chmod($fixture . '/bootstrap/app.php', 0600);
+        chmod($fixture . '/vendor/autoload.php', 0600);
+        $prepared = true;
+    }
+    $arguments = [PHP_BINARY];
+    if (php_ini_loaded_file()) { array_push($arguments, '-c', php_ini_loaded_file()); }
+    array_push($arguments, $project . '/tools/panel/panel_passphrase.php', $fixture);
+    assertNoCredentials(implode(' ', $arguments));
+    $process = new Symfony\Component\Process\Process($arguments, $fixture,
+        ['NE_CREDENTIAL_TEST_APP_KEY' => $key ?? config('app.key')]);
+    $process->setInput($input);
+    $process->setTimeout(20);
+    $process->run();
+    ok($process->getErrorOutput() === '', 'Credential CLI forwarded application error output.');
+    $output = $process->getOutput();
+    ok(strlen($output) <= 4096 && substr_count(trim($output), "\n") === 0, 'Credential CLI returned unexpected diagnostic output.');
+    try { $response = json_decode($output, true, 8, JSON_THROW_ON_ERROR); }
+    catch (Throwable) { throw new RuntimeException('Credential CLI did not return a single JSON response.'); }
+    return [$process->getExitCode(), $response];
+}
+function credentialBridgeFailure(array|string $input, ?string $key = null): void
+{
+    [$exit, $response] = credentialBridge(is_array($input) ? json_encode($input, JSON_THROW_ON_ERROR) : $input, $key);
+    eq($exit, 1, 'Credential CLI did not fail closed.');
+    eq($response, ['error' => 'ca_credential_unavailable']);
+    assertNoCredentials(json_encode($response));
+}
 
 credentialCheck('native plugin migration creates a separate credential vault', function (): void {
     global $credentialTable, $credentialHost;
@@ -277,6 +321,58 @@ credentialCheck('plugin disable blocks credential access and preserves encrypted
     } finally { app(PluginManager::class)->enable('node_endpoint'); }
 });
 
+credentialCheck('real PHP CLI bridge prepares recovers and binds without credential arguments', function (): void {
+    global $credentialIds, $credentialHost, $credentialTable, $credentialRoots, $secretCanaries, $cipherCanaries;
+    $id = str_repeat('e', 32);
+    $request = ['action' => 'prepare', 'credential_id' => $id, 'host' => $credentialHost];
+    [$exit, $prepared] = credentialBridge(json_encode($request, JSON_THROW_ON_ERROR));
+    eq($exit, 0, 'Run this isolated test as a non-root application user on Linux.');
+    eq(array_keys($prepared), ['credential_id', 'passphrase']);
+    eq($prepared['credential_id'], $id);
+    ok(preg_match('/^[A-Za-z0-9_-]{64}$/D', $prepared['passphrase']) === 1, 'CLI generated an invalid credential.');
+    $secretCanaries[] = $prepared['passphrase'];
+    $cipherCanaries[] = DB::table($credentialTable)->where('id', $id)->value('ciphertext');
+    ok(hash_equals($prepared['passphrase'], CaPassphrases::get($id)), 'CLI did not use the real application vault.');
+    [$exit, $retry] = credentialBridge(json_encode($request, JSON_THROW_ON_ERROR));
+    eq($exit, 0);
+    ok(hash_equals($prepared['passphrase'], $retry['passphrase']), 'CLI retry replaced the pending credential.');
+    $request['action'] = 'get';
+    [$exit, $recovered] = credentialBridge(json_encode($request, JSON_THROW_ON_ERROR));
+    eq($exit, 0);
+    ok(hash_equals($prepared['passphrase'], $recovered['passphrase']), 'CLI recovery returned a different credential.');
+    // Omission is supported for recovery by opaque ID; Root normally also sends its original host.
+    unset($request['host']);
+    [$exit, $recovered] = credentialBridge(json_encode($request, JSON_THROW_ON_ERROR));
+    eq($exit, 0);
+    ok(hash_equals($prepared['passphrase'], $recovered['passphrase']), 'Opaque-ID recovery unexpectedly regenerated a credential.');
+    $pin = str_repeat('e', 64);
+    $binding = ['action' => 'bind', 'credential_id' => $id, 'host' => $credentialHost, 'fingerprint' => $pin];
+    [$exit, $bound] = credentialBridge(json_encode($binding, JSON_THROW_ON_ERROR));
+    eq($exit, 0);
+    eq($bound, ['status' => 'stored', 'credential_id' => $id, 'fingerprint' => $pin]);
+    ok(hash_equals($prepared['passphrase'], CaPassphrases::reveal($pin)), 'CLI bind did not persist the selected vault association.');
+    assertNoCredentials(json_encode($bound));
+});
+
+credentialCheck('real PHP CLI bridge rejects invalid input wrong host key and disabled plugin generically', function (): void {
+    global $credentialIds, $credentialHost, $credentialTable, $credentialRoots;
+    $before = DB::table($credentialTable)->orderBy('id')->get()->toJson();
+    $request = ['action' => 'get', 'credential_id' => $credentialIds[0], 'host' => $credentialHost];
+    credentialBridgeFailure(array_replace($request, ['host' => '198.51.100.20']));
+    credentialBridgeFailure(array_replace($request, ['unexpected' => true]));
+    credentialBridgeFailure(array_replace($request, ['action' => 'reveal']));
+    credentialBridgeFailure(array_replace($request, ['credential_id' => '../state']));
+    credentialBridgeFailure('{broken');
+    credentialBridgeFailure(str_repeat('x', 4097));
+    credentialBridgeFailure($request, 'base64:' . base64_encode(random_bytes(32)));
+    credentialBridgeFailure(['action' => 'bind', 'credential_id' => $credentialIds[2], 'host' => $credentialHost,
+        'fingerprint' => $credentialRoots[0]['fingerprint']]);
+    app(PluginManager::class)->disable('node_endpoint');
+    try { credentialBridgeFailure($request); }
+    finally { app(PluginManager::class)->enable('node_endpoint'); }
+    ok(DB::table($credentialTable)->orderBy('id')->get()->toJson() === $before, 'Rejected CLI operations changed the credential vault.');
+});
+
 credentialCheck('application logs and the normal settings row contain no credential material', function (): void {
     foreach (glob(storage_path('logs/*')) ?: [] as $path) {
         if (is_file($path)) { assertNoCredentials(file_get_contents($path)); }
@@ -285,4 +381,4 @@ credentialCheck('application logs and the normal settings row contain no credent
 });
 
 echo json_encode(['result' => 'PASS', 'checks' => count($checks), 'framework' => Illuminate\Foundation\Application::VERSION,
-    'scope' => 'Isolated Laravel/Crypt/SQLite and native Admin API; generated test credentials only; no production']) . PHP_EOL;
+    'scope' => 'Isolated Laravel/Crypt/SQLite, native Admin API and real PHP CLI subprocess; generated test credentials only; no production']) . PHP_EOL;

@@ -1,16 +1,18 @@
 # Linux Root 管理工具
 
-底层入口管理器位于 `tools/panel/node-endpoint-panel.sh`，管理器版本 **1.0.0**；当前补充工具包为 **tools 1.0.4**，一键引导版本为 **root-installer-v1.0.5**。仅由管理员通过 SSH 使用；Web 插件不执行 Shell、不持有 Root 权限。依赖 Linux、Python 3.10+、OpenSSL 1.1.1+、Nginx/OpenResty、`ss`；原生 PHP 部署需要 `php`、`runuser`，Docker 部署需要 Docker CLI。工具不安装依赖、不升级系统、不下载或替换 Node 二进制。
+底层入口管理器位于 `tools/panel/node-endpoint-panel.sh`，管理器版本 **1.0.0**；当前补充工具包为 **tools 1.0.4**，一键引导版本为 **root-installer-v1.0.6**。仅由管理员通过 SSH 使用；Web 插件不执行 Shell、不持有 Root 权限。依赖 Linux、Python 3.10+、OpenSSL 1.1.1+、Nginx/OpenResty、`ss`；原生 PHP 部署需要 `php`、`runuser`，Docker 部署需要 Docker CLI。工具不安装依赖、不升级系统、不下载或替换 Node 二进制。
 
 ## 一键安装与防火墙
 
 先上传并启用 **NodeEndpoint-1.0.4.zip**，保存通讯地址 / 端口 / HTTPS，然后在面板服务器以 Root 登录交互 SSH：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.5/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.6/install.sh | bash
 ```
 
 引导脚本通过 GitHub HTTPS 的固定标签下载，校验后续 Python 安装器和 tools 1.0.4 工具包摘要。首次下载需要信任仓库与下载渠道，也可先下载、独立核对再本地执行。标准 FPM 向导在安装独立入口后处理本机配置端口的 TCP 防火墙规则，允许所有来源访问该端口，再尝试公共 CA 本机导入。入口状态、PKI、插件设置及已有节点不因工具补丁更新而重建。
+
+首次配置会检测本机公网 IPv4，显示候选并等待确认；回车接受，也可手工输入实际通讯 IP 或域名。检测失败必须手工填写，不使用文档示例地址。已有真实 Root 入口地址优先作为默认值保留。向导不会因为检测到另一个公网 IP 就自动改写现有入口；原版面板仍须保证插件页面保存值与最终计划一致。
 
 未发现可自动填写的 FPM 站点时，Docker / Octane 或特殊布局会回退到底层手工菜单；该菜单不执行上述两个自动后续步骤。完成入口安装后，须分别运行 `--configure-firewall` 和 `--sync-ca`。需要自行限制来源 IP 时，跳过自动防火墙并按自己的策略配置。
 
@@ -23,16 +25,28 @@ curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoi
 
 ```bash
 # 只读取已有安装记录并配置其 TCP 端口，不重装入口或生成证书。
-curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.5/install.sh | bash -s -- --configure-firewall
+curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.6/install.sh | bash -s -- --configure-firewall
 
 # 只同步现有公共 CA；插件通讯地址、端口、HTTPS 必须与 Root 记录一致。
-curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.5/install.sh | bash -s -- --sync-ca
+curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.6/install.sh | bash -s -- --sync-ca
 
 # 只读部署检测；准备下载缓存，不添加规则、安装入口或导入 CA。
-curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.5/install.sh | bash -s -- --detect-only
+curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.6/install.sh | bash -s -- --detect-only
 ```
 
 已有自定义防火墙策略时，一键安装可加 `-s -- --skip-firewall` 跳过本机规则步骤，管理员自行确认入口 TCP 端口可达。`--configure-firewall` 不等于 `--sync-ca`，两者不重新生成 CA。插件仍为 1.0.4，无需为工具更新重新上传同版本 ZIP、卸载其他插件或升级 Xboard 主程序。
+
+## 修复已安装独立面板的通讯地址
+
+旧教程中的 `203.0.113.10` 是文档示例 IP。若已将其安装为实际入口，单独修改插件页面不能修正 Nginx 入口和证书 SAN。对于提供 `xboard:configure-endpoint` 命令的独立 Xboard 后端，在同一面板服务器以 Root 执行：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.6/install.sh | bash -s -- --repair-address
+```
+
+向导检测公网 IPv4 并显示候选，也允许手工输入真实 IP / 域名。审阅地址及修改计划后确认；沿用现有 CA 和口令，重签包含新地址 SAN 的服务器证书，以站点用户保存插件通讯设置，再处理防火墙及公共 CA 同步。CA 私钥不进入面板，现有 CA 指纹和托管口令不因修复而更换。旧版手动 CA 仍需原口令；若在线 CA 私钥已经离线，应先按离线签发流程处理。
+
+普通安装和升级继续保留现有真实地址；修复地址必须显式执行。此修复入口不用于缺少该 Artisan 命令的原版面板；原版面板按下文 `modify` 流程核对修改，并将插件保存值与 Root 计划保持一致。修复后刷新插件页面并重新复制节点安装命令，不重新初始化面板。
 
 ## 底层管理器与手工安装
 
@@ -48,9 +62,10 @@ bash tools/panel/node-endpoint-panel.sh menu
 安装采用单独 `node-endpoint.conf`，只允许已被真实主配置 HTTP 层 include 匹配的目录，不修改原站 server block、原 443 证书、PHP、Redis、数据库或 Xboard 全局配置。默认 HTTPS 8443，拒绝 80/443 和已占用端口。
 
 ```bash
-# 已确认的原生 PHP-FPM 示例
+# 已确认的原生 PHP-FPM 示例；先输入此面板的实际通讯 IP / 域名
+read -r -p '实际通讯 IP / 域名: ' NODE_ENDPOINT_HOST
 bash tools/panel/node-endpoint-panel.sh install \
-  --host 203.0.113.10 --port 8443 \
+  --host "$NODE_ENDPOINT_HOST" --port 8443 \
   --include-dir /etc/nginx/sites-enabled \
   --site-config /etc/nginx/sites-enabled/xboard.conf --site-name panel.example.com \
   --app /srv/xboard --app-user www-data --php /usr/bin/php \

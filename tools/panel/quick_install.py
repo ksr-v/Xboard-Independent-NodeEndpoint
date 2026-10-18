@@ -4,6 +4,7 @@ import argparse
 import fnmatch
 import hashlib
 import io
+import ipaddress
 import json
 import os
 from pathlib import Path, PurePosixPath
@@ -11,6 +12,7 @@ import re
 import shutil
 import ssl
 import stat
+import subprocess
 import sys
 import tempfile
 import urllib.parse
@@ -171,6 +173,119 @@ def ask(label, default=''):
     return result
 
 
+def reject_example_host(value):
+    """Guard new candidates, while leaving legacy PKI/credential reads usable."""
+    from pki import SafetyError, validate_host
+    try:
+        host, kind = validate_host(value)
+    except SafetyError as error:
+        raise ValueError(str(error)) from None
+    if kind == 'IP':
+        address = ipaddress.ip_address(host)
+        examples = ('192.0.2.0/24', '198.51.100.0/24', '203.0.113.0/24', '2001:db8::/32')
+        require(not any(address in ipaddress.ip_network(network) for network in examples),
+                '这是文档示例 IP，不能作为实际通讯地址；已有入口请用 --repair-address 显式修复')
+    return host
+
+
+class NoIPRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, request, fp, code, message, headers, newurl):
+        return None
+
+
+def detect_public_ip(opener=None):
+    """Suggest only a bounded HTTPS public IPv4 response; never guess on failure."""
+    source = 'https://api.ipify.org'
+    try:
+        if opener is None:
+            context = ssl.create_default_context()
+            context.minimum_version = ssl.TLSVersion.TLSv1_2
+            opener = urllib.request.build_opener(NoIPRedirect(), urllib.request.HTTPSHandler(context=context))
+        with opener.open(urllib.request.Request(source, headers={'User-Agent': 'NodeEndpoint-IP-Detection/1.0'}), timeout=5) as response:
+            require(response.geturl() == source, 'IP 检测拒绝重定向')
+            data = response.read(129)
+        require(len(data) <= 128, 'IP 检测响应过长')
+        address = ipaddress.ip_address(data.decode('ascii').strip())
+        require(address.version == 4 and address.is_global and not address.is_multicast,
+                '未检测到公网 IPv4')
+        return reject_example_host(str(address))
+    except (OSError, ValueError, UnicodeError):
+        return ''
+
+
+def select_communication_host(current=None, explicit=None):
+    if explicit is not None:
+        return reject_example_host(explicit)
+    if current is not None:
+        return reject_example_host(current)
+    suggested = detect_public_ip()
+    print('检测服务器出口公网 IPv4 作为候选；NAT/多 IP 服务器请核对节点实际可访问的地址。'
+          if suggested else '未能检测公网 IPv4，请输入本机实际通讯 IP 或域名。')
+    return reject_example_host(ask('通讯 IP/域名（不含协议；回车接受候选，可手工覆盖）', suggested))
+
+
+def panel_endpoint_command(plan, check=False):
+    """Run the custom backend command as its recorded application UID, never Root."""
+    import manager
+    import pwd
+    owner = pwd.getpwnam(plan.get('app_user') or '')
+    require(owner.pw_uid != 0 and owner.pw_gid != 0, '必须使用非 Root 应用用户保存面板设置')
+    app = Path(plan['app']).resolve(strict=True)
+    require((app / 'app/Console/Commands/ConfigureEndpoint.php').is_file(),
+            '--repair-address 需要独立 Xboard 后端；原版面板请按手动修改流程处理')
+    php = manager.trusted_file(plan.get('php') or '', True)
+    runuser = manager.trusted_file(shutil.which('runuser') or '/usr/sbin/runuser', True)
+    arguments = ['list', '--raw'] if check else ['xboard:configure-endpoint', '--host=' + reject_example_host(plan['host']),
+        '--port=' + str(plan['port']), '--ws-mode=' + ('rewrite' if plan.get('ws_backend') else 'rest')]
+    environment = {'PATH': '/usr/sbin:/usr/bin:/sbin:/bin', 'LANG': 'C.UTF-8', 'LC_ALL': 'C.UTF-8',
+                   'HOME': owner.pw_dir, 'USER': owner.pw_name, 'LOGNAME': owner.pw_name}
+    try:
+        result = subprocess.run([str(runuser), '-u', owner.pw_name, '--', str(php),
+                                 '-d', 'display_errors=0', '-d', 'log_errors=0', 'artisan', *arguments],
+                                cwd=app, env=environment, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=90)
+    except (OSError, subprocess.TimeoutExpired):
+        raise ValueError('应用用户命令未完成；未输出应用日志。若入口已提交，可重跑 --repair-address 完成面板设置同步') from None
+    require(result.returncode == 0, '应用用户命令未完成；未输出应用日志。若入口已提交，可重跑 --repair-address 完成面板设置同步')
+    if check:
+        require(any(line.split()[:1] == ['xboard:configure-endpoint']
+                    for line in result.stdout.decode('utf-8', errors='replace').splitlines()),
+                '独立后端缺少 xboard:configure-endpoint，未修改入口')
+
+
+def repair_address(explicit=None, skip_firewall=False, nginx=None):
+    """Explicitly renew the server SAN under the existing CA, then save the panel."""
+    import manager
+    from panel_ca import payload_from_state
+    plan, payload = payload_from_state('/var/lib/node-endpoint')
+    from pki import read_json
+    metadata = read_json(manager.trusted_file('/var/lib/node-endpoint/pki/state.json'))
+    require(metadata.get('active_ca') and metadata.get('host') == plan['host'] and not metadata.get('rotation'),
+            '地址修复要求现有 CA、证书地址与入口一致，且没有待完成的 CA 轮换；未创建新 CA')
+    panel_endpoint_command(plan, check=True)
+    try:
+        current = reject_example_host(plan['host'])
+    except ValueError:
+        current = None
+    host = select_communication_host(current=current, explicit=explicit)
+    require(not (Path('/var/lib/node-endpoint/pki/state.json').is_symlink()), '拒绝 PKI 状态符号链接')
+    print('修复通讯地址：' + plan['host'] + ' -> ' + host + ':' + str(plan['port'])
+          + '；沿用原 CA 和口令，仅在地址变化时重签服务器证书。')
+    argv = (['--nginx', nginx] if nginx else []) + ['modify', '--host', host, '--port', str(plan['port']),
+        '--site-config', plan['source_site'], '--site-name', plan['site_name'], '--include-dir', plan['include_dir'],
+        '--app', plan['app'], '--app-user', plan['app_user'], '--php', plan['php'],
+        '--deployment', plan['deployment'], '--backend', plan['backend']]
+    if plan.get('ws_backend'):
+        argv += ['--enable-ws', '--ws-backend', plan['ws_backend']]
+    manager.execute(manager.parser().parse_args(argv))
+    committed, after = payload_from_state('/var/lib/node-endpoint')
+    require(committed['host'] == host and committed['port'] == plan['port'], '入口已被其他操作修改，未写入面板设置')
+    require(after['pem'] == payload['pem'] and after['fingerprints'] == payload['fingerprints'],
+            'CA 信任发生变化，未自动保存面板设置，请核对并发维护操作')
+    panel_endpoint_command(committed)
+    print('面板通讯设置已同步；正在核对防火墙并同步原 CA 公共证书。')
+    finish_install(skip_firewall)
+
+
 def php_candidates():
     paths = set()
     for process in Path('/proc').iterdir():
@@ -277,6 +392,8 @@ def main():
     actions.add_argument('--detect-only', action='store_true', help='Prepare verified tool cache and inspect; do not install endpoint or change firewall')
     actions.add_argument('--sync-ca', action='store_true', help='Import public CA from existing Root state into this panel; do not reinstall endpoint')
     actions.add_argument('--configure-firewall', action='store_true', help='Allow the installed entry TCP port persistently; do not reinstall or regenerate certificates')
+    actions.add_argument('--repair-address', action='store_true', help='Repair an installed custom backend endpoint using the existing CA; renew server SAN and save panel settings')
+    parser.add_argument('--host', help='Actual bare IP or DNS host; otherwise detect a public IPv4 candidate on first installation/repair')
     parser.add_argument('--skip-firewall', action='store_true', help='Keep local firewall unchanged during entry installation')
     args = parser.parse_args()
     require(sys.platform == 'linux' and os.geteuid() == 0, '请在面板服务器以 Root 运行')
@@ -284,7 +401,8 @@ def main():
     import pwd
     os.umask(0o077)
     require(not (args.skip_firewall and (args.detect_only or args.sync_ca or args.configure_firewall)),
-            '--skip-firewall 仅用于入口安装')
+            '--skip-firewall 仅用于入口安装或地址修复')
+    require(not (args.host and (args.detect_only or args.sync_ca or args.configure_firewall)), '--host 仅用于安装或地址修复')
     require(args.detect_only or args.sync_ca or args.configure_firewall or sys.stdin.isatty(), '安装需要 SSH 交互终端，不要将脚本通过管道执行')
     for name in ('openssl', 'ss', 'runuser'):
         require(shutil.which(name), '缺少依赖：' + name + '，请先通过本机包管理器安装')
@@ -309,6 +427,8 @@ def main():
     selected_nginx = args.nginx
     if not selected_nginx and Path('/www/server/nginx/sbin/nginx').is_file():
         selected_nginx = '/www/server/nginx/sbin/nginx'
+    if args.repair_address:
+        return repair_address(args.host, args.skip_firewall, selected_nginx)
     environment = manager.Environment(selected_nginx)
     choices = discover(environment, manager)
     if args.detect_only:
@@ -326,8 +446,13 @@ def main():
         user = ask('Xboard 非 Root 运行用户')
     require(pwd.getpwnam(user).pw_uid != 0, '应用不能以 Root 运行')
     php = select(php_candidates(), 'PHP CLI（按实际 FPM 版本选择）')
-    host = ask('通讯 IP/域名（与已启用插件页面保存值一致）')
-    port = ask('通讯端口', '8443')
+    state = Path('/var/lib/node-endpoint/installation.json')
+    installed = None
+    if state.exists():
+        from panel_ca import payload_from_state
+        installed, _ = payload_from_state(state.parent)
+    host = select_communication_host(current=installed['host'] if installed else None, explicit=args.host)
+    port = ask('通讯端口', str(installed['port']) if installed else '8443')
     include_dir = site['include_dir'] or ask('检测已列出的 HTTP include 目录')
     argv = (['--nginx', selected_nginx] if selected_nginx else []) + ['install', '--host', host, '--port', port,
             '--site-config', site['site_config'], '--site-name', site['site_name'], '--include-dir', include_dir,
@@ -336,7 +461,6 @@ def main():
         argv += ['--enable-ws', '--ws-backend', site['ws_backend']]
     else:
         print('未启用 WS；请将插件页新入口模式设为 REST fallback。')
-    state = Path('/var/lib/node-endpoint/installation.json')
     if state.exists():
         require(input('独立入口已存在。修改前请备份；输入 MODIFY 继续：') == 'MODIFY', '取消修改')
         argv[argv.index('install')] = 'modify'

@@ -2,7 +2,7 @@
 
 为 Xboard 增加独立的节点通讯入口，让节点通过 **IP + 私有证书**连接面板，也保留使用原面板域名的独立部署命令。默认独立端口为 **HTTPS TCP 8443**。原网站、登录、订阅、`app_url` 和其他插件保留原有配置。
 
-当前插件为 **NodeEndpoint 1.0.4**；Root 一键入口为 **root-installer-v1.0.5 / tools 1.0.4**。新建 CA 的口令自动随机生成，并使用面板 `APP_KEY` 加密保存；管理员可在 HTTPS 管理页面按需查看和复制。已有独立面板请先升级插件到 1.0.4，再使用新版 Root 工具；无需卸载其他插件。全新独立 Xboard 用户使用 [内置插件版宝塔教程](https://github.com/ksr-v/Xboard-Custom-Source/blob/v2026.10.18.4/docs/installation/aapanel.zh-CN.md)，不必单独上传插件。
+当前插件为 **NodeEndpoint 1.0.4**；Root 一键入口为 **root-installer-v1.0.6 / tools 1.0.4**。新建 CA 的口令自动随机生成，并使用面板 `APP_KEY` 加密保存；管理员可在 HTTPS 管理页面按需查看和复制。已有独立面板请先升级插件到 1.0.4，再使用新版 Root 工具；无需卸载其他插件。全新独立 Xboard 用户使用 [内置插件版宝塔教程](https://github.com/ksr-v/Xboard-Custom-Source/blob/v2026.10.18.5/docs/installation/aapanel.zh-CN.md)，不必单独上传插件。
 
 ## 选择安装路线
 
@@ -98,15 +98,15 @@ sudo -u www /www/server/php/83/bin/php artisan xboard:install
 在**面板服务器**以 **Root** 登录交互 SSH，执行：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.5/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.6/install.sh | bash
 ```
 
 一键入口下载固定版本安装器，校验内置摘要，再下载并校验 **tools 1.0.4** 工具包。它不会安装缺失依赖、升级系统包、升级 Xboard 或替换 Node 二进制。首次下载仍需信任仓库和 GitHub HTTPS；可先下载脚本、独立核对后在本机执行。
 
 标准宝塔 / PHP-FPM 向导会检测实际网站 Nginx、站点、应用目录、FPM / WS 后端和运行用户，多候选时按提示选择。以下自动后续步骤适用于该标准 FPM 向导：
 
-1. 核对通讯 IP / 端口 / HTTPS / WS 模式，与插件页面保持一致。
-2. 审阅安装计划，输入提示中的完整内容并回车，例如 `INSTALL 203.0.113.10:8443`。只输入 `INSTALL` 会重新询问；`CANCEL`、EOF 或 Ctrl+C 取消。这一行是安装器要求的回答，不是 Shell 命令。
+1. 未有 Root 安装记录时，向导检测本机公网 IPv4 并显示候选，回车接受或手工输入实际通讯 IP / 域名；检测失败时必须手工输入。核对通讯 IP / 端口 / HTTPS / WS 模式，与插件页面保持一致。已有真实 Root 入口地址作为默认值保留，不因公网检测结果变化而自动替换。
+2. 审阅安装计划，按提示填写完整的 `INSTALL <实际地址>:<端口>` 并回车，地址和端口以本机计划为准。只输入 `INSTALL` 会重新询问；`CANCEL`、EOF 或 Ctrl+C 取消。这一行是安装器要求的回答，不是 Shell 命令。
 3. 新建 CA 自动生成随机口令，并先加密保存到面板，再签发证书，不再要求输入和重复输入 CA 口令。已有 CA 不会改口令或重新签发；旧版手动创建、尚未托管的 CA 在维护时仍使用原隐藏输入流程。
 4. 工具创建独立 HTTPS 入口，再处理本机 TCP 防火墙规则，最后尝试将**公共 CA**自动导入面板。
 5. 查看每一步结果，刷新插件页面，确认 CA 已导入；从节点服务器验证连接后再接入业务。
@@ -137,18 +137,28 @@ curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoi
 
 ```bash
 # 只按已保存的入口端口配置本机防火墙，不重新安装入口或生成证书。
-curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.5/install.sh | bash -s -- --configure-firewall
+curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.6/install.sh | bash -s -- --configure-firewall
 
 # 只将现有公共 CA 同步到本机插件，不修改防火墙或重新签发证书。
-curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.5/install.sh | bash -s -- --sync-ca
+curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.6/install.sh | bash -s -- --sync-ca
 
 # 只读检测部署，不安装入口、不添加防火墙规则、不导入 CA。
-curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.5/install.sh | bash -s -- --detect-only
+curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.6/install.sh | bash -s -- --detect-only
 ```
 
 `--detect-only` 会准备已校验的下载缓存，但部署检测本身只读。`--sync-ca` 要求插件启用，且插件通讯地址 / 端口 / HTTPS 与 Root 安装记录一致；不一致时先核对并修正插件设置，再重试。
 
 Root 缓存位于 `/opt/nodeendpoint-quick/` 的专用版本目录。入口检查 Root 身份、属主、路径和权限，使用 `umask 077`，临时目录 `0700`、文件 `0600`，无需额外 `chmod +x`；不会对整个 Xboard 目录执行 `chmod` / `chown`。管道启动后的交互从 `/dev/tty` 读取。
+
+### 已安装独立面板：修复误用的示例 IP
+
+`203.0.113.10` 是文档示例地址，不能作为真实节点通讯地址。旧教程若将它写入已安装入口，在**同一台独立 Xboard 面板服务器以 Root**执行：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.6/install.sh | bash -s -- --repair-address
+```
+
+核对检测出的服务器公网 IPv4，回车接受或手工输入实际地址，再按计划确认。此命令仅适用于提供 `xboard:configure-endpoint` 的独立后端；它沿用现有 CA 和口令，为新地址重签服务器证书，并以站点用户保存通讯设置、同步公共 CA。只在网页修改 IP 无法修正服务器证书。修复完成后刷新插件页面，再复制新的节点安装命令；不要重跑 `init.sh` 或重建 CA。
 
 ## 新机器接入：域名或 IP 双选
 
@@ -184,7 +194,7 @@ CA 轮换时，面板导入只影响后续复制的新机器命令，不会自�
 
 ## 高级操作、卸载与验证边界
 
-需要离线下载或手工部署时，从 [root-installer-v1.0.5 Release](https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/tag/root-installer-v1.0.5)取得 **node-endpoint-tools-1.0.4.zip** 和同次 SHA256SUMS，校验后解压到专用受保护目录，再校验包内 `MANIFEST.sha256`。不要解压覆盖 Xboard 目录。直接运行 `tools/panel/node-endpoint-panel.sh install / modify` 属于底层手工流程，**不自动配置防火墙**；一键向导的防火墙处理不能套用于这些手工命令。
+需要离线下载或手工部署时，从 [root-installer-v1.0.6 Release](https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/tag/root-installer-v1.0.6)取得 **node-endpoint-tools-1.0.4.zip** 和同次 SHA256SUMS，校验后解压到专用受保护目录，再校验包内 `MANIFEST.sha256`。不要解压覆盖 Xboard 目录。直接运行 `tools/panel/node-endpoint-panel.sh install / modify` 属于底层手工流程，**不自动配置防火墙**；一键向导的防火墙处理不能套用于这些手工命令。
 
 禁用或卸载插件不会自动移除 Root HTTPS 入口；禁用会停止新入口 handshake 的地址重写，需先确认已迁移节点的 REST / WSS 行为。拆除入口前先迁移全部使用者，再按 Root 工具单独确认卸载；保留所需 PKI 和恢复备份。原生卸载保留插件自己的恢复设置及公共 CA，显式清理另见工具说明。
 
