@@ -23,4 +23,4 @@ if (is_link($ca) || is_link(dirname($ca))) {
     fwrite(STDERR, "Settings removed; refused symlink CA path. Inspect manually.\n"); exit(2);
 }
 if (is_file($ca)) { unlink($ca); }
-fwrite(STDOUT, "Only NodeEndpoint recovery settings, its migration marker and imported public CA were removed. Root listener and PKI were preserved.\n");
+fwrite(STDOUT, "Only NodeEndpoint recovery settings, its migration marker and imported public CA were removed. Root listener, PKI and encrypted CA credentials were preserved. Back up the credential table together with the original APP_KEY before any separate credential cleanup.\n");

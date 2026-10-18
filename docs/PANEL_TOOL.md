@@ -1,16 +1,16 @@
 # Linux Root 管理工具
 
-底层入口管理器位于 `tools/panel/node-endpoint-panel.sh`，管理器版本 **1.0.0**；当前补充工具包为 **tools 1.0.3**，一键引导版本为 **root-installer-v1.0.4**。仅由管理员通过 SSH 使用；Web 插件不执行 Shell、不持有 Root 权限。依赖 Linux、Python 3.10+、OpenSSL 1.1.1+、Nginx/OpenResty、`ss`；原生 PHP 部署需要 `php`、`runuser`，Docker 部署需要 Docker CLI。工具不安装依赖、不升级系统、不下载或替换 Node 二进制。
+底层入口管理器位于 `tools/panel/node-endpoint-panel.sh`，管理器版本 **1.0.0**；当前补充工具包为 **tools 1.0.4**，一键引导版本为 **root-installer-v1.0.5**。仅由管理员通过 SSH 使用；Web 插件不执行 Shell、不持有 Root 权限。依赖 Linux、Python 3.10+、OpenSSL 1.1.1+、Nginx/OpenResty、`ss`；原生 PHP 部署需要 `php`、`runuser`，Docker 部署需要 Docker CLI。工具不安装依赖、不升级系统、不下载或替换 Node 二进制。
 
 ## 一键安装与防火墙
 
-先上传并启用 **NodeEndpoint-1.0.3.zip**，保存通讯地址 / 端口 / HTTPS，然后在面板服务器以 Root 登录交互 SSH：
+先上传并启用 **NodeEndpoint-1.0.4.zip**，保存通讯地址 / 端口 / HTTPS，然后在面板服务器以 Root 登录交互 SSH：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.4/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.5/install.sh | bash
 ```
 
-引导脚本通过 GitHub HTTPS 的固定标签下载，校验后续 Python 安装器和 tools 1.0.3 工具包摘要。首次下载需要信任仓库与下载渠道，也可先下载、独立核对再本地执行。标准 FPM 向导在安装独立入口后处理本机配置端口的 TCP 防火墙规则，允许所有来源访问该端口，再尝试公共 CA 本机导入。入口状态、PKI、插件设置及已有节点不因工具补丁更新而重建。
+引导脚本通过 GitHub HTTPS 的固定标签下载，校验后续 Python 安装器和 tools 1.0.4 工具包摘要。首次下载需要信任仓库与下载渠道，也可先下载、独立核对再本地执行。标准 FPM 向导在安装独立入口后处理本机配置端口的 TCP 防火墙规则，允许所有来源访问该端口，再尝试公共 CA 本机导入。入口状态、PKI、插件设置及已有节点不因工具补丁更新而重建。
 
 未发现可自动填写的 FPM 站点时，Docker / Octane 或特殊布局会回退到底层手工菜单；该菜单不执行上述两个自动后续步骤。完成入口安装后，须分别运行 `--configure-firewall` 和 `--sync-ca`。需要自行限制来源 IP 时，跳过自动防火墙并按自己的策略配置。
 
@@ -23,16 +23,16 @@ curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoi
 
 ```bash
 # 只读取已有安装记录并配置其 TCP 端口，不重装入口或生成证书。
-curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.4/install.sh | bash -s -- --configure-firewall
+curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.5/install.sh | bash -s -- --configure-firewall
 
 # 只同步现有公共 CA；插件通讯地址、端口、HTTPS 必须与 Root 记录一致。
-curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.4/install.sh | bash -s -- --sync-ca
+curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.5/install.sh | bash -s -- --sync-ca
 
 # 只读部署检测；准备下载缓存，不添加规则、安装入口或导入 CA。
-curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.4/install.sh | bash -s -- --detect-only
+curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.5/install.sh | bash -s -- --detect-only
 ```
 
-已有自定义防火墙策略时，一键安装可加 `-s -- --skip-firewall` 跳过本机规则步骤，管理员自行确认入口 TCP 端口可达。`--configure-firewall` 不等于 `--sync-ca`，两者不重新生成 CA。插件仍为 1.0.3，无需为工具更新重新上传同版本 ZIP、卸载其他插件或升级 Xboard 主程序。
+已有自定义防火墙策略时，一键安装可加 `-s -- --skip-firewall` 跳过本机规则步骤，管理员自行确认入口 TCP 端口可达。`--configure-firewall` 不等于 `--sync-ca`，两者不重新生成 CA。插件仍为 1.0.4，无需为工具更新重新上传同版本 ZIP、卸载其他插件或升级 Xboard 主程序。
 
 ## 底层管理器与手工安装
 
@@ -65,7 +65,11 @@ bash tools/panel/node-endpoint-panel.sh install \
   --enable-ws --ws-backend http://127.0.0.1:8076
 ```
 
-安装展示具体计划并要求输入 `INSTALL <host>:<port>`；CA 口令使用隐藏交互输入，最少 16 字符，不接受参数形式。`modify` 使用同样参数，修改地址时生成新服务器私钥及证书，端口修改沿用有效证书。同一输入重复执行不创建第二个监听。`--confirm` 可传入上述完整确认文字供受控 SSH 自动化使用。
+安装展示具体计划并要求完整输入 `INSTALL <host>:<port>`；输错只重新询问，不重跑整个安装事务。`CANCEL`、EOF 或 Ctrl+C 取消；`--confirm` 参数仍须精确匹配。
+
+插件 1.0.4 的原生 PHP 部署中新 CA 口令默认自动随机生成，并先通过非 Root PHP 将口令按 `APP_KEY` 加密保存到面板独立凭据表，再签发证书。Root 状态只记录凭据 ID、CA 指纹和应用绑定；普通输出没有口令。管理员可在 HTTPS `/node-endpoint` 的证书区显式查看或复制口令，显示会自动清空。请一并备份数据库和原 `.env` / APP_KEY。
+
+已签发 CA 不自动换口令、不重新生成。未托管的旧 CA 仍隐藏输入原口令；不支持托管的部署可显式选择 `--manual-ca-passphrase` 创建新 CA，设置至少 16 字符的口令。不能通过升级工具反推出原口令。`modify` 使用同样参数，修改地址时生成新服务器私钥及证书，端口修改沿用有效证书。同一输入重复执行不创建第二个监听。
 
 交互菜单修改已有入口时，从原计划载入地址、端口、部署方式、后端、HTTPS 和 WebSocket 默认设置，并分别允许保留或更改。CA 已离线时，重签菜单要求提供离线加密 CA key 路径；菜单还提供导出/验证/删除在线 CA key 和分阶段 CA 轮换。最终计划及确认文字仍会显示。
 

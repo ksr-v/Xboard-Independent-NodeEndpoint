@@ -1,4 +1,22 @@
-# Root 防火墙一体化：root-installer-v1.0.4
+# NodeEndpoint 1.0.4 / root-installer-v1.0.5
+
+新 CA 的加密口令自动随机生成，先按面板原 `APP_KEY` 加密保存到独立凭据表，再由 Root 签发证书。管理员在 HTTPS `/node-endpoint` 证书区按需查看和复制；普通设置、状态、节点命令和日志不包含口令。CA 私钥继续放在网站之外的 Root 私有目录或离线介质。
+
+原有独立面板先原生上传 `NodeEndpoint-1.0.4.zip` 升级并确认启用，再在面板服务器以 Root 执行：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.5/install.sh | bash
+```
+
+已有 CA 不换口令、不重新签发，也不要求重新对接节点；未托管的旧 CA 维护时继续使用原口令。新 CA 不再出现两次隐藏口令输入。Root 仍要求确认完整的 `INSTALL IP:端口`，误输可重试，`CANCEL` 取消。面板数据库和原 `.env` / APP_KEY 必须一起备份。
+
+本版保留宝塔 Nginx 解析和防火墙一体化，并修复 UFW 空规则表不能 `insert 1` 的情况。内置插件后端版同时保留 Composer 版本检查、缓存权限、PHP `symlink` 前置检查和已安装面板恢复流程。
+
+- 独立插件安装及升级：[README](README.md)
+- 全新内置插件后端及原版面板升级：[宝塔教程](https://github.com/ksr-v/Xboard-Custom-Source/blob/v2026.10.18.4/docs/installation/aapanel.zh-CN.md)
+- 托管、备份及验证边界：[CA_PASSPHRASE_TEST_REPORT.md](CA_PASSPHRASE_TEST_REPORT.md)
+
+## 历史 Root 防火墙一体化：root-installer-v1.0.4
 
 面板 Root 一键安装现在串联 **独立 HTTPS 入口 → 本机 TCP 端口放行 → 公共 CA 自动导入**，使用固定校验的 tools 1.0.3。
 

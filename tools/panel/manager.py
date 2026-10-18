@@ -462,7 +462,8 @@ def probe_after_reload(plan, pki):
 
 class Manager:
     SNAPSHOT = {'installation': 'installation.json', 'pki_state': 'pki/state.json',
-                'trust_bundle': 'pki/trust-bundle.pem', 'public_status': 'public-status.json'}
+                'trust_bundle': 'pki/trust-bundle.pem', 'public_status': 'public-status.json',
+                'managed_passphrases': 'pki/managed-passphrases.json'}
 
     def __init__(self, state, env, openssl='openssl'):
         self.state, self.env = Path(state), env
@@ -518,7 +519,8 @@ class Manager:
         if manifest.get('version') != VERSION:
             raise SafetyError('Unknown backup version')
         pending = []
-        if not isinstance(manifest.get('files'), dict) or not set(self.SNAPSHOT).issubset(manifest['files']):
+        required = set(self.SNAPSHOT) - {'managed_passphrases'}
+        if not isinstance(manifest.get('files'), dict) or not required.issubset(manifest['files']):
             raise SafetyError('Incomplete backup manifest')
         for label, item in manifest['files'].items():
             if label == 'nginx_config':
@@ -658,6 +660,17 @@ class Manager:
 
 
 def confirmation(expected, provided=None):
+    if provided is None and expected.startswith('INSTALL '):
+        while True:
+            try:
+                answer = input('请核对上方计划，完整输入 "' + expected + '"（CANCEL 取消）：').strip()
+            except (EOFError, KeyboardInterrupt):
+                raise SafetyError('已取消入口确认，未进入证书或 Nginx 变更事务') from None
+            if answer.upper() == 'CANCEL':
+                raise SafetyError('已取消入口确认，未进入证书或 Nginx 变更事务')
+            if answer == expected:
+                return
+            print('输入不匹配，请包含完整地址和端口：' + expected)
     answer = provided if provided is not None else input('Type exactly "' + expected + '": ').strip()
     if answer != expected:
         raise SafetyError('Explicit operation confirmation did not match')
@@ -698,6 +711,7 @@ def parser():
         item.add_argument('--http', action='store_true')
         item.add_argument('--confirm-http', choices=('TOKEN_AND_CONTENT_SENT_IN_PLAINTEXT',))
         item.add_argument('--ca-key')
+        item.add_argument('--manual-ca-passphrase', action='store_true', help='Use a manually entered CA passphrase instead of panel-managed credentials')
         item.add_argument('--confirm')
     item = sub.add_parser('renew')
     item.add_argument('--ca-key')
@@ -710,7 +724,8 @@ def parser():
         if name != 'export-ca':
             item.add_argument('--fingerprint', required=True)
         item.add_argument('--confirm')
-    sub.add_parser('rotate-prepare')
+    item = sub.add_parser('rotate-prepare')
+    item.add_argument('--manual-ca-passphrase', action='store_true')
     for name in ('rotate-activate', 'rotate-finish'):
         item = sub.add_parser(name)
         item.add_argument('--fingerprint', required=True)
@@ -822,16 +837,17 @@ def execute(args):
         pki = PKI(state, args.openssl)
         if args.action in ('export-ca', 'verify-export', 'remove-online-ca-key'):
             assert_export_destination(state, args.destination)
-            password = passphrase()
-            if args.action == 'export-ca':
-                output = pki.export_ca(args.destination, password, args.ca_id)
-            elif args.action == 'verify-export':
-                pki.verify_export(args.destination, password, args.fingerprint, args.ca_id)
-                output = {'verified': True}
-            else:
+            from panel_passphrase import with_password
+            def maintain(password):
+                if args.action == 'export-ca':
+                    return pki.export_ca(args.destination, password, args.ca_id)
+                if args.action == 'verify-export':
+                    pki.verify_export(args.destination, password, args.fingerprint, args.ca_id)
+                    return {'verified': True}
                 confirmation('REMOVE ONLINE CA KEY ' + args.fingerprint, args.confirm)
                 pki.remove_online_key(args.destination, password, args.fingerprint, args.ca_id)
-                output = {'online_key_removed': True, 'notice': 'Verify offline storage separately; SSD/COW erasure cannot be guaranteed.'}
+                return {'online_key_removed': True, 'notice': 'Verify offline storage separately; SSD/COW erasure cannot be guaranteed.'}
+            output = with_password(pki, maintain, passphrase, ca_id=args.ca_id)
         elif args.action in ('status', 'check-expiry'):
             manager = Manager(state, None, args.openssl)
             checks = {}
@@ -863,9 +879,18 @@ def execute(args):
                 def apply():
                     if plan['https']:
                         if not pki.meta:
-                            pki.create(plan['host'], passphrase(True))
+                            if args.manual_ca_passphrase:
+                                pki.create(plan['host'], passphrase(True))
+                            else:
+                                from panel_passphrase import ManagedPassphrases
+                                ManagedPassphrases(state, plan).create(pki, plan['host'])
                         elif pki.meta['host'] != plan['host']:
-                            pki.renew(plan['host'], passphrase(), args.ca_key)
+                            from panel_passphrase import with_password
+                            with_password(pki, lambda password: pki.renew(plan['host'], password, args.ca_key),
+                                          passphrase, plan=plan, ca_key=args.ca_key, manual=args.manual_ca_passphrase)
+                        else:
+                            from panel_passphrase import existing_password
+                            existing_password(pki, plan, ca_key=args.ca_key)
                 output = manager.transaction(apply, plan)
             elif args.action == 'backup':
                 manager.assert_owned()
@@ -876,12 +901,17 @@ def execute(args):
             elif args.action == 'renew':
                 meta = manager.assert_owned()
                 confirmation('REPLACE SERVER KEY ' + meta['plan']['host'], args.confirm)
-                password = passphrase()
-                output = manager.transaction(lambda: pki.renew(meta['plan']['host'], password, args.ca_key))
+                from panel_passphrase import with_password
+                output = manager.transaction(lambda: with_password(pki,
+                    lambda password: pki.renew(meta['plan']['host'], password, args.ca_key),
+                    passphrase, plan=meta['plan'], ca_key=args.ca_key))
             elif args.action == 'rotate-prepare':
-                manager.assert_owned()
-                password = passphrase(True)
-                output = manager.transaction(lambda: pki.prepare_rotation(password), reload=False)
+                meta = manager.assert_owned()
+                if args.manual_ca_passphrase:
+                    output = manager.transaction(lambda: pki.prepare_rotation(passphrase(True)), reload=False)
+                else:
+                    from panel_passphrase import ManagedPassphrases
+                    output = manager.transaction(lambda: ManagedPassphrases(state, meta['plan']).prepare_rotation(pki), reload=False)
             elif args.action == 'rotate-activate':
                 confirmation('ALL NODES TRUST BOTH CA ' + args.fingerprint, args.confirm)
                 output = manager.transaction(lambda: pki.activate_rotation(args.fingerprint))

@@ -2,7 +2,7 @@
 
 为 Xboard 增加独立的节点通讯入口，让节点通过 **IP + 私有证书**连接面板，也保留使用原面板域名的独立部署命令。默认独立端口为 **HTTPS TCP 8443**。原网站、登录、订阅、`app_url` 和其他插件保留原有配置。
 
-当前插件为 **NodeEndpoint 1.0.3**；Root 一键入口为 **root-installer-v1.0.4 / tools 1.0.3**。这次 Root 工具更新增加本机防火墙处理，**不需要重新上传同版本插件，不升级 Xboard 主程序，也不要求卸载其他插件**。
+当前插件为 **NodeEndpoint 1.0.4**；Root 一键入口为 **root-installer-v1.0.5 / tools 1.0.4**。新建 CA 的口令自动随机生成，并使用面板 `APP_KEY` 加密保存；管理员可在 HTTPS 管理页面按需查看和复制。已有独立面板请先升级插件到 1.0.4，再使用新版 Root 工具；无需卸载其他插件。全新独立 Xboard 用户使用 [内置插件版宝塔教程](https://github.com/ksr-v/Xboard-Custom-Source/blob/v2026.10.18.4/docs/installation/aapanel.zh-CN.md)，不必单独上传插件。
 
 ## 选择安装路线
 
@@ -10,7 +10,7 @@
 | --- | --- |
 | 空服务器，没有 Xboard | [先安装 Xboard](#从零安装空服务器)，再安装插件和独立入口 |
 | 已有正常运行的原版 Xboard | [保留数据接入插件](#原版-xboard-面板接入保留现有数据)，不运行面板初始化或重装脚本 |
-| 已安装旧版 NodeEndpoint | 上传 [NodeEndpoint-1.0.3.zip](https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/download/v1.0.3/NodeEndpoint-1.0.3.zip) 原生升级、启用并刷新；保留设置与 CA |
+| 已安装旧版 NodeEndpoint | 上传 [NodeEndpoint-1.0.4.zip](https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/download/v1.0.4/NodeEndpoint-1.0.4.zip) 原生升级、启用并刷新；保留设置与 CA |
 | 插件和独立 HTTPS 入口都已安装 | [只补防火墙](#已有入口只补防火墙或同步-ca)，不重装入口、不重新生成证书 |
 | 为新的节点服务器安装 xboard-node | 在原生机器管理[选择域名或 IP 命令](#新机器接入域名或-ip-双选) |
 | 将已有生产节点改为 IP 对接 | 使用[保留配置的迁移工具](#已有节点迁移保留配置)，不要执行新装命令 |
@@ -82,7 +82,7 @@ sudo -u www /www/server/php/83/bin/php artisan xboard:install
 
 ## 安装或升级 NodeEndpoint 插件
 
-从 [v1.0.3 Release](https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/tag/v1.0.3) 下载 **NodeEndpoint-1.0.3.zip** 和同次 **SHA256SUMS**，核对 ZIP 摘要。GitHub 自动生成的 “Source code” 压缩包不能用于原生插件上传。
+从 [v1.0.4 Release](https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/tag/v1.0.4) 下载 **NodeEndpoint-1.0.4.zip** 和同次 **SHA256SUMS**，核对 ZIP 摘要。GitHub 自动生成的 “Source code” 压缩包不能用于原生插件上传。
 
 1. 在 Xboard 原生插件管理上传 ZIP，安装或升级，确认 NodeEndpoint 已启用。已有 1.0.0 / 1.0.1 / 1.0.2 直接升级，不先卸载；原有设置和公共 CA 保留。
 2. 打开面板域名下的 `/node-endpoint`，以 Xboard 管理员登录。
@@ -91,29 +91,29 @@ sudo -u www /www/server/php/83/bin/php artisan xboard:install
 
 原生机器管理中的安装双选通过插件动态资源加载，不修改 Xboard 核心或编译后的 Admin bundle。常驻 Octane 环境按宿主流程 reload 应用 worker；升级后刷新浏览器页面。
 
-已是 **1.0.3** 时，无需为 Root 防火墙更新重复上传同一个 ZIP。
+已是 **1.0.4** 时，无需重复上传同一个 ZIP；刷新页面后再查看新的口令托管状态。
 
 ## Root 一键安装独立入口
 
 在**面板服务器**以 **Root** 登录交互 SSH，执行：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.4/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.5/install.sh | bash
 ```
 
-一键入口下载固定版本安装器，校验内置摘要，再下载并校验 **tools 1.0.3** 工具包。它不会安装缺失依赖、升级系统包、升级 Xboard 或替换 Node 二进制。首次下载仍需信任仓库和 GitHub HTTPS；可先下载脚本、独立核对后在本机执行。
+一键入口下载固定版本安装器，校验内置摘要，再下载并校验 **tools 1.0.4** 工具包。它不会安装缺失依赖、升级系统包、升级 Xboard 或替换 Node 二进制。首次下载仍需信任仓库和 GitHub HTTPS；可先下载脚本、独立核对后在本机执行。
 
 标准宝塔 / PHP-FPM 向导会检测实际网站 Nginx、站点、应用目录、FPM / WS 后端和运行用户，多候选时按提示选择。以下自动后续步骤适用于该标准 FPM 向导：
 
 1. 核对通讯 IP / 端口 / HTTPS / WS 模式，与插件页面保持一致。
-2. 审阅安装计划。出现 `Type exactly "INSTALL 地址:端口"` 时，输入引号内的完整文字并回车，例如 `INSTALL 203.0.113.10:8443`；这是确认将要创建的入口。
-3. 出现 `Encrypted CA passphrase (never logged)` 时，设置并保存至少 **16 字符**的强口令。输入时不回显；这是加密 CA 私钥的密码，不是面板密码或机器 Token。
+2. 审阅安装计划，输入提示中的完整内容并回车，例如 `INSTALL 203.0.113.10:8443`。只输入 `INSTALL` 会重新询问；`CANCEL`、EOF 或 Ctrl+C 取消。这一行是安装器要求的回答，不是 Shell 命令。
+3. 新建 CA 自动生成随机口令，并先加密保存到面板，再签发证书，不再要求输入和重复输入 CA 口令。已有 CA 不会改口令或重新签发；旧版手动创建、尚未托管的 CA 在维护时仍使用原隐藏输入流程。
 4. 工具创建独立 HTTPS 入口，再处理本机 TCP 防火墙规则，最后尝试将**公共 CA**自动导入面板。
 5. 查看每一步结果，刷新插件页面，确认 CA 已导入；从节点服务器验证连接后再接入业务。
 
 未发现可自动填写的 FPM 站点时，Docker / Octane 或特殊布局会进入底层手工菜单。该菜单不自动处理防火墙或导入 CA；核对真实参数、完成入口安装后，须分别执行下方的 `--configure-firewall` 和 `--sync-ca`。
 
-首次根 CA 和服务器证书采用双 10 年策略，后续服务器证书不超过 CA 的实际到期时间。CA 私钥应按[Root 工具说明](docs/PANEL_TOOL.md#双十年证书与离线-ca)加密导出、验证并离线保管。**不要将 CA 私钥或服务器私钥上传面板；自动导入只传公共证书，不传私钥或口令。**
+首次根 CA 和服务器证书采用双 10 年策略，后续服务器证书不超过 CA 的实际到期时间。CA 私钥应按[Root 工具说明](docs/PANEL_TOOL.md#双十年证书与离线-ca)加密导出、验证并离线保管。私钥始终保存在网站之外的 Root 私有目录或离线介质；面板仅保存公共证书和加密后的口令。管理员在 HTTPS `/node-endpoint` 的证书区显式查看 / 复制口令；普通设置、节点命令和日志均不含口令。请将数据库与原 `.env` / `APP_KEY` 一同备份，丢失原 APP_KEY 将无法解密已保存的口令。
 
 ### 自动防火墙处理范围
 
@@ -137,13 +137,13 @@ curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoi
 
 ```bash
 # 只按已保存的入口端口配置本机防火墙，不重新安装入口或生成证书。
-curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.4/install.sh | bash -s -- --configure-firewall
+curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.5/install.sh | bash -s -- --configure-firewall
 
 # 只将现有公共 CA 同步到本机插件，不修改防火墙或重新签发证书。
-curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.4/install.sh | bash -s -- --sync-ca
+curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.5/install.sh | bash -s -- --sync-ca
 
 # 只读检测部署，不安装入口、不添加防火墙规则、不导入 CA。
-curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.4/install.sh | bash -s -- --detect-only
+curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.5/install.sh | bash -s -- --detect-only
 ```
 
 `--detect-only` 会准备已校验的下载缓存，但部署检测本身只读。`--sync-ca` 要求插件启用，且插件通讯地址 / 端口 / HTTPS 与 Root 安装记录一致；不一致时先核对并修正插件设置，再重试。
@@ -184,7 +184,7 @@ CA 轮换时，面板导入只影响后续复制的新机器命令，不会自�
 
 ## 高级操作、卸载与验证边界
 
-需要离线下载或手工部署时，从 [root-installer-v1.0.4 Release](https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/tag/root-installer-v1.0.4)取得 **node-endpoint-tools-1.0.3.zip** 和同次 SHA256SUMS，校验后解压到专用受保护目录，再校验包内 `MANIFEST.sha256`。不要解压覆盖 Xboard 目录。直接运行 `tools/panel/node-endpoint-panel.sh install / modify` 属于底层手工流程，**不自动配置防火墙**；一键向导的防火墙处理不能套用于这些手工命令。
+需要离线下载或手工部署时，从 [root-installer-v1.0.5 Release](https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/tag/root-installer-v1.0.5)取得 **node-endpoint-tools-1.0.4.zip** 和同次 SHA256SUMS，校验后解压到专用受保护目录，再校验包内 `MANIFEST.sha256`。不要解压覆盖 Xboard 目录。直接运行 `tools/panel/node-endpoint-panel.sh install / modify` 属于底层手工流程，**不自动配置防火墙**；一键向导的防火墙处理不能套用于这些手工命令。
 
 禁用或卸载插件不会自动移除 Root HTTPS 入口；禁用会停止新入口 handshake 的地址重写，需先确认已迁移节点的 REST / WSS 行为。拆除入口前先迁移全部使用者，再按 Root 工具单独确认卸载；保留所需 PKI 和恢复备份。原生卸载保留插件自己的恢复设置及公共 CA，显式清理另见工具说明。
 
@@ -201,4 +201,4 @@ CA 轮换时，面板导入只影响后续复制的新机器命令，不会自�
 
 已有插件与安装源验证分别见 [NATIVE_DOMAIN_TEST_REPORT.md](NATIVE_DOMAIN_TEST_REPORT.md)、[NATIVE_INSTALL_CHOICES_TEST_REPORT.md](NATIVE_INSTALL_CHOICES_TEST_REPORT.md)、[NATIVE_MACHINE_TEST_REPORT.md](NATIVE_MACHINE_TEST_REPORT.md)；Root / Linux 权限历史证据见 [TEST_REPORT.md](TEST_REPORT.md) 和 [VM_TEST_REPORT.md](VM_TEST_REPORT.md)。Root 防火墙补丁的实际测试范围以同次 Release 报告为准。
 
-开发者可运行 `python3 tools/build/build.py --plugin-only` 与 `python3 tools/build/verify.py --plugin-only` 构建和核验当前插件，输出在 `dist/v1.0.3/`。Root 工具独立发布，保留已发布的插件与历史包字节。
+开发者可运行 `python3 tools/build/build.py --plugin-only` 与 `python3 tools/build/verify.py --plugin-only` 构建和核验当前插件，输出在 `dist/v1.0.4/`。Root 工具独立发布，保留已发布的插件与历史包字节。

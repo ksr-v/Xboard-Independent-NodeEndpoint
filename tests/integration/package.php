@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 $projectRoot = dirname(__DIR__, 2);
-$packagePath = realpath($argv[1] ?? $projectRoot . '/dist/v1.0.3/NodeEndpoint-1.0.3.zip');
+$packagePath = realpath($argv[1] ?? $projectRoot . '/dist/v1.0.4/NodeEndpoint-1.0.4.zip');
 if (!$packagePath || !is_file($packagePath)) throw new RuntimeException('Build the package before running this smoke test.');
 // Always isolate this run; never reuse the UI server or the 25-test fixture.
 $packageFixture = __DIR__ . '/work/package-' . gmdate('Ymd-His') . '-' . bin2hex(random_bytes(3));
@@ -34,7 +34,7 @@ function treeHashes(string $directory): array
 }
 
 $packageFiles = [];
-packageCheck('ZIP has one NodeEndpoint root, safe paths and version 1.0.3', function () use ($packagePath, &$packageFiles): void {
+packageCheck('ZIP has one NodeEndpoint root, safe paths and version 1.0.4', function () use ($packagePath, &$packageFiles): void {
     $zip = new ZipArchive();
     eq($zip->open($packagePath), true, 'Cannot open distribution ZIP.');
     try {
@@ -57,7 +57,7 @@ packageCheck('ZIP has one NodeEndpoint root, safe paths and version 1.0.3', func
         }
         $config = json_decode($zip->getFromName('NodeEndpoint/config.json'), true, 512, JSON_THROW_ON_ERROR);
         eq($config['code'], 'node_endpoint');
-        eq($config['version'], '1.0.3');
+        eq($config['version'], '1.0.4');
     } finally { $zip->close(); }
 });
 
@@ -83,13 +83,13 @@ packageCheck('unmodified native PluginManager.upload imports exact ZIP bytes', f
     eq($installedFiles, $expected, 'Native upload changed or omitted ZIP contents.');
 });
 
-packageCheck('native installation applies own schema and enables version 1.0.3', function () use ($manager): void {
+packageCheck('native installation applies own schema and enables version 1.0.4', function () use ($manager): void {
     eq($manager->install('node_endpoint'), true);
     ok(Schema::hasTable('node_endpoint_settings'), 'Own migration missing.');
     eq((bool) App\Models\Plugin::where('code', 'node_endpoint')->value('is_enabled'), false);
     eq($manager->enable('node_endpoint'), true);
     $row = App\Models\Plugin::where('code', 'node_endpoint')->firstOrFail();
-    eq($row->version, '1.0.3');
+    eq($row->version, '1.0.4');
     eq((bool) $row->is_enabled, true);
 });
 
@@ -105,7 +105,7 @@ packageCheck('uploaded page/assets and native authorized settings API respond', 
     eq(requestFixture('https://old.panel.example/api/v1/node-endpoint/settings')->getStatusCode(), 403);
     $response = requestFixture('https://old.panel.example/api/v1/node-endpoint/settings', 'GET', [], $adminToken);
     eq($response->getStatusCode(), 200, $response->getContent());
-    eq(jsonResponse($response)['data']['version'], '1.0.3');
+    eq(jsonResponse($response)['data']['version'], '1.0.4');
 });
 
 packageCheck('uploaded settings save and native scoped handshake work', function () use ($adminToken): void {

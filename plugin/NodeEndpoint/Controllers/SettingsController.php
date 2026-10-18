@@ -4,7 +4,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Plugin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
-use Plugin\NodeEndpoint\Services\{Endpoint, Settings, Certificates, Probe, CommandBuilder};
+use Plugin\NodeEndpoint\Services\{Endpoint, Settings, Certificates, Probe, CommandBuilder, CaPassphrases};
 final class SettingsController extends Controller
 {
     private function invalidResponse(\Throwable $error)
@@ -22,11 +22,33 @@ final class SettingsController extends Controller
                 if ($parsed) { $ca[] = Certificates::metadata($parsed, openssl_x509_fingerprint($pem, 'sha256')); }
             }
         }
-        return response()->json(['data' => ['version' => '1.0.3', 'settings' => $settings,
+        return response()->json(['data' => ['version' => '1.0.4', 'settings' => $settings,
             'urls' => Endpoint::urls($settings), 'ca' => $ca,
+            'ca_passphrases' => CaPassphrases::metadata(array_column($ca, 'fingerprint_sha256')),
             'compatibility' => Plugin::whereIn('code', ['smart_expiry', 'qrcode_extend', 'qrcodeextend', 'flow_scope', 'flowscope'])
                 ->get(['code', 'version', 'is_enabled']),
             'note' => 'FlowScope 采集器 panel_url 独立维护；本插件不修改其绑定、数据或服务。']]);
+    }
+    public function revealCaPassphrase(Request $request)
+    {
+        $headers = ['Cache-Control' => 'no-store, private', 'Pragma' => 'no-cache', 'Expires' => '0'];
+        try {
+            $input = $request->all();
+            if (!$request->isSecure() || array_keys($input) !== ['fingerprint'] || !is_string($input['fingerprint'])
+                || !preg_match('/^[a-f0-9]{64}$/D', $input['fingerprint'])) { throw new \RuntimeException(); }
+            $path = Settings::caPath();
+            if (!extension_loaded('openssl') || !is_file($path) || is_link($path) || filesize($path) > 32768) { throw new \RuntimeException(); }
+            $pem = file_get_contents($path);
+            if (!is_string($pem) || str_contains($pem, 'PRIVATE KEY')) { throw new \RuntimeException(); }
+            preg_match_all('/-----BEGIN CERTIFICATE-----.*?-----END CERTIFICATE-----/s', $pem, $matches);
+            if (!$matches[0] || count($matches[0]) > 2 || trim(str_replace($matches[0], '', $pem)) !== '') { throw new \RuntimeException(); }
+            $fingerprints = array_map(fn ($cert) => openssl_x509_fingerprint($cert, 'sha256'), $matches[0]);
+            if (!in_array($input['fingerprint'], $fingerprints, true)) { throw new \RuntimeException(); }
+            return response()->json(['data' => ['fingerprint_sha256' => $input['fingerprint'],
+                'passphrase' => CaPassphrases::reveal($input['fingerprint'])]], 200, $headers);
+        } catch (\Throwable) {
+            return response()->json(['message' => 'CA 口令不可用，请检查 HTTPS、当前 CA 绑定或使用原有手动口令。'], 422, $headers);
+        }
     }
     public function save(Request $request)
     {

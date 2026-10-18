@@ -7,6 +7,8 @@ Route::prefix('api/v1/node-endpoint')->middleware(['admin', Enabled::class, 'thr
     Route::post('settings', [SettingsController::class, 'save']);
     Route::post('ca', [SettingsController::class, 'importCa']);
     Route::get('ca', [SettingsController::class, 'exportCa']);
+    Route::post('ca-passphrase/reveal', [SettingsController::class, 'revealCaPassphrase'])
+        ->middleware('throttle:5,1,ne-ca-reveal:');
     Route::post('status-import', [SettingsController::class, 'importStatus']);
     Route::post('probe', [SettingsController::class, 'probe']);
     Route::post('detect-ip', [SettingsController::class, 'detectIp']);

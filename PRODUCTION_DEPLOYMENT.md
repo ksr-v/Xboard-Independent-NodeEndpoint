@@ -8,7 +8,7 @@
 
 保留面板数据库、原网站 Nginx 配置与证书、`plugins/`、Admin bundle、Node 的配置/凭据/实例元数据/稳定数据目录和 FlowScope 采集器配置的受保护备份。记录各组件实际版本、摘要、应用运行用户与服务状态。不同机器的路径、IP、部署方式不能沿用开发机假设。
 
-当前原生插件为 **NodeEndpoint-1.0.3.zip**，Root 一键入口为 **root-installer-v1.0.4 / tools 1.0.3**；从对应 Release 取得包和摘要并核对。插件或 Root 工具更新不等于升级 Xboard 主程序，不要求卸载其他插件。Root 引导脚本通过固定 GitHub HTTPS 标签取得，并校验后续安装器 / 工具包；也可先下载、独立核对后本地执行。它不升级 Nginx、PHP 或系统软件。以 Root 通过 SSH 执行底层只读检测：
+当前原生插件为 **NodeEndpoint-1.0.4.zip**，Root 一键入口为 **root-installer-v1.0.5 / tools 1.0.4**；从对应 Release 取得包和摘要并核对。插件或 Root 工具更新不等于升级 Xboard 主程序，不要求卸载其他插件。Root 引导脚本通过固定 GitHub HTTPS 标签取得，并校验后续安装器 / 工具包；也可先下载、独立核对后本地执行。它不升级 Nginx、PHP 或系统软件。以 Root 通过 SSH 执行底层只读检测：
 
 ```bash
 bash tools/panel/node-endpoint-panel.sh detect
@@ -21,7 +21,7 @@ bash tools/panel/node-endpoint-panel.sh detect
 先原生安装并启用插件、保存相同 host/port/HTTPS/WS 模式。推荐在面板服务器以 Root 使用一键入口：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.4/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.5/install.sh | bash
 ```
 
 标准 FPM 向导先安装 HTTPS 入口，再添加允许所有来源访问本机配置 TCP 端口的防火墙规则，最后自动尝试公共 CA 本机导入。firewalld 对默认及活动 zone 验证 runtime / permanent 放行；UFW 保存对应规则，未启用时报告 inactive 而不启用整个防火墙。未支持、冲突或无法确认时明确报告 `manual_required`，不修改云安全组或供应商策略。防火墙失败仍尝试 CA 导入，最终有未完成步骤时返回非零，保留已安装入口，不因此回滚或重新生成 CA。
@@ -49,9 +49,9 @@ bash tools/panel/node-endpoint-panel.sh install \
 
 ## CA 保管与验证
 
-Root `status` 查看公共 CA / server 指纹、SAN、真实起止时间与状态。一键流程仅将公共 CA 本机导入插件，要求插件启用且通讯地址 / 端口 / HTTPS 与 Root 记录一致；不传私钥或口令。手工 / 异机导入时，将公共 CA 从可信 SSH 渠道复制到管理员并独立核对指纹；公共 `public-status.json` 可以导入页面。不要导出私钥到网站、静态目录或数据库。
+Root `status` 查看公共 CA / server 指纹、SAN、真实起止时间与状态。公共 CA 同步要求插件启用且通讯地址 / 端口 / HTTPS 与 Root 记录一致，仍只传公共证书。新版另有独立的非 Root 口令托管通道：新 CA 的随机口令按 APP_KEY 加密保存在数据库，Root 状态只保存凭据 ID，管理员只能通过 HTTPS 显式查看。数据库与原 `.env` / APP_KEY 必须一起备份。手工 / 异机导入时从可信 SSH 渠道取得公共 CA 并独立核对指纹；私钥始终不进入网站、静态目录或数据库。
 
-使用 Root `export-ca` / `verify-export` 导出并验证加密 CA 私钥和 manifest，独立确认公共 CA 指纹，再执行 `remove-online-ca-key`。离线介质应独立保管；同机其他目录仍属于在线副本。Root 状态保留证书和不可变历史私钥目录用于恢复，审计并离线保管每个 CA 的密钥。后续重签提供离线加密 `--ca-key` 路径，密码仅在终端输入。
+使用 Root `export-ca` / `verify-export` 导出并验证加密 CA 私钥和 manifest，独立确认公共 CA 指纹，再执行 `remove-online-ca-key`。离线介质应独立保管；同机其他目录仍属于在线副本。后续重签提供离线加密 `--ca-key` 路径；已托管 CA 从面板取回同一口令，未托管的旧 CA 仍隐藏输入原口令。升级不更换现有 CA。
 
 ## 新增与分批迁移
 

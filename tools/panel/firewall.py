@@ -191,8 +191,13 @@ def _ufw(binary, port, state, result):
     before = _run(binary, ['show', 'added'], 'ufw:show_added:before').stdout
     # UFW handles duplicate rules itself. Inserting rather than appending makes
     # a new rule precede user denies without deleting or rewriting those rules.
+    # UFW 0.36 rejects insert position 1 when no rules exist. Only its exact
+    # C-locale empty report permits an ordinary add; never retry a failed
+    # insert with an append when existing rules or unknown output are present.
+    empty = before.strip() == "Added user rules (see 'ufw status' for running firewall):\n(None)"
+    args = ([] if empty else ['insert', '1']) + ['allow', 'in', f'{port}/tcp', 'comment', 'NodeEndpoint']
     result['mutation_attempted'] = True
-    _run(binary, ['insert', '1', 'allow', 'in', f'{port}/tcp', 'comment', 'NodeEndpoint'], 'ufw:insert')
+    _run(binary, args, 'ufw:add_empty' if empty else 'ufw:insert')
     after = _run(binary, ['show', 'added'], 'ufw:show_added:after').stdout
     if after != before:
         result['changes'].append({'manager': 'ufw', 'scope': 'persistent', 'action': 'insert_allow_tcp'})

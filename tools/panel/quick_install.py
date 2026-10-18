@@ -17,8 +17,8 @@ import urllib.parse
 import urllib.request
 import zipfile
 
-TOOLS_URL = 'https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/download/root-installer-v1.0.4/node-endpoint-tools-1.0.3.zip'
-TOOLS_SHA256 = 'ea46e0ea8fe1275204c9a7f1f3dd21157a3bdf34070917e1aad8e49cda537a93'
+TOOLS_URL = 'https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/download/root-installer-v1.0.5/node-endpoint-tools-1.0.4.zip'
+TOOLS_SHA256 = 'c89b7f2d2b12e2fbc58a95e3d5dc98f06f496781db860c63b7814f6a7b587f24'
 CACHE = Path('/opt/nodeendpoint-quick') / TOOLS_SHA256
 
 
@@ -77,7 +77,8 @@ def verified_members(data, expected=TOOLS_SHA256):
         require(all(hashlib.sha256(result[name]).hexdigest() == digest for name, digest in manifest.items()), '成员摘要不匹配')
         require({'tools/panel/manager.py', 'tools/panel/nginx.py', 'tools/panel/pki.py',
                  'tools/panel/panel_ca.py', 'tools/panel/sync_panel_ca.php',
-                 'tools/panel/firewall.py'} <= set(result), '缺少管理器、防火墙或 CA 导入工具')
+                 'tools/panel/firewall.py', 'tools/panel/panel_passphrase.py',
+                 'tools/panel/panel_passphrase.php'} <= set(result), '缺少管理器、防火墙、CA 导入或口令托管工具')
         return result
 
 
@@ -287,7 +288,7 @@ def main():
     require(args.detect_only or args.sync_ca or args.configure_firewall or sys.stdin.isatty(), '安装需要 SSH 交互终端，不要将脚本通过管道执行')
     for name in ('openssl', 'ss', 'runuser'):
         require(shutil.which(name), '缺少依赖：' + name + '，请先通过本机包管理器安装')
-    print('校验固定 tools v1.0.3（本机 TCP 端口放行 + CA 自动导入）；不更新 Xboard、Node 或系统软件。')
+    print('校验固定 tools v1.0.4（随机 CA 口令加密托管 + 本机 TCP 端口放行 + CA 自动导入）；不更新 Xboard、Node 或系统软件。')
     data = Path(args.package_file).read_bytes() if args.package_file else download()
     directory = install_cache(verified_members(data))
     sys.dont_write_bytecode = True
@@ -339,7 +340,7 @@ def main():
     if state.exists():
         require(input('独立入口已存在。修改前请备份；输入 MODIFY 继续：') == 'MODIFY', '取消修改')
         argv[argv.index('install')] = 'modify'
-    print('接下来由已校验管理器核对站点/路由/监听并展示计划，要求输入 INSTALL 地址:端口 和隐藏 CA 口令。')
+    print('接下来核对站点/路由/监听并展示计划，请完整确认 INSTALL 地址:端口。新版插件的新 CA 口令自动随机生成并加密保存在面板；原有未托管 CA 仍需原口令。')
     if not args.skip_firewall:
         print('入口成功后将为该 TCP 端口添加允许所有来源的本机防火墙规则并持久保存；自管规则可用 --skip-firewall。')
     manager.execute(manager.parser().parse_args(argv))
