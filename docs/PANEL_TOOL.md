@@ -1,16 +1,16 @@
 # Linux Root 管理工具
 
-底层入口管理器位于 `tools/panel/node-endpoint-panel.sh`，管理器版本 **1.0.0**；当前补充工具包为 **tools 1.0.4**，一键引导版本为 **root-installer-v1.0.7**。仅由管理员通过 SSH 使用；Web 插件不执行 Shell、不持有 Root 权限。依赖 Linux、Python 3.10+、OpenSSL 1.1.1+、Nginx/OpenResty、`ss`；原生 PHP 部署需要 `php`、`runuser`，Docker 部署需要 Docker CLI。工具不安装依赖、不升级系统、不下载或替换 Node 二进制。
+底层入口管理器位于 `tools/panel/node-endpoint-panel.sh`，管理器版本 **1.0.0**；当前补充工具包为 **tools 1.0.5**，一键引导版本为 **root-installer-v1.0.8**。仅由管理员通过 SSH 使用；Web 插件不执行 Shell、不持有 Root 权限。依赖 Linux、Python 3.10+、OpenSSL 1.1.1+、Nginx/OpenResty、`ss`；原生 PHP 部署需要 `php`、`runuser`，Docker 部署需要 Docker CLI。工具不安装依赖、不升级系统、不下载或替换 Node 二进制。
 
 ## 一键安装与防火墙
 
-先上传并启用 **NodeEndpoint-1.0.5.zip**，保存通讯地址 / 端口 / HTTPS。可直接点击页面“SSH 配置入口”中的“一键复制 Root 工具命令”，在面板服务器以 Root 登录交互 SSH 后执行；命令预填已保存的 IP / 域名，端口及 WS 模式仍需在向导中核对。未保存的修改不会用于生成命令。通用安装命令也可手工执行：
+先上传并启用 **NodeEndpoint-1.0.6.zip**，保存通讯地址 / 端口 / HTTPS。可直接点击页面“SSH 配置入口”中的“一键复制 Root 工具命令”，在面板服务器以 Root 登录交互 SSH 后执行；命令预填已保存的 IP / 域名，端口及 WS 模式仍需在向导中核对。未保存的修改不会用于生成命令。通用安装命令也可手工执行：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.7/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.8/install.sh | bash
 ```
 
-引导脚本通过 GitHub HTTPS 的固定标签下载，校验后续 Python 安装器和 tools 1.0.4 工具包摘要。首次下载需要信任仓库与下载渠道，也可先下载、独立核对再本地执行。标准 FPM 向导在安装独立入口后处理本机配置端口的 TCP 防火墙规则，允许所有来源访问该端口，再尝试公共 CA 本机导入。入口状态、PKI、插件设置及已有节点不因工具补丁更新而重建。
+引导脚本通过 GitHub HTTPS 的固定标签下载，校验后续 Python 安装器和 tools 1.0.5 工具包摘要。首次下载需要信任仓库与下载渠道，也可先下载、独立核对再本地执行。标准 FPM 向导在安装独立入口后处理本机配置端口的 TCP 防火墙规则，允许所有来源访问该端口，再尝试公共 CA 本机导入。入口状态、PKI、插件设置及已有节点不因工具补丁更新而重建。
 
 首次配置且未指定 `--host` 时，先选择通讯地址输入方式：
 
@@ -32,23 +32,39 @@ curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoi
 
 ```bash
 # 只读取已有安装记录并配置其 TCP 端口，不重装入口或生成证书。
-curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.7/install.sh | bash -s -- --configure-firewall
+curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.8/install.sh | bash -s -- --configure-firewall
 
 # 只同步现有公共 CA；插件通讯地址、端口、HTTPS 必须与 Root 记录一致。
-curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.7/install.sh | bash -s -- --sync-ca
+curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.8/install.sh | bash -s -- --sync-ca
 
 # 只读部署检测；准备下载缓存，不添加规则、安装入口或导入 CA。
-curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.7/install.sh | bash -s -- --detect-only
+curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.8/install.sh | bash -s -- --detect-only
 ```
 
 已有自定义防火墙策略时，一键安装可加 `-s -- --skip-firewall` 跳过本机规则步骤，管理员自行确认入口 TCP 端口可达。`--configure-firewall` 不等于 `--sync-ca`，两者不重新生成 CA。Root 工具仍兼容插件 1.0.4 及以上；新增的网页命令复制按钮需要插件 1.0.5。单独更新工具无需卸载其他插件或升级 Xboard 主程序。
+
+## 修复私有入口 IPv4“待获取”
+
+Node 的机器状态与出口 IPv4 使用不同接口。旧版独立 Nginx 入口遗漏 FlowScope 的精确 `POST /api/v2/flowscope/node-address`，造成核心对接正常、IPv4 上报 404。tools 1.0.5 补齐该入口，不放宽整个 FlowScope 路径前缀或管理 API。
+
+在面板服务器以 Root 执行专用刷新命令：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.8/install.sh | bash -s -- --refresh-entry
+```
+
+`--refresh-entry` 校验本工具管理的安装记录，直接读取当前站点、PHP、IP、端口和 WS 模式，审阅计划并输入完整确认短语后刷新路径规则。此操作不写插件设置或防火墙，保留 CA、服务器证书及托管口令，不需要重新对接节点。支持原生 HTTPS FPM / Octane，Docker 不在自动刷新范围内。
+
+也可先原生升级 NodeEndpoint 1.0.6，用网页按钮复制普通 Root 向导，对已有入口选择修改并保留当前参数。只上传插件、只同步 CA 或只补防火墙均不会更新已加载的 Nginx 配置。修改通讯 IP 仍使用普通向导，并按新地址更新服务器证书。
+
+确认 FlowScope 2.4.0 启用，并使用含自动 IPv4 上报的独立 Node v1.13-orphan.4。Node 缓存 404 结果 10 分钟，修复后等待自动重试并刷新详情；不必重装节点、改 Token 或强制重启。公共 IPv4 检测服务不可达也会导致暂时待获取。诊断与本轮验证记录见 [FLOWSCOPE_PRIVATE_ENDPOINT_TEST_REPORT.md](FLOWSCOPE_PRIVATE_ENDPOINT_TEST_REPORT.md)。
 
 ## 修复已安装独立面板的通讯地址
 
 旧教程中的 `203.0.113.10` 是文档示例 IP。若已将其安装为实际入口，单独修改插件页面不能修正 Nginx 入口和证书 SAN。对于提供 `xboard:configure-endpoint` 命令的独立 Xboard 后端，在同一面板服务器以 Root 执行：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.7/install.sh | bash -s -- --repair-address
+curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.8/install.sh | bash -s -- --repair-address
 ```
 
 先选择自动检测公网 IPv4 或手工输入真实 IP / 域名；自动模式显示候选并允许覆盖，手工模式不请求公网检测服务。审阅地址及修改计划后确认；沿用现有 CA 和口令，重签包含新地址 SAN 的服务器证书，以站点用户保存插件通讯设置，再处理防火墙及公共 CA 同步。CA 私钥不进入面板，现有 CA 指纹和托管口令不因修复而更换。旧版手动 CA 仍需原口令；若在线 CA 私钥已经离线，应先按离线签发流程处理。
@@ -99,7 +115,7 @@ bash tools/panel/node-endpoint-panel.sh install \
 
 Docker 额外指定 `--container <id> --container-app /srv/app --container-user <nonroot_uid>`，并确认宿主 `--app` 与容器挂载路径严格一致、容器确实发布后端端口。镜像没有可核实的宿主应用挂载、需要远程/动态 upstream、多个负载均衡后端、或容器 Route 表不能以非 Root 身份确认时，V1 安全拒绝安装，需单独审计适配。这是支持边界，不代表所有 Docker / 宝塔布局已验收。
 
-入口只开放精确匹配的 V1 UniProxy `config/user/push/alive/alivelist/status`；V2 `handshake/report/config/user/push/alive/alivelist/status`；V2 machine 仅 `nodes/status`，没有 `machine/config`。HTTP 方法受限，其余路径返回 404。需要 WS 时单独确认实际 `/ws` 后端或已经处理 Upgrade 的 all-in-one 根 proxy；入口精确转发 `/ws`、保留新 Host 和 scheme。Xboard handshake 返回的新 WSS 地址仍需 Web 插件的入口限定能力及实际节点验证，不能仅凭代理配置视为通过。覆盖转发 Host / Proto / Port / For 并清空可伪造的 Forwarded / Prefix / NodeEndpoint 标记。访问日志关闭，避免旧客户端查询 Token 被记录。
+入口只开放精确匹配的 V1 UniProxy `config/user/push/alive/alivelist/status`；V2 `handshake/report/config/user/push/alive/alivelist/status`；V2 machine 仅 `nodes/status`，没有 `machine/config`；另允许 FlowScope 的精确 `POST /api/v2/flowscope/node-address` 用于现有身份的出口 IPv4 上报。HTTP 方法受限，其余路径返回 404，不开放 FlowScope 管理接口或周期流量接口。需要 WS 时单独确认实际 `/ws` 后端或已经处理 Upgrade 的 all-in-one 根 proxy；入口精确转发 `/ws`、保留新 Host 和 scheme。Xboard handshake 返回的新 WSS 地址仍需 Web 插件的入口限定能力及实际节点验证，不能仅凭代理配置视为通过。覆盖转发 Host / Proto / Port / For 并清空可伪造的 Forwarded / Prefix / NodeEndpoint 标记。访问日志关闭，避免旧客户端查询 Token 被记录。
 
 HTTP 必须额外提供 `--http --confirm-http TOKEN_AND_CONTENT_SENT_IN_PLAINTEXT`。Token 和通信内容将可能明文传输；HTTPS 失败不会自动降级。
 

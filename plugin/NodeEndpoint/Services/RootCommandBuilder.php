@@ -3,7 +3,7 @@ namespace Plugin\NodeEndpoint\Services;
 use InvalidArgumentException;
 final class RootCommandBuilder
 {
-    private const INSTALLER = 'https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.6/install.sh';
+    private const INSTALLER = 'https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.8/install.sh';
     private static function unavailable(string $note, ?string $target = null): array
     {
         return ['command' => null, 'note' => $note, 'target_url' => $target];

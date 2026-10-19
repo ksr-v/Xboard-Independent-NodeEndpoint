@@ -45,9 +45,9 @@ nodeendpoint_bootstrap() (
     printf '%s\n' 'Downloading the pinned installer; private root files use 0700/0600.'
     curl --fail --show-error --silent --location --proto '=https' --proto-redir '=https' \
         --tlsv1.2 --connect-timeout 15 --max-time 180 \
-        'https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/download/root-installer-v1.0.7/quick_install.py' \
+        'https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/download/root-installer-v1.0.8/quick_install.py' \
         --output "$work/quick_install.py"
-    printf '%s  %s\n' 'eaa303e1422f3be260a129b5a2e93c00535bd313140b9450d56073e213c397fb' "$work/quick_install.py" | sha256sum --check --status \
+    printf '%s  %s\n' '91c31ce373e0c98fe2695afb670835d7d0339feaa52d397a24ca3a781a6e82c0' "$work/quick_install.py" | sha256sum --check --status \
         || fail 'Installer SHA-256 mismatch; nothing was executed.'
     chmod 600 "$work/quick_install.py"
     cd /

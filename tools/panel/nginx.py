@@ -20,6 +20,14 @@ API_METHODS = {
     '/api/v2/server/machine/status': ['POST'],
 }
 
+# This authenticated metadata report is supplied by the optional FlowScope
+# plugin, not native ServerRoute. Never expose other FlowScope routes here.
+OPTIONAL_API_METHODS = {'/api/v2/flowscope/node-address': ['POST']}
+OPTIONAL_API_ACTIONS = {
+    '/api/v2/flowscope/node-address': 'Plugin\\Flowscope\\Controllers\\AddressController@store',
+}
+OPTIONAL_API_MIDDLEWARE = 'Plugin\\Flowscope\\Middleware\\EnsureEnabled'
+
 # Exact source snapshot audited in .audit/Xboard. Unknown middleware is never
 # patched or implicitly trusted; add new profiles only after a source audit.
 AUDITED_PROXY_TRUST_SHA256 = {
@@ -275,13 +283,36 @@ def check_port(port, loaded_nodes, ss_output, own_config=None):
 
 def verify_routes(routes):
     observed = {}
+    optional = {}
     for item in routes:
         path = '/' + item.get('uri', '').lstrip('/')
         if path in API_METHODS:
             observed.setdefault(path, []).append(set(item.get('method', '').split('|')) - {'HEAD'})
+        if path in OPTIONAL_API_METHODS:
+            optional.setdefault(path, []).append(item)
     if any(path not in observed or len(observed[path]) != 1 or
            not set(methods).issubset(observed[path][0]) for path, methods in API_METHODS.items()):
         raise SafetyError('Actual Laravel route table differs from audited Node API profile')
+    for path, items in optional.items():
+        if len(items) != 1:
+            raise SafetyError('Optional Node address route must have exactly one audited action')
+        item = items[0]
+        methods = set(item.get('method', '').split('|')) - {'HEAD'}
+        middleware = item.get('middleware')
+        if (methods != set(OPTIONAL_API_METHODS[path]) or
+                item.get('action') != OPTIONAL_API_ACTIONS[path] or
+                not isinstance(middleware, list) or OPTIONAL_API_MIDDLEWARE not in middleware):
+            raise SafetyError('Optional Node address route differs from its audited method, action or state guard')
+    return list(optional)
+
+
+def optional_api_methods(plan):
+    """Old saved plans remain closed until an explicit route audit updates them."""
+    paths = plan.get('optional_api_paths', [])
+    if (not isinstance(paths, list) or any(not isinstance(path, str) or path not in OPTIONAL_API_METHODS for path in paths) or
+            len(set(paths)) != len(paths)):
+        raise SafetyError('Invalid optional Node API path selection')
+    return {path: OPTIONAL_API_METHODS[path] for path in paths}
 
 
 def literal_loopback_backend(value, upstreams=None):
@@ -311,6 +342,7 @@ def quote_path(path):
 
 
 def render(plan, cert=None, key=None):
+    api_methods = {**API_METHODS, **optional_api_methods(plan)}
     host, _ = validate_host(plan['host'])
     port = int(plan['port'])
     if port in (80, 443):
@@ -327,7 +359,7 @@ def render(plan, cert=None, key=None):
             raise SafetyError('HTTPS requires verified private PKI')
         lines += [f'    ssl_certificate {quote_path(cert)};', f'    ssl_certificate_key {quote_path(key)};',
                   '    ssl_protocols TLSv1.2 TLSv1.3;', '    ssl_session_tickets off;']
-    for path, methods in API_METHODS.items():
+    for path, methods in api_methods.items():
         lines += [f'    location = {path} {{',
                   f'        if ($request_method !~ ^({"|".join(methods)})$) {{ return 405; }}']
         if plan['deployment'] == 'fpm':

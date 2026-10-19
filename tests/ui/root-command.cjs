@@ -7,7 +7,7 @@ const assert = require('node:assert/strict');
 
 (async () => {
   const root = path.resolve(__dirname, '../../plugin/NodeEndpoint');
-  const installer = 'https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.6/install.sh';
+  const installer = 'https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.8/install.sh';
   let settings = { enabled: true, host: '8.8.8.8', port: 8443, https: true, http_acknowledged: false, ws_mode: 'rest' };
   let failSave = false, expired = false, saves = 0, loads = 0;
   let holdPost = false, holdGet = false, releasePost, releaseGet, postHeld, getHeld;

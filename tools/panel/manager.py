@@ -343,7 +343,7 @@ class Environment:
             probe_backend(backend, host, port, args.http)
         routes = application_routes(args, app)
         from nginx import verify_routes
-        verify_routes(routes)
+        optional_api_paths = verify_routes(routes)
         ws_backend = None
         if args.enable_ws:
             if not args.ws_backend:
@@ -368,6 +368,7 @@ class Environment:
                 'ws_backend': ws_backend, 'config_path': str(target), 'main_config': self.main,
                 'source_site': site_path, 'source_site_sha256': sha256(self.files[site_path]),
                 'route_profile_sha256': sha256(json.dumps(routes, sort_keys=True)),
+                'optional_api_paths': optional_api_paths,
                 'proxy_trust_profile_sha256': proxy_profile,
                 'container': args.container, 'app_user': args.app_user, 'php': args.php,
                 'container_app': args.container_app, 'container_user': args.container_user,

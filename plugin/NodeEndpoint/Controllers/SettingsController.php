@@ -22,7 +22,7 @@ final class SettingsController extends Controller
                 if ($parsed) { $ca[] = Certificates::metadata($parsed, openssl_x509_fingerprint($pem, 'sha256')); }
             }
         }
-        return response()->json(['data' => ['version' => '1.0.5', 'settings' => $settings,
+        return response()->json(['data' => ['version' => '1.0.6', 'settings' => $settings,
             'urls' => Endpoint::urls($settings), 'ca' => $ca, 'root_tool' => RootCommandBuilder::build($settings),
             'ca_passphrases' => CaPassphrases::metadata(array_column($ca, 'fingerprint_sha256')),
             'compatibility' => Plugin::whereIn('code', ['smart_expiry', 'qrcode_extend', 'qrcodeextend', 'flow_scope', 'flowscope'])

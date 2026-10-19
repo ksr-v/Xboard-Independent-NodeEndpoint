@@ -19,8 +19,8 @@ import urllib.parse
 import urllib.request
 import zipfile
 
-TOOLS_URL = 'https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/download/root-installer-v1.0.5/node-endpoint-tools-1.0.4.zip'
-TOOLS_SHA256 = '45f82dff04ef90dbf0f67cba0bc04ed59f96307ed840742d12aa733d853dfee5'
+TOOLS_URL = 'https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/download/root-installer-v1.0.8/node-endpoint-tools-1.0.5.zip'
+TOOLS_SHA256 = '7bb619440db545b6785e41d92707aa687ad43cb9529d4f8981f86dc4e1d3eb2f'
 CACHE = Path('/opt/nodeendpoint-quick') / TOOLS_SHA256
 
 
@@ -299,6 +299,33 @@ def repair_address(explicit=None, skip_firewall=False, nginx=None):
     finish_install(skip_firewall)
 
 
+def refresh_entry(nginx=None):
+    """Re-audit an owned HTTPS entry without changing its address or CA trust."""
+    import manager
+    from panel_ca import payload_from_state
+    plan, before = payload_from_state('/var/lib/node-endpoint')
+    required = ('host', 'source_site', 'site_name', 'include_dir', 'app', 'app_user', 'php', 'deployment', 'backend')
+    require(all(isinstance(plan.get(key), str) and plan[key] for key in required),
+            'Root 安装记录缺少完整站点参数，未猜测或重建入口')
+    require(type(plan.get('port')) is int and plan.get('https') is True and plan['deployment'] in ('fpm', 'octane'),
+            '刷新仅支持已有的同机 HTTPS FPM/Octane 独立入口')
+    argv = (['--nginx', nginx] if nginx else []) + ['modify', '--host', plan['host'], '--port', str(plan['port']),
+        '--site-config', plan['source_site'], '--site-name', plan['site_name'], '--include-dir', plan['include_dir'],
+        '--app', plan['app'], '--app-user', plan['app_user'], '--php', plan['php'],
+        '--deployment', plan['deployment'], '--backend', plan['backend']]
+    if plan.get('ws_backend'):
+        argv += ['--enable-ws', '--ws-backend', plan['ws_backend']]
+    print('刷新已安装入口的路由白名单；保留当前通讯地址、端口、CA 和面板设置。请核对完整计划并输入 INSTALL 地址:端口确认。')
+    manager.execute(manager.parser().parse_args(argv))
+    committed, after = payload_from_state('/var/lib/node-endpoint')
+    require(all(committed.get(key) == plan.get(key) for key in ('host', 'port', 'https')),
+            '刷新后的入口地址或端口发生变化，请核对并发维护操作')
+    require(after['pem'] == before['pem'] and after['fingerprints'] == before['fingerprints'],
+            '刷新后的 CA 信任发生变化，请核对并发维护操作')
+    print('入口路由刷新完成，通讯地址和 CA 已核对保持一致。')
+    print('若节点已检测到公网 IPv4，旧的 404 退避最多 10 分钟后会重试上报，随后可刷新服务器管理页面。')
+
+
 def php_candidates():
     paths = set()
     for process in Path('/proc').iterdir():
@@ -406,6 +433,7 @@ def main():
     actions.add_argument('--sync-ca', action='store_true', help='Import public CA from existing Root state into this panel; do not reinstall endpoint')
     actions.add_argument('--configure-firewall', action='store_true', help='Allow the installed entry TCP port persistently; do not reinstall or regenerate certificates')
     actions.add_argument('--repair-address', action='store_true', help='Repair an installed custom backend endpoint using the existing CA; renew server SAN and save panel settings')
+    actions.add_argument('--refresh-entry', action='store_true', help='Re-audit the owned HTTPS entry route allowlist, retaining its address, CA and panel settings')
     parser.add_argument('--host', help='Actual bare IP or DNS host; omit to choose IPv4 detection or manual input on first installation/repair')
     parser.add_argument('--skip-firewall', action='store_true', help='Keep local firewall unchanged during entry installation')
     args = parser.parse_args()
@@ -413,13 +441,13 @@ def main():
     require(sys.version_info >= (3, 10), '需要 Python 3.10+')
     import pwd
     os.umask(0o077)
-    require(not (args.skip_firewall and (args.detect_only or args.sync_ca or args.configure_firewall)),
+    require(not (args.skip_firewall and (args.detect_only or args.sync_ca or args.configure_firewall or args.refresh_entry)),
             '--skip-firewall 仅用于入口安装或地址修复')
-    require(not (args.host and (args.detect_only or args.sync_ca or args.configure_firewall)), '--host 仅用于安装或地址修复')
+    require(not (args.host and (args.detect_only or args.sync_ca or args.configure_firewall or args.refresh_entry)), '--host 仅用于安装或地址修复')
     require(args.detect_only or args.sync_ca or args.configure_firewall or sys.stdin.isatty(), '安装需要 SSH 交互终端，不要将脚本通过管道执行')
     for name in ('openssl', 'ss', 'runuser'):
         require(shutil.which(name), '缺少依赖：' + name + '，请先通过本机包管理器安装')
-    print('校验固定 tools v1.0.4（随机 CA 口令加密托管 + 本机 TCP 端口放行 + CA 自动导入）；不更新 Xboard、Node 或系统软件。')
+    print('校验固定 tools v1.0.5（随机 CA 口令加密托管 + 本机 TCP 端口放行 + CA 自动导入）；不更新 Xboard、Node 或系统软件。')
     data = Path(args.package_file).read_bytes() if args.package_file else download()
     directory = install_cache(verified_members(data))
     sys.dont_write_bytecode = True
@@ -440,6 +468,8 @@ def main():
     selected_nginx = args.nginx
     if not selected_nginx and Path('/www/server/nginx/sbin/nginx').is_file():
         selected_nginx = '/www/server/nginx/sbin/nginx'
+    if args.refresh_entry:
+        return refresh_entry(selected_nginx)
     if args.repair_address:
         return repair_address(args.host, args.skip_firewall, selected_nginx)
     environment = manager.Environment(selected_nginx)

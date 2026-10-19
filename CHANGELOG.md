@@ -1,5 +1,12 @@
 # 变更记录
 
+## 1.0.6 / root-installer-v1.0.8 — 私有入口 IPv4 上报修复
+
+- 为独立入口补齐 FlowScope 的精确 `POST /api/v2/flowscope/node-address`；不放宽整个插件 API、管理页面或周期流量接口。原 Node 核心通讯与可选 FlowScope 路由分开审计，未安装插件的面板保持兼容。
+- 网页复制 Root 命令固定到 root-installer-v1.0.8 / tools 1.0.5。新增 `--refresh-entry`，从已有安装记录读取参数，审阅并确认后刷新原生 HTTPS FPM / Octane 入口；不写插件设置或防火墙。仅上传插件、同步 CA 或补防火墙不会更新已加载的 Nginx 路径。
+- 同地址修改保留 CA、服务器证书、托管口令与节点身份。Node 对旧 404 最多等待 10 分钟后自动重试，不需要重装节点、改 Token 或强制重启。
+- README 与工具说明同步独立全插件后端 v2026.10.19.2。当前验证状态见 [私有入口 IPv4 修复报告](docs/FLOWSCOPE_PRIVATE_ENDPOINT_TEST_REPORT.md)。
+
 ## 1.0.4 / root-installer-v1.0.5 — CA 口令自动生成与面板加密托管
 
 - 新 CA 自动生成随机口令，按 APP_KEY 加密保存到独立表；签发前保存待完成凭据，Root 只保存不透明 ID，中断后核对证书再绑定。

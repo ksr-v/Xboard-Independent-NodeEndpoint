@@ -1,4 +1,20 @@
-# NodeEndpoint 1.0.4 / root-installer-v1.0.5
+# NodeEndpoint 1.0.6 / root-installer-v1.0.8
+
+修复私有证书入口对接正常、服务器详情 IPv4 仍“待获取”的路径遗漏：Node 的 IPv4 使用 FlowScope 精确 `POST /api/v2/flowscope/node-address`，旧版独立 Nginx 入口未转发该接口。此次仅补充精确 POST 路径，不开放插件管理或周期流量 API。Node 二进制和机器身份不变。
+
+已有入口在面板服务器以 Root 执行：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.8/install.sh | bash -s -- --refresh-entry
+```
+
+工具从已管理的安装记录读取参数，核对计划并输入完整确认短语后刷新原生 HTTPS FPM / Octane 入口；保留现有 CA、服务器证书及托管口令，不写插件设置或防火墙。Docker 不在自动刷新范围。只更新插件或只同步 CA 不会更新已有 Nginx 入口。
+
+可上传 `NodeEndpoint-1.0.6.zip` 原生升级，保留原设置并刷新，网页复制命令随之固定到新版 Root 工具。无需卸载其他插件、重装节点、改 Token 或强制重启；Node 对此前 404 最多缓存 10 分钟，等待自动重试即可。还需确保 FlowScope 2.4.0 已启用，节点可直连公网 IPv4 检测服务。
+
+全新安装使用 [内置四插件后端 v2026.10.19.2 宝塔教程](https://github.com/ksr-v/Xboard-Custom-Source/blob/v2026.10.19.2/docs/installation/aapanel.zh-CN.md)，地址仍提供自动 IPv4 / 手动输入选择。精确验证状态见 [FLOWSCOPE_PRIVATE_ENDPOINT_TEST_REPORT.md](docs/FLOWSCOPE_PRIVATE_ENDPOINT_TEST_REPORT.md)。
+
+## 1.0.4 / root-installer-v1.0.5 历史发行说明
 
 新 CA 的加密口令自动随机生成，先按面板原 `APP_KEY` 加密保存到独立凭据表，再由 Root 签发证书。管理员在 HTTPS `/node-endpoint` 证书区按需查看和复制；普通设置、状态、节点命令和日志不包含口令。CA 私钥继续放在网站之外的 Root 私有目录或离线介质。
 
