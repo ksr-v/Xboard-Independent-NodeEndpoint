@@ -136,39 +136,82 @@ class CommunicationHostTests(unittest.TestCase):
     def test_existing_real_address_is_retained_without_detection_or_prompt(self):
         for current in ['8.8.8.8', '192.168.128.128', 'panel.example']:
             with self.subTest(current=current), patch.object(quick, 'detect_public_ip') as detect, \
-                    patch.object(quick, 'ask') as ask:
+                    patch.object(quick, 'ask') as ask, patch('builtins.input') as menu:
                 self.assertEqual(quick.select_communication_host(current=current), current)
                 detect.assert_not_called()
                 ask.assert_not_called()
+                menu.assert_not_called()
 
     def test_explicit_new_address_skips_detection_and_prompt(self):
-        with patch.object(quick, 'detect_public_ip') as detect, patch.object(quick, 'ask') as ask:
+        with patch.object(quick, 'detect_public_ip') as detect, patch.object(quick, 'ask') as ask, \
+                patch('builtins.input') as menu:
             self.assertEqual(quick.select_communication_host(explicit='1.1.1.1'), '1.1.1.1')
             detect.assert_not_called()
             ask.assert_not_called()
+            menu.assert_not_called()
 
     def test_fresh_install_suggests_detected_ip_and_accepts_entered_choice(self):
         with patch.object(quick, 'detect_public_ip', return_value='8.8.8.8') as detect, \
-                patch.object(quick, 'ask', return_value='8.8.8.8') as ask:
+                patch.object(quick, 'ask', return_value='8.8.8.8') as ask, \
+                patch('builtins.input', return_value='1') as menu:
             self.assertEqual(quick.select_communication_host(), '8.8.8.8')
+            menu.assert_called_once()
             detect.assert_called_once_with()
             ask.assert_called_once()
             self.assertEqual(ask.call_args.args[1] if len(ask.call_args.args) > 1 else ask.call_args.kwargs['default'], '8.8.8.8')
 
+    def test_enter_selects_automatic_detection(self):
+        with patch.object(quick, 'detect_public_ip', return_value='8.8.8.8') as detect, \
+                patch.object(quick, 'ask', return_value='8.8.8.8'), \
+                patch('builtins.input', return_value=''):
+            self.assertEqual(quick.select_communication_host(), '8.8.8.8')
+            detect.assert_called_once_with()
+
+    def test_manual_choice_never_probes_network_or_suggests_a_default(self):
+        with patch.object(quick, 'detect_public_ip') as detect, \
+                patch.object(quick, 'ask', return_value='panel.example') as ask, \
+                patch('builtins.input', return_value='2'):
+            self.assertEqual(quick.select_communication_host(), 'panel.example')
+            detect.assert_not_called()
+            ask.assert_called_once()
+            self.assertEqual(ask.call_args.args[1:], ())
+            self.assertNotIn('default', ask.call_args.kwargs)
+
+    def test_invalid_menu_choices_retry_until_a_valid_choice(self):
+        with patch.object(quick, 'detect_public_ip') as detect, \
+                patch.object(quick, 'ask', return_value='1.1.1.1') as ask, \
+                patch('builtins.input', side_effect=['invalid', '3', ' 2 ']) as menu:
+            self.assertEqual(quick.select_communication_host(), '1.1.1.1')
+            self.assertEqual(menu.call_count, 3)
+            detect.assert_not_called()
+            ask.assert_called_once()
+
+    def test_cancellation_and_closed_input_stop_before_detection_or_address_prompt(self):
+        for choice in ['CANCEL', ' cancel ', EOFError(), KeyboardInterrupt()]:
+            with self.subTest(choice=type(choice).__name__ if isinstance(choice, BaseException) else choice), \
+                    patch.object(quick, 'detect_public_ip') as detect, patch.object(quick, 'ask') as ask, \
+                    patch('builtins.input', side_effect=[choice]):
+                with self.assertRaises(ValueError):
+                    quick.select_communication_host()
+                detect.assert_not_called()
+                ask.assert_not_called()
+
     def test_user_can_override_egress_suggestion_for_nat_or_multihomed_host(self):
         with patch.object(quick, 'detect_public_ip', return_value='8.8.8.8'), \
-                patch.object(quick, 'ask', return_value='1.1.1.1'):
+                patch.object(quick, 'ask', return_value='1.1.1.1'), patch('builtins.input', return_value='1'):
             self.assertEqual(quick.select_communication_host(), '1.1.1.1')
 
     def test_failed_detection_prompts_without_an_invented_default(self):
         with patch.object(quick, 'detect_public_ip', return_value=''), \
-                patch.object(quick, 'ask', return_value='panel.example') as ask:
+                patch.object(quick, 'ask', return_value='panel.example') as ask, \
+                patch('builtins.input', return_value='1'):
             self.assertEqual(quick.select_communication_host(), 'panel.example')
             self.assertEqual(ask.call_args.args[1] if len(ask.call_args.args) > 1 else ask.call_args.kwargs.get('default', ''), '')
 
     def test_manual_and_explicit_documentation_addresses_never_become_candidates(self):
         with patch.object(quick, 'detect_public_ip', return_value='8.8.8.8'), \
-                patch.object(quick, 'ask', return_value='203.0.113.10'), self.assertRaises(ValueError):
+                patch.object(quick, 'ask', return_value='203.0.113.10'), \
+                patch('builtins.input', return_value='2'), self.assertRaises(ValueError):
             quick.select_communication_host()
         with patch.object(quick, 'detect_public_ip') as detect, patch.object(quick, 'ask') as ask:
             with self.assertRaises(ValueError):

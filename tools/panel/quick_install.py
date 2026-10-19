@@ -218,6 +218,19 @@ def select_communication_host(current=None, explicit=None):
         return reject_example_host(explicit)
     if current is not None:
         return reject_example_host(current)
+    print('请选择节点通讯地址的获取方式：\n1. 自动检测本机公网 IPv4（默认）\n2. 手动输入 IP / 域名')
+    while True:
+        try:
+            choice = input('请选择 [1]（CANCEL 取消）：').strip().upper() or '1'
+        except (EOFError, KeyboardInterrupt):
+            raise ValueError('已取消通讯地址选择，未继续安装入口') from None
+        if choice == 'CANCEL':
+            raise ValueError('已取消通讯地址选择，未继续安装入口')
+        if choice in ('1', '2'):
+            break
+        print('请输入 1 或 2；输入 CANCEL 取消。')
+    if choice == '2':
+        return reject_example_host(ask('请输入实际通讯 IP / 域名（不含协议）'))
     suggested = detect_public_ip()
     print('检测服务器出口公网 IPv4 作为候选；NAT/多 IP 服务器请核对节点实际可访问的地址。'
           if suggested else '未能检测公网 IPv4，请输入本机实际通讯 IP 或域名。')
@@ -393,7 +406,7 @@ def main():
     actions.add_argument('--sync-ca', action='store_true', help='Import public CA from existing Root state into this panel; do not reinstall endpoint')
     actions.add_argument('--configure-firewall', action='store_true', help='Allow the installed entry TCP port persistently; do not reinstall or regenerate certificates')
     actions.add_argument('--repair-address', action='store_true', help='Repair an installed custom backend endpoint using the existing CA; renew server SAN and save panel settings')
-    parser.add_argument('--host', help='Actual bare IP or DNS host; otherwise detect a public IPv4 candidate on first installation/repair')
+    parser.add_argument('--host', help='Actual bare IP or DNS host; omit to choose IPv4 detection or manual input on first installation/repair')
     parser.add_argument('--skip-firewall', action='store_true', help='Keep local firewall unchanged during entry installation')
     args = parser.parse_args()
     require(sys.platform == 'linux' and os.geteuid() == 0, '请在面板服务器以 Root 运行')
