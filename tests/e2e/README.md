@@ -1,5 +1,7 @@
 # 两台授权虚拟机的实际 Xboard 联测
 
+2026-10-24 的独立 aaPanel/Docker 限速与路由测试另见 [测试报告](../../docs/RATE_ROUTE_TEST_REPORT.md)。`rate_route_*` 四个辅助程序使用新 SQLite 容器及前台 Node，不使用下述历史标准服务实验的数据库或绑定；固定路径、镜像和日期仅适用于本轮专用 VM，不能直接作为生产命令执行。
+
 此目录是验收辅助程序，不是生产安装器。它直接启动已安装 Xboard 的 Laravel、数据库、Redis、队列和原版 NodeWorker，使用摘要固定的实际 Go Node 与 Xray / sing-box 内核；不模拟面板 API 或 WebSocket 服务。
 
 本轮固定面板为 `192.168.128.128`，节点为 `192.168.128.129`，通过用户明确授权的 `codex` 免密 SSH / sudo 操作。程序中的路径、日期、端口和 callback 限制与本轮实验对应；在其他环境必须先重新审查实际部署和归属，不能原样复制运行。执行结果和未测范围见根目录 `FULL_E2E_TEST_REPORT.md`。

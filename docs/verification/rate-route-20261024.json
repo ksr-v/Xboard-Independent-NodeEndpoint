@@ -1,0 +1,677 @@
+{
+  "format_version": 1,
+  "scope": "Published independent Node binary; controlled loopback targets; dedicated SQLite Docker panel.",
+  "sources": {
+    "managed-report": {
+      "data": [
+        {
+          "expected": ">64 Mbps",
+          "kernel": "singbox",
+          "observed": 6403.379,
+          "pass": true,
+          "test": "panel-unlimited-download"
+        },
+        {
+          "expected": 16,
+          "kernel": "singbox",
+          "observed": 16,
+          "pass": true,
+          "test": "panel-limit-payload"
+        },
+        {
+          "expected": "12.8..19.2 Mbps",
+          "kernel": "singbox",
+          "observed": 15.822,
+          "pass": true,
+          "test": "panel-new-connection-16Mbps"
+        },
+        {
+          "expected": "<=19.2 Mbps",
+          "kernel": "singbox",
+          "observed": 5406.406,
+          "pass": false,
+          "test": "enable-limit-existing-connection"
+        },
+        {
+          "expected": "9.6..14.4 Mbps",
+          "kernel": "singbox",
+          "observed": 11.84,
+          "pass": true,
+          "test": "change-positive-existing-connection"
+        },
+        {
+          "expected": ">64 Mbps",
+          "kernel": "singbox",
+          "observed": 2173.034,
+          "pass": true,
+          "test": "remove-limit-new-connection"
+        },
+        {
+          "expected": ">64 Mbps",
+          "kernel": "singbox",
+          "observed": 18.791,
+          "pass": false,
+          "test": "remove-limit-existing-connection"
+        },
+        {
+          "expected": "OUTBOUND",
+          "included_in_summary": false,
+          "kernel": "singbox",
+          "observed": "DIRECT",
+          "pass": false,
+          "superseded_by": "managed-routes-report:singbox:panel-native-route-1",
+          "superseded_reason": "Initial run used the wrong outbound settings format for this kernel.",
+          "test": "panel-native-route-1"
+        },
+        {
+          "expected": "OTHER",
+          "kernel": "singbox",
+          "observed": "OTHER",
+          "pass": true,
+          "test": "panel-native-route-2"
+        },
+        {
+          "expected": "DIRECT",
+          "kernel": "singbox",
+          "observed": "DIRECT",
+          "pass": true,
+          "test": "panel-route-removal"
+        },
+        {
+          "expected": ">64 Mbps",
+          "kernel": "xray",
+          "observed": 6927.823,
+          "pass": true,
+          "test": "panel-unlimited-download"
+        },
+        {
+          "expected": 16,
+          "kernel": "xray",
+          "observed": 16,
+          "pass": true,
+          "test": "panel-limit-payload"
+        },
+        {
+          "expected": "12.8..19.2 Mbps",
+          "kernel": "xray",
+          "observed": 15.994,
+          "pass": true,
+          "test": "panel-new-connection-16Mbps"
+        },
+        {
+          "expected": "<=19.2 Mbps",
+          "kernel": "xray",
+          "observed": 4058.463,
+          "pass": false,
+          "test": "enable-limit-existing-connection"
+        },
+        {
+          "expected": "9.6..14.4 Mbps",
+          "kernel": "xray",
+          "observed": 11.997,
+          "pass": true,
+          "test": "change-positive-existing-connection"
+        },
+        {
+          "expected": ">64 Mbps",
+          "kernel": "xray",
+          "observed": 6322.391,
+          "pass": true,
+          "test": "remove-limit-new-connection"
+        },
+        {
+          "expected": ">64 Mbps",
+          "kernel": "xray",
+          "observed": 18.655,
+          "pass": false,
+          "test": "remove-limit-existing-connection"
+        },
+        {
+          "expected": "OUTBOUND",
+          "kernel": "xray",
+          "observed": "OUTBOUND",
+          "pass": true,
+          "test": "panel-native-route-1"
+        },
+        {
+          "expected": "OTHER",
+          "kernel": "xray",
+          "observed": "OTHER",
+          "pass": true,
+          "test": "panel-native-route-2"
+        },
+        {
+          "expected": "DIRECT",
+          "kernel": "xray",
+          "observed": "DIRECT",
+          "pass": true,
+          "test": "panel-route-removal"
+        }
+      ],
+      "sha256": "e5854601873a33e425f4d29c3a8322902f6ef994a72a465d010a6e249de3250b",
+      "source_file": "/opt/xboard-rate-route-traffic-20261024/managed-report.json"
+    },
+    "managed-routes-report": {
+      "data": [
+        {
+          "expected": [
+            1,
+            1
+          ],
+          "kernel": "singbox",
+          "observed": [
+            1,
+            1
+          ],
+          "pass": true,
+          "test": "panel-route-outbound-payload"
+        },
+        {
+          "expected": "OUTBOUND",
+          "kernel": "singbox",
+          "observed": "BLOCKED",
+          "pass": false,
+          "test": "panel-native-route-1"
+        },
+        {
+          "expected": "OTHER",
+          "kernel": "singbox",
+          "observed": "OTHER",
+          "pass": true,
+          "test": "panel-native-route-2"
+        },
+        {
+          "expected": "OUTBOUND",
+          "kernel": "singbox",
+          "observed": "OUTBOUND",
+          "pass": true,
+          "test": "panel-native-route-after-cold-start"
+        },
+        {
+          "expected": "DIRECT",
+          "kernel": "singbox",
+          "observed": "DIRECT",
+          "pass": true,
+          "test": "panel-route-removal"
+        },
+        {
+          "expected": [
+            1,
+            1
+          ],
+          "kernel": "xray",
+          "observed": [
+            1,
+            1
+          ],
+          "pass": true,
+          "test": "panel-route-outbound-payload"
+        },
+        {
+          "expected": "OUTBOUND",
+          "kernel": "xray",
+          "observed": "OUTBOUND",
+          "pass": true,
+          "test": "panel-native-route-1"
+        },
+        {
+          "expected": "OTHER",
+          "kernel": "xray",
+          "observed": "OTHER",
+          "pass": true,
+          "test": "panel-native-route-2"
+        },
+        {
+          "expected": "OUTBOUND",
+          "kernel": "xray",
+          "observed": "OUTBOUND",
+          "pass": true,
+          "test": "panel-native-route-after-cold-start"
+        },
+        {
+          "expected": "DIRECT",
+          "kernel": "xray",
+          "observed": "DIRECT",
+          "pass": true,
+          "test": "panel-route-removal"
+        }
+      ],
+      "sha256": "4d1ae088a06469cf4191145311a5b1cab6c01ec5c085d9cebb61f3831e9da6a5",
+      "source_file": "/opt/xboard-rate-route-traffic-20261024/managed-routes-report.json"
+    },
+    "panel-audit": {
+      "data": {
+        "audit": {
+          "actual_route_order": [
+            1,
+            2
+          ],
+          "hidden_enabled_node_runs": false,
+          "negative_user_limit_accepted": true,
+          "requested_route_order": [
+            2,
+            1
+          ],
+          "route_order_preserved": false
+        },
+        "observer-audit": {
+          "database_changes_rolled_back": true,
+          "hidden_enabled_node_runs": true,
+          "hidden_route_update_events": [],
+          "visible_route_update_events": [
+            {
+              "event": "sync.config",
+              "node_id": 1
+            }
+          ]
+        }
+      },
+      "sha256": "8e1ea37fdbd01409da92731797202765d391ea4a91071fd7b13aaa7d05200d69",
+      "source_file": "/opt/xboard-rate-route-20261024/panel-audit-safe.json"
+    },
+    "panel-verification": {
+      "data": {
+        "container": "codex-xboard-rate-route-20261024",
+        "container_id": "2337231004b6890b6f77e1fbb47746d7054cc69360a0ca2238371b14778fea06",
+        "database": "isolated-sqlite",
+        "host_nginx_changed": false,
+        "http_status": 200,
+        "image": "sha256:f8d45147fe23db138f0922b6137d162b283f90c2129ca6775c507ba084e00d73",
+        "phase": "verified",
+        "plugins": [
+          {
+            "code": "flowscope",
+            "enabled": true,
+            "version": "2.4.0"
+          },
+          {
+            "code": "node_endpoint",
+            "enabled": true,
+            "version": "1.0.7"
+          },
+          {
+            "code": "qrcodeextend",
+            "enabled": true,
+            "version": "1.2.0"
+          },
+          {
+            "code": "smart_expiry",
+            "enabled": true,
+            "version": "1.2.0"
+          }
+        ],
+        "port": 17004,
+        "result": "PASS"
+      },
+      "sha256": "bb68623f2103799da1a5ccfdd773ecdd506728da51bafbd13f029b1b9731c637",
+      "source_file": "/opt/xboard-rate-route-20261024/verification.json"
+    },
+    "standalone-singbox": {
+      "data": [
+        {
+          "expected": ">32 Mbps",
+          "kernel": "singbox",
+          "observed": 9536.696,
+          "pass": true,
+          "test": "unlimited-download"
+        },
+        {
+          "expected": ">32 Mbps",
+          "kernel": "singbox",
+          "observed": 10692.445,
+          "pass": true,
+          "test": "unlimited-upload"
+        },
+        {
+          "expected": "complete within expected bandwidth window",
+          "kernel": "singbox",
+          "observed": "TRANSFER_TimeoutError",
+          "pass": false,
+          "test": "8Mbps-download"
+        },
+        {
+          "expected": "complete within expected bandwidth window",
+          "kernel": "singbox",
+          "observed": "TRANSFER_TimeoutError",
+          "pass": false,
+          "test": "8Mbps-upload"
+        },
+        {
+          "expected": "complete within expected bandwidth window",
+          "kernel": "singbox",
+          "observed": "TRANSFER_TimeoutError",
+          "pass": false,
+          "test": "same-user-two-connections"
+        },
+        {
+          "expected": "complete within expected bandwidth window",
+          "kernel": "singbox",
+          "observed": "TRANSFER_TimeoutError",
+          "pass": false,
+          "test": "different-users-two-connections"
+        },
+        {
+          "expected": "OUTBOUND",
+          "kernel": "singbox",
+          "observed": "OUTBOUND",
+          "pass": true,
+          "test": "custom-outbound-port-1"
+        },
+        {
+          "expected": "OTHER",
+          "kernel": "singbox",
+          "observed": "OTHER",
+          "pass": true,
+          "test": "custom-outbound-port-2"
+        },
+        {
+          "expected": "BLOCKED",
+          "kernel": "singbox",
+          "observed": "BLOCKED",
+          "pass": true,
+          "test": "block-port-1"
+        },
+        {
+          "expected": "OTHER",
+          "kernel": "singbox",
+          "observed": "OTHER",
+          "pass": true,
+          "test": "block-port-2"
+        },
+        {
+          "expected": "OUTBOUND",
+          "kernel": "singbox",
+          "observed": "OUTBOUND",
+          "pass": true,
+          "test": "exact-domain-1"
+        },
+        {
+          "expected": "BLOCKED",
+          "kernel": "singbox",
+          "observed": "CLOSED",
+          "pass": true,
+          "test": "exact-domain-2"
+        },
+        {
+          "expected": "OUTBOUND",
+          "kernel": "singbox",
+          "observed": "OUTBOUND",
+          "pass": true,
+          "test": "suffix-domain-1"
+        },
+        {
+          "expected": "OUTBOUND",
+          "kernel": "singbox",
+          "observed": "OUTBOUND",
+          "pass": true,
+          "test": "suffix-domain-2"
+        },
+        {
+          "expected": "OUTBOUND",
+          "kernel": "singbox",
+          "observed": "OUTBOUND",
+          "pass": true,
+          "test": "combined-port-network-1"
+        },
+        {
+          "expected": "OTHER",
+          "kernel": "singbox",
+          "observed": "OUTBOUND",
+          "pass": false,
+          "test": "combined-port-network-2"
+        },
+        {
+          "expected": "BLOCKED",
+          "kernel": "singbox",
+          "observed": "BLOCKED",
+          "pass": true,
+          "test": "first-match-1"
+        },
+        {
+          "expected": ">0 CONNECT requests",
+          "kernel": "singbox",
+          "observed": 6,
+          "pass": true,
+          "test": "controlled-outbound-actually-used"
+        }
+      ],
+      "sha256": "5171ef00e69303992b69639f9cb8e068194523ef5b0f5a0353e7a951c9736a41",
+      "source_file": "/opt/xboard-rate-route-traffic-20261024/standalone-singbox.json"
+    },
+    "standalone-xray": {
+      "data": [
+        {
+          "expected": ">32 Mbps",
+          "kernel": "xray",
+          "observed": 11191.792,
+          "pass": true,
+          "test": "unlimited-download"
+        },
+        {
+          "expected": ">32 Mbps",
+          "kernel": "xray",
+          "observed": 4023.371,
+          "pass": true,
+          "test": "unlimited-upload"
+        },
+        {
+          "expected": "6.4..9.6 Mbps",
+          "kernel": "xray",
+          "observed": 8.0,
+          "pass": true,
+          "test": "8Mbps-download"
+        },
+        {
+          "expected": "6.4..9.6 Mbps",
+          "kernel": "xray",
+          "observed": 4439.254,
+          "pass": false,
+          "test": "8Mbps-upload"
+        },
+        {
+          "expected": "6.4..9.6 Mbps total",
+          "kernel": "xray",
+          "observed": 8.0,
+          "pass": true,
+          "test": "same-user-two-connections"
+        },
+        {
+          "expected": "12.8..19.2 Mbps total",
+          "kernel": "xray",
+          "observed": 15.996,
+          "pass": true,
+          "test": "different-users-two-connections"
+        },
+        {
+          "expected": "OUTBOUND",
+          "kernel": "xray",
+          "observed": "OUTBOUND",
+          "pass": true,
+          "test": "custom-outbound-port-1"
+        },
+        {
+          "expected": "OTHER",
+          "kernel": "xray",
+          "observed": "OTHER",
+          "pass": true,
+          "test": "custom-outbound-port-2"
+        },
+        {
+          "expected": "BLOCKED",
+          "kernel": "xray",
+          "observed": "CLOSED",
+          "pass": true,
+          "test": "block-port-1"
+        },
+        {
+          "expected": "OTHER",
+          "kernel": "xray",
+          "observed": "OTHER",
+          "pass": true,
+          "test": "block-port-2"
+        },
+        {
+          "expected": "OUTBOUND",
+          "kernel": "xray",
+          "observed": "OUTBOUND",
+          "pass": true,
+          "test": "exact-domain-1"
+        },
+        {
+          "expected": "BLOCKED",
+          "kernel": "xray",
+          "observed": "OUTBOUND",
+          "pass": false,
+          "test": "exact-domain-2"
+        },
+        {
+          "expected": "OUTBOUND",
+          "kernel": "xray",
+          "observed": "OUTBOUND",
+          "pass": true,
+          "test": "suffix-domain-1"
+        },
+        {
+          "expected": "OUTBOUND",
+          "kernel": "xray",
+          "observed": "OUTBOUND",
+          "pass": true,
+          "test": "suffix-domain-2"
+        },
+        {
+          "expected": "OUTBOUND",
+          "kernel": "xray",
+          "observed": "OUTBOUND",
+          "pass": true,
+          "test": "combined-port-network-1"
+        },
+        {
+          "expected": "OTHER",
+          "kernel": "xray",
+          "observed": "OUTBOUND",
+          "pass": false,
+          "test": "combined-port-network-2"
+        },
+        {
+          "expected": "BLOCKED",
+          "kernel": "xray",
+          "observed": "CLOSED",
+          "pass": true,
+          "test": "first-match-1"
+        },
+        {
+          "expected": ">0 CONNECT requests",
+          "kernel": "xray",
+          "observed": 7,
+          "pass": true,
+          "test": "controlled-outbound-actually-used"
+        }
+      ],
+      "sha256": "0fb34a0f77c0dd49ca7e75001e93db783b8b511246fa1de06c921d9ce639ebae",
+      "source_file": "/opt/xboard-rate-route-traffic-20261024/standalone-xray.json"
+    },
+    "threshold-report": {
+      "data": [
+        {
+          "expected": "7.2..10.8 Mbps",
+          "kernel": "singbox",
+          "observed": 9.587,
+          "pass": true,
+          "test": "9Mbps-threshold-download"
+        },
+        {
+          "expected": "7.2..10.8 Mbps",
+          "kernel": "singbox",
+          "observed": 8.938,
+          "pass": true,
+          "test": "9Mbps-threshold-upload"
+        }
+      ],
+      "sha256": "4895a3e6c5525915003f6ee008810d5f467eced6d3d9de663f42dc40a397da2b",
+      "source_file": "/opt/xboard-rate-route-traffic-20261024/threshold-report.json"
+    }
+  },
+  "summary": {
+    "effective_checks": 67,
+    "failed": 13,
+    "failures": [
+      {
+        "kernel": "singbox",
+        "source": "standalone-singbox",
+        "test": "8Mbps-download"
+      },
+      {
+        "kernel": "singbox",
+        "source": "standalone-singbox",
+        "test": "8Mbps-upload"
+      },
+      {
+        "kernel": "singbox",
+        "source": "standalone-singbox",
+        "test": "same-user-two-connections"
+      },
+      {
+        "kernel": "singbox",
+        "source": "standalone-singbox",
+        "test": "different-users-two-connections"
+      },
+      {
+        "kernel": "singbox",
+        "source": "standalone-singbox",
+        "test": "combined-port-network-2"
+      },
+      {
+        "kernel": "xray",
+        "source": "standalone-xray",
+        "test": "8Mbps-upload"
+      },
+      {
+        "kernel": "xray",
+        "source": "standalone-xray",
+        "test": "exact-domain-2"
+      },
+      {
+        "kernel": "xray",
+        "source": "standalone-xray",
+        "test": "combined-port-network-2"
+      },
+      {
+        "kernel": "singbox",
+        "source": "managed-report",
+        "test": "enable-limit-existing-connection"
+      },
+      {
+        "kernel": "singbox",
+        "source": "managed-report",
+        "test": "remove-limit-existing-connection"
+      },
+      {
+        "kernel": "xray",
+        "source": "managed-report",
+        "test": "enable-limit-existing-connection"
+      },
+      {
+        "kernel": "xray",
+        "source": "managed-report",
+        "test": "remove-limit-existing-connection"
+      },
+      {
+        "kernel": "singbox",
+        "source": "managed-routes-report",
+        "test": "panel-native-route-1"
+      }
+    ],
+    "passed": 54
+  },
+  "supersessions": [
+    {
+      "final_cold_start_pass": true,
+      "final_hot_update_pass": false,
+      "kernel": "singbox",
+      "replacement_source": "managed-routes-report",
+      "source": "managed-report",
+      "test": "panel-native-route-1"
+    }
+  ],
+  "test_date": "2026-10-24"
+}

@@ -1,0 +1,81 @@
+{
+  "cleanup": {
+    "container": "codex-xboard-rate-route-20261024",
+    "container_removed": true,
+    "data_retained": true
+  },
+  "containers": [
+    {
+      "ID": "6bb8ae29ce05",
+      "Image": "xboard-aapanel-fixture:patched-705e71f",
+      "Names": "xboard-aa-docker-20261023-xboard-1",
+      "Ports": "127.0.0.1:17001->7001/tcp",
+      "Status": "Up 8 hours"
+    }
+  ],
+  "disk_free_GiB": 31.18,
+  "original_critical_processes": {
+    "1080": {
+      "name": "redis-server",
+      "same_process_exists": true
+    },
+    "1787": {
+      "name": "mariadbd",
+      "same_process_exists": true
+    },
+    "1804": {
+      "name": "BT-Task",
+      "same_process_exists": true
+    },
+    "1839": {
+      "name": "BT-Panel",
+      "same_process_exists": true
+    },
+    "1925": {
+      "name": "webserver",
+      "same_process_exists": true
+    },
+    "977": {
+      "name": "nginx",
+      "same_process_exists": true
+    }
+  },
+  "original_critical_processes_preserved": true,
+  "original_nginx_config_count": 8,
+  "original_nginx_configs_unchanged": true,
+  "original_nginx_master_pid": 977,
+  "owned_traffic_pids": [],
+  "primary_panel_http_status": 200,
+  "primary_plugins": [
+    [
+      "flowscope",
+      "2.4.0",
+      1
+    ],
+    [
+      "node_endpoint",
+      "1.0.6",
+      1
+    ],
+    [
+      "qrcodeextend",
+      "1.2.0",
+      1
+    ],
+    [
+      "smart_expiry",
+      "1.2.0",
+      1
+    ]
+  ],
+  "result": "PASS",
+  "root_endpoint_state_exists": false,
+  "temporary_docker_proxy_dropin_exists": false,
+  "test_date": "2026-10-24",
+  "test_ports_free": {
+    "17004": true,
+    "19090": true,
+    "19091": true
+  },
+  "traffic_node_process_count": 0
+}
