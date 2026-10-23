@@ -31,6 +31,11 @@ def _require(condition, message='Root CA 凭据元数据无效，拒绝继续'):
 
 
 def _context(plan):
+    if isinstance(plan, dict) and plan.get('deployment') == 'docker' and plan.get('docker_context'):
+        from docker_context import validate_context
+        context = plan['docker_context']
+        validate_context(context)
+        return {'docker_context': context}
     _require(isinstance(plan, dict) and plan.get('deployment') in ('fpm', 'octane')
              and all(isinstance(plan.get(key), str) and plan[key] for key in ('app', 'app_user', 'php')),
              '自动保存 CA 口令需要原生 FPM/Octane 的 app-user 和 PHP；旧版插件或 Docker 请显式使用 --manual-ca-passphrase')
@@ -84,6 +89,31 @@ class PanelBridge:
             raise SafetyError(FAILURE) from None
 
 
+class DockerPanelBridge:
+    def __init__(self, context):
+        self.context = context
+
+    def call(self, action, credential_id, host=None, fingerprint=None):
+        try:
+            from docker_context import run_helper
+            _require(ID.fullmatch(credential_id))
+            payload = {'action': action, 'credential_id': credential_id}
+            if host is not None:
+                payload['host'] = host
+            if fingerprint is not None:
+                payload['fingerprint'] = fingerprint
+            response = run_helper(self.context, 'panel_passphrase', payload)
+            if action in ('prepare', 'get'):
+                _require(set(response) == {'credential_id', 'passphrase'} and response['credential_id'] == credential_id
+                         and isinstance(response['passphrase'], str) and SECRET.fullmatch(response['passphrase']))
+            else:
+                _require(action == 'bind' and response == {'status': 'stored', 'credential_id': credential_id,
+                                                           'fingerprint': fingerprint})
+            return response
+        except Exception:
+            raise SafetyError(FAILURE) from None
+
+
 class ManagedPassphrases:
     def __init__(self, state, plan=None, bridge=None):
         self.path = Path(state) / 'pki' / FILENAME
@@ -91,14 +121,15 @@ class ManagedPassphrases:
         if plan is not None:
             context = _context(plan)
             if self.data:
-                _require({key: self.data[key] for key in context} == context,
+                _require({key: self.data.get(key) for key in context} == context,
                          'CA 凭据属于其他应用或运行身份，拒绝更换绑定')
         else:
             _require(self.data is not None, '此 CA 没有自动保存的口令记录')
-            context = {key: self.data[key] for key in ('app', 'app_user', 'php')}
+            context = ({'docker_context': self.data['docker_context']} if self.data['schema_version'] == 2
+                       else {key: self.data[key] for key in ('app', 'app_user', 'php')})
         if self.data is None:
-            self.data = {'schema_version': 1, **context, 'pending': None, 'cas': {}}
-        self.bridge = bridge or PanelBridge(context)
+            self.data = {'schema_version': 2 if 'docker_context' in context else 1, **context, 'pending': None, 'cas': {}}
+        self.bridge = bridge or (DockerPanelBridge(context['docker_context']) if 'docker_context' in context else PanelBridge(context))
 
     def _private_parent(self):
         parent = manager.trusted_file(self.path.parent)
@@ -125,9 +156,14 @@ class ManagedPassphrases:
             raise SafetyError('Root CA 凭据元数据无效，拒绝继续') from None
 
     def _validate(self, data):
-        _require(isinstance(data, dict) and set(data) == {'schema_version', 'app', 'app_user', 'php', 'pending', 'cas'}
-                 and data['schema_version'] == 1)
-        _context({'deployment': 'fpm', **{key: data[key] for key in ('app', 'app_user', 'php')}})
+        _require(isinstance(data, dict))
+        if data.get('schema_version') == 2:
+            _require(set(data) == {'schema_version', 'docker_context', 'pending', 'cas'})
+            _context({'deployment': 'docker', 'docker_context': data['docker_context']})
+        else:
+            _require(set(data) == {'schema_version', 'app', 'app_user', 'php', 'pending', 'cas'}
+                     and data['schema_version'] == 1)
+            _context({'deployment': 'fpm', **{key: data[key] for key in ('app', 'app_user', 'php')}})
         _require(isinstance(data['cas'], dict))
         for ca_id, record in data['cas'].items():
             _require(isinstance(ca_id, str) and CA_ID.fullmatch(ca_id)
@@ -241,6 +277,41 @@ def existing_password(pki, plan=None, ca_id=None, ca_key=None):
     if not (pki.root / FILENAME).exists() and not (pki.root / FILENAME).is_symlink():
         return None
     return ManagedPassphrases(pki.state, plan).password(pki, ca_id, ca_key)
+
+
+def rebind_docker_context(pki, plan, ca_key=None):
+    """Called only inside a reviewed Root transaction; no new CA or password."""
+    target = pki.root / FILENAME
+    if plan.get('deployment') != 'docker' or not plan.get('docker_context') or not target.exists():
+        return False
+    vault = ManagedPassphrases(pki.state)
+    _require(vault.data['schema_version'] == 2, '已有 CA 属于原生应用；Docker 迁移需要单独审阅，未更换绑定')
+    old, candidate = vault.data['docker_context'], _context(plan)['docker_context']
+    if old == candidate:
+        return False
+    stable = ('daemon_id', 'project', 'service', 'working_dir', 'app', 'uid', 'gid', 'php', 'bind_sources', 'volume_sources')
+    _require(all(old.get(key) == candidate.get(key) for key in stable),
+             'Docker 应用或持久化来源不同，拒绝换绑 CA')
+    _require(vault.data['pending'] is None and pki.meta and pki.meta.get('active_ca') in vault.data['cas'],
+             '先恢复待完成的 CA 凭据操作，未自动换绑容器')
+    trusted = pki.meta.get('trusted_ca')
+    _require(isinstance(trusted, list) and 1 <= len(trusted) <= 2
+             and all(isinstance(identity, str) and CA_ID.fullmatch(identity) for identity in trusted)
+             and len(set(trusted)) == len(trusted) and pki.meta['active_ca'] in trusted,
+             '原 CA 信任记录不完整，拒绝跳过私钥证明换绑容器')
+    bridge = DockerPanelBridge(candidate)
+    for identity in trusted:
+        record = vault.data['cas'].get(identity)
+        _require(record is not None, '缺少现有 CA 绑定，未自动认领新容器')
+        folder = pki.ca_dir(identity)
+        _require(pki.openssl.info(folder / 'ca.pem')['sha256'] == record['fingerprint'])
+        password = bridge.call('get', record['credential_id'], record['host'])['passphrase']
+        key = Path(ca_key) if ca_key and identity == pki.meta['active_ca'] else folder / 'ca.key.pem'
+        _require(key.is_file(), '容器重建换绑需要原 CA 私钥作本机匹配验证；请提供 --ca-key，未重建 CA')
+        pki.openssl.key_matches(key, folder / 'ca.pem', password)
+    vault.data['docker_context'] = candidate
+    vault._save()
+    return True
 
 
 def with_password(pki, callback, manual_prompt, plan=None, ca_id=None, ca_key=None, manual=False):

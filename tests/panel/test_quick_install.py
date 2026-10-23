@@ -6,6 +6,7 @@ import io
 import json
 from pathlib import Path
 import stat
+import subprocess
 import sys
 import tempfile
 from types import SimpleNamespace
@@ -22,7 +23,7 @@ spec.loader.exec_module(quick)
 
 
 def bundle(extra=None, symlink=False):
-    files = {'tools/panel/' + name: b'# fixture\n' for name in ('manager.py', 'nginx.py', 'pki.py', 'panel_ca.py', 'sync_panel_ca.php', 'firewall.py', 'panel_passphrase.py', 'panel_passphrase.php')}
+    files = {'tools/panel/' + name: b'# fixture\n' for name in ('manager.py', 'nginx.py', 'pki.py', 'panel_ca.py', 'sync_panel_ca.php', 'firewall.py', 'panel_passphrase.py', 'panel_passphrase.php', 'docker_context.py', 'endpoint_settings.php')}
     if extra:
         files.update(extra)
     manifest = ''.join(hashlib.sha256(data).hexdigest() + '  ' + name + '\n' for name, data in files.items())
@@ -42,13 +43,22 @@ def bundle(extra=None, symlink=False):
 
 
 class BootstrapTests(unittest.TestCase):
+    def test_manager_cli_never_creates_bytecode_in_a_verified_tool_directory(self):
+        with tempfile.TemporaryDirectory() as directory:
+            destination=Path(directory)
+            for name in ('manager.py','pki.py','nginx.py'):
+                (destination/name).write_bytes((ROOT/'tools/panel'/name).read_bytes())
+            result=subprocess.run([sys.executable,'-I',str(destination/'manager.py'),'--help'],capture_output=True)
+            self.assertEqual(result.returncode,0)
+            self.assertFalse((destination/'__pycache__').exists())
+
     def test_wrong_pin_rejected_before_zip_or_file_operations(self):
         with self.assertRaisesRegex(ValueError, 'SHA-256'):
             quick.verified_members(b'not a zip')
 
     def test_pinned_members_and_manifest_verified(self):
         raw, pin = bundle()
-        self.assertEqual(len(quick.verified_members(raw, pin)), 9)
+        self.assertEqual(len(quick.verified_members(raw, pin)), 11)
         changed = bytearray(raw)
         changed[-1] ^= 1
         with self.assertRaises(ValueError):

@@ -1,5 +1,12 @@
 # 变更记录
 
+## 1.0.7 / root-installer-v1.0.9 — Docker 简化安装
+
+- 标准 Compose 镜像和局部数据挂载支持宿主机 Root 自动配置：识别反代、以普通 UID 执行固定助手、随机 CA 口令加密托管、通讯设置与公共 CA 自动同步。
+- 展示完整计划后一次确认。容器重建需 Root 重新审阅，并用原 CA 私钥验证托管口令后换绑；失败保留原 CA 和配置。
+- 独立全插件后端新增 `bash docker-install.sh`，默认宝塔 MySQL / MariaDB + 内置 Redis，填写数据库连接、管理员邮箱和通讯地址后一次确认；可选 SQLite。已有同版本安装重跑不初始化数据库。
+- 网页复制命令固定到 Root v1.0.9 / tools 1.0.6，二维码插件仍为 1.2.0 审计副本。
+
 ## 1.0.6 / root-installer-v1.0.8 — 私有入口 IPv4 上报修复
 
 - 为独立入口补齐 FlowScope 的精确 `POST /api/v2/flowscope/node-address`；不放宽整个插件 API、管理页面或周期流量接口。原 Node 核心通讯与可选 FlowScope 路由分开审计，未安装插件的面板保持兼容。

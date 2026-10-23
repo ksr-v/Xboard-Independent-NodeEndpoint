@@ -18,6 +18,7 @@ import ssl
 import stat
 import subprocess
 import sys
+sys.dont_write_bytecode = True
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from pki import PKI, SafetyError, VERSION, atomic_write, read_json, write_json, validate_host
@@ -258,6 +259,9 @@ class Environment:
                              'Backend, Xboard route table and selected source site must be confirmed before installation.']}
 
     def plan(self, args, state, installed):
+        docker_auto = bool(getattr(args, 'docker_auto', False))
+        if docker_auto and args.deployment != 'docker':
+            raise SafetyError('--docker-auto requires the Docker deployment profile')
         host, _ = validate_host(args.host)
         port = args.port
         if port in (80, 443):
@@ -291,7 +295,7 @@ class Environment:
         app = Path(args.app).resolve(strict=True)
         if state == app or app in state.parents or state == app / 'public' or app / 'public' in state.parents:
             raise SafetyError('PKI/state must be outside the entire Xboard application tree')
-        if not (app / 'artisan').is_file() or not (app / 'public/index.php').is_file():
+        if not docker_auto and (not (app / 'artisan').is_file() or not (app / 'public/index.php').is_file()):
             raise SafetyError('Selected application does not contain Laravel artisan and public/index.php')
         backend_nodes = [x for x in walk(site.children) if x.words[0] in ('proxy_pass', 'fastcgi_pass')]
         ws_locations = [x for x in walk(site.children) if x.words[0] == 'location' and
@@ -299,6 +303,7 @@ class Environment:
         ws_nodes = [x for location in ws_locations for x in walk(location.children)]
         backend_nodes = [x for x in backend_nodes if x not in ws_nodes]
         proxy_profile = None
+        docker_context = None
         if args.deployment == 'fpm':
             roots = values(site.children, 'root')
             if roots != [[str(app / 'public')]]:
@@ -315,8 +320,19 @@ class Environment:
                 require_listener(self.ss, backend_port)
             backend = args.backend
         else:
-            from nginx import verify_proxy_trust
-            proxy_profile = verify_proxy_trust(app)
+            if docker_auto:
+                from docker_context import inspect_context, read_proxy_profile, assert_state_isolated
+                from nginx import AUDITED_PROXY_TRUST_SHA256
+                docker_context = inspect_context(args.container, args.backend)
+                if Path(docker_context['working_dir']).resolve() != app:
+                    raise SafetyError('Docker Compose project directory differs from the selected host application directory')
+                assert_state_isolated(docker_context, state)
+                proxy_profile = read_proxy_profile(docker_context)
+                if proxy_profile not in AUDITED_PROXY_TRUST_SHA256:
+                    raise SafetyError('Docker TrustProxies profile is not audited')
+            else:
+                from nginx import verify_proxy_trust
+                proxy_profile = verify_proxy_trust(app)
             upstreams = {x.words[1]: x.children for x in walk(self.nodes) if x.words[0] == 'upstream'}
             candidates = set()
             for node in backend_nodes:
@@ -327,8 +343,9 @@ class Environment:
             backend, backend_port = literal_loopback_backend(args.backend)
             if candidates != {backend}:
                 raise SafetyError('Backend must exactly match the single observed loopback HTTP proxy target')
-            require_listener(self.ss, backend_port)
-            if args.deployment == 'docker':
+            if not docker_auto:
+                require_listener(self.ss, backend_port)
+            if args.deployment == 'docker' and not docker_auto:
                 if not args.container:
                     raise SafetyError('Docker deployment requires explicit container identity')
                 inspect, _, _ = command(['docker', 'inspect', '--format', '{{json .NetworkSettings.Ports}}', args.container])
@@ -341,7 +358,7 @@ class Environment:
                        mount.get('Destination') == args.container_app for mount in mounts):
                     raise SafetyError('Docker application must match an observed host bind mount exactly')
             probe_backend(backend, host, port, args.http)
-        routes = application_routes(args, app)
+        routes = application_routes(args, app, docker_context) if docker_auto else application_routes(args, app)
         from nginx import verify_routes
         optional_api_paths = verify_routes(routes)
         ws_backend = None
@@ -361,8 +378,12 @@ class Environment:
                     observed.update(x.words[1].rstrip('/') for x in directives if x.words[0] == 'proxy_pass')
             if ws_backend not in observed:
                 raise SafetyError('WebSocket backend is not observed in the source site /ws location')
-            require_listener(self.ss, ws_port)
-        return {'version': VERSION, 'ownership': installed.get('ownership') or secrets.token_hex(16),
+            if docker_auto:
+                if ws_backend != backend:
+                    raise SafetyError('Automatic Docker WebSocket traffic must use the audited Caddy entry')
+            else:
+                require_listener(self.ss, ws_port)
+        plan = {'version': VERSION, 'ownership': installed.get('ownership') or secrets.token_hex(16),
                 'host': host, 'port': port, 'https': not args.http, 'ipv6': Path('/proc/net/if_inet6').exists(),
                 'deployment': args.deployment, 'backend': backend, 'app': str(app),
                 'ws_backend': ws_backend, 'config_path': str(target), 'main_config': self.main,
@@ -373,6 +394,11 @@ class Environment:
                 'container': args.container, 'app_user': args.app_user, 'php': args.php,
                 'container_app': args.container_app, 'container_user': args.container_user,
                 'site_name': args.site_name, 'include_dir': str(target.parent)}
+        if docker_auto:
+            plan.update(docker_context=docker_context, container=docker_context['container_id'],
+                        container_app=docker_context['app'],
+                        container_user=str(docker_context['uid']) + ':' + str(docker_context['gid']))
+        return plan
 
 
 def fnmatch_path(path, pattern):
@@ -387,7 +413,17 @@ def require_listener(ss_output, port):
         raise SafetyError('Confirmed backend does not have an observed listening TCP socket')
 
 
-def application_routes(args, app):
+def application_routes(args, app, context=None):
+    if args.deployment == 'docker' and getattr(args, 'docker_auto', False):
+        from docker_context import inspect_context, run_artisan
+        context = context or inspect_context(args.container, args.backend)
+        try:
+            routes = json.loads(run_artisan(context, ['route:list', '--json']))
+            if not isinstance(routes, list) or any(not isinstance(route, dict) for route in routes):
+                raise ValueError('Unexpected route list')
+            return routes
+        except (ValueError, UnicodeError):
+            raise SafetyError('Docker Laravel route:list did not return JSON; unknown build refused') from None
     if args.deployment == 'docker':
         if not args.container_app or not args.container_user or args.container_user in ('0', 'root'):
             raise SafetyError('Docker route audit requires explicit non-root --container-user and --container-app')
@@ -707,6 +743,7 @@ def parser():
         item.add_argument('--container')
         item.add_argument('--container-app')
         item.add_argument('--container-user')
+        item.add_argument('--docker-auto', action='store_true', help='Audit the standard Compose image and use its pinned non-root local Docker bridge')
         item.add_argument('--enable-ws', action='store_true')
         item.add_argument('--ws-backend')
         item.add_argument('--http', action='store_true')
@@ -823,6 +860,11 @@ def execute(args):
         application = Path(args.app).resolve()
         if state == application or application in state.parents:
             raise SafetyError('PKI/state must be outside the entire Xboard application tree')
+        if getattr(args, 'docker_auto', False):
+            if args.deployment != 'docker':
+                raise SafetyError('--docker-auto requires the Docker deployment profile')
+            from docker_context import inspect_context, assert_state_isolated
+            assert_state_isolated(inspect_context(args.container, args.backend), state)
     state = initialize_state(state)
     # Root-only exclusive lock; lock content never includes secrets.
     import fcntl
@@ -875,9 +917,17 @@ def execute(args):
                 if args.action == 'modify' and not manager.installed:
                     raise SafetyError('No installed entry to modify')
                 plan = env.plan(args, state, manager.installed)
+                approved = getattr(args, '_approved_plan', None)
+                if approved is not None and (not isinstance(approved, dict) or
+                        {key: value for key, value in plan.items() if key != 'ownership'} !=
+                        {key: value for key, value in approved.items() if key != 'ownership'}):
+                    raise SafetyError('Reviewed entry plan changed before execution; review it again before confirming')
                 print(json.dumps({'reviewable_plan': plan}, ensure_ascii=False, indent=2))
                 confirmation('INSTALL ' + plan['host'] + ':' + str(plan['port']), args.confirm)
                 def apply():
+                    if plan.get('docker_context'):
+                        from panel_passphrase import rebind_docker_context
+                        rebind_docker_context(pki, plan, args.ca_key)
                     if plan['https']:
                         if not pki.meta:
                             if args.manual_ca_passphrase:

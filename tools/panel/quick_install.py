@@ -18,9 +18,10 @@ import tempfile
 import urllib.parse
 import urllib.request
 import zipfile
+sys.dont_write_bytecode = True
 
-TOOLS_URL = 'https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/download/root-installer-v1.0.8/node-endpoint-tools-1.0.5.zip'
-TOOLS_SHA256 = '7bb619440db545b6785e41d92707aa687ad43cb9529d4f8981f86dc4e1d3eb2f'
+TOOLS_URL = 'https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/download/root-installer-v1.0.9/node-endpoint-tools-1.0.6.zip'
+TOOLS_SHA256 = 'd1dd1258b68e34e7feca111a85c97bd0d435516093b49840633166fe066e566e'
 CACHE = Path('/opt/nodeendpoint-quick') / TOOLS_SHA256
 
 
@@ -80,7 +81,8 @@ def verified_members(data, expected=TOOLS_SHA256):
         require({'tools/panel/manager.py', 'tools/panel/nginx.py', 'tools/panel/pki.py',
                  'tools/panel/panel_ca.py', 'tools/panel/sync_panel_ca.php',
                  'tools/panel/firewall.py', 'tools/panel/panel_passphrase.py',
-                 'tools/panel/panel_passphrase.php'} <= set(result), '缺少管理器、防火墙、CA 导入或口令托管工具')
+                 'tools/panel/panel_passphrase.php', 'tools/panel/docker_context.py',
+                 'tools/panel/endpoint_settings.php'} <= set(result), '缺少管理器、防火墙、CA 导入或口令托管工具')
         return result
 
 
@@ -121,13 +123,25 @@ def install_cache(members, target=CACHE):
     return target
 
 
+def owned_config(manager):
+    state = Path('/var/lib/node-endpoint')
+    if not (state / 'installation.json').exists():
+        return None
+    manager.trusted_file(state / 'installation.json')
+    return manager.Manager(state, None).assert_owned()['config_path']
+
+
 def discover(environment, manager):
     """Use the same expanded Nginx AST and literal backends as the manager."""
     candidates = []
+    excluded = owned_config(manager)
     for filename, text in environment.files.items():
-        for site in manager.expanded(manager.parse(text, filename), environment.files, environment.prefix):
+        if filename == excluded:
+            continue
+        for site in manager.parse(text, filename):
             if site.words != ['server']:
                 continue
+            site.children = manager.expanded(site.children, environment.files, environment.prefix)
             roots = manager.values(site.children, 'root')
             if len(roots) != 1 or len(roots[0]) != 1 or '$' in roots[0][0]:
                 continue
@@ -165,6 +179,151 @@ def select(items, label):
         answer = input('编号：').strip()
         if answer.isdigit() and 1 <= int(answer) <= len(items):
             return items[int(answer) - 1]
+
+
+def discover_docker(environment, app_dir=None):
+    """Join verified local Compose contexts to actual host Nginx loopback sites."""
+    import manager
+    from docker_context import list_contexts
+    contexts = list_contexts(app_dir)
+    candidates = []
+    excluded = owned_config(manager)
+    directories = {str(PurePosixPath(pattern).parent) for pattern in environment.includes
+                   if not any(c in str(PurePosixPath(pattern).parent) for c in ('*', '?', '['))
+                   and fnmatch.fnmatchcase(str(PurePosixPath(pattern).parent / 'node-endpoint.conf'), pattern)}
+    upstreams = {node.words[1]: node.children for node in manager.walk(environment.nodes)
+                 if node.words[0] == 'upstream'}
+    for filename, text in environment.files.items():
+        if filename == excluded:
+            continue
+        for site in manager.parse(text, filename):
+            if site.words != ['server']:
+                continue
+            site.children = manager.expanded(site.children, environment.files, environment.prefix)
+            backends, websocket = set(), set()
+            for location in manager.walk(site.children):
+                if location.words[0] != 'location':
+                    continue
+                directives = list(manager.walk(location.children))
+                targets = set()
+                for node in directives:
+                    if node.words[0] != 'proxy_pass' or len(node.words) != 2:
+                        continue
+                    try:
+                        value = node.words[1]
+                        alias = value[7:] if value.startswith('http://') else value
+                        targets.add(manager.literal_loopback_backend(alias if alias in upstreams else value, upstreams)[0])
+                    except (ValueError, RuntimeError):
+                        continue
+                backends.update(targets)
+                if any(node.words[:2] == ['proxy_set_header', 'Upgrade'] for node in directives) and any(
+                        node.words[:2] == ['proxy_set_header', 'Connection'] for node in directives):
+                    websocket.update(targets)
+            if len(backends) != 1:
+                continue
+            backend = next(iter(backends))
+            matching = [ctx for ctx in contexts if backend == 'http://127.0.0.1:' + str(ctx['host_port'])]
+            if len(matching) != 1:
+                continue
+            names = [name for group in manager.values(site.children, 'server_name') for name in group
+                     if not any(c in name for c in ('*', '$', '~')) and name != '_']
+            if not names:
+                continue
+            # A single server block can have aliases; its first concrete name
+            # identifies the same reviewed block without another selection.
+            preferred = str(PurePosixPath(filename).parent)
+            candidates.append({'site_config': filename, 'site_name': names[0],
+                'source_file_sha256': manager.sha256(text), 'app': matching[0]['working_dir'],
+                'backend': backend, 'include_dir': preferred if preferred in directories else
+                (next(iter(directories)) if len(directories) == 1 else ''),
+                'ws_backend': backend if websocket == {backend} else '', 'docker_context': matching[0]})
+    return list({json.dumps(value, sort_keys=True): value for value in candidates}.values())
+
+
+def docker_setup(app_dir=None, nginx=None, host=None, port=8443, simple_confirm=True,
+                 skip_firewall=False, confirmed=False, expected_backend=None, expected_site=None,
+                 ca_key=None):
+    """Host-only Root workflow; Docker helpers always run as a non-root UID."""
+    import manager
+    from docker_context import run_helper
+    from panel_ca import payload_from_state
+    from pki import read_json
+    manager.linux_root()
+    environment = manager.Environment(nginx)
+    site = select(discover_docker(environment, app_dir), 'Docker 面板反代站点')
+    ctx = site['docker_context']
+    if confirmed:
+        require(isinstance(expected_site, dict) and expected_backend is not None,
+                '合并确认缺少先前审核的站点和后端，未继续安装')
+        require(site['backend'] == expected_backend and all(site.get(key) == expected_site.get(key)
+                for key in ('site_config', 'site_name', 'backend', 'source_file_sha256')),
+                '反代站点在确认后发生变化，请重新运行并核对计划')
+        require(host is not None and type(port) is int, '合并确认需要明确的通讯地址和端口')
+    state = Path('/var/lib/node-endpoint')
+    installed = None
+    before = None
+    if (state / 'installation.json').exists():
+        installed, before = payload_from_state(state)
+        require(installed.get('deployment') == 'docker' and installed.get('docker_context')
+                and installed.get('app') == site['app'], '已有 Root 入口属于其他面板或旧手动部署，拒绝自动接管')
+        metadata = read_json(manager.trusted_file(state / 'pki/state.json'))
+        require(metadata.get('active_ca') and not metadata.get('rotation'),
+                '存在未完成的 CA 轮换，请先完成维护；不会自动替换 CA')
+    response = run_helper(ctx, 'endpoint_settings', {'action': 'read'})
+    require(response.get('status') == 'read' and response.get('uid') == ctx['uid']
+            and isinstance(response.get('settings'), dict), '未取得可信面板通讯设置')
+    settings = response['settings']
+    current = installed['host'] if installed else settings.get('host')
+    if current:
+        try:
+            current = reject_example_host(current)
+        except ValueError:
+            current = None
+    selected_host = select_communication_host(current=current or None, explicit=host)
+    selected_port = installed['port'] if installed and port == 8443 else port
+    require(type(selected_port) is int and 1 <= selected_port <= 65535, '通讯端口无效')
+    include_dir = site['include_dir'] or ask('检测已列出的 HTTP include 目录')
+    argv = (['--nginx', nginx] if nginx else []) + [
+        'modify' if installed else 'install', '--host', selected_host, '--port', str(selected_port),
+        '--site-config', site['site_config'], '--site-name', site['site_name'], '--include-dir', include_dir,
+        '--app', site['app'], '--deployment', 'docker', '--backend', site['backend'], '--docker-auto',
+        '--container', ctx['container_id'], '--container-app', ctx['app'],
+        '--container-user', str(ctx['uid']) + ':' + str(ctx['gid'])]
+    if site['ws_backend']:
+        argv += ['--enable-ws', '--ws-backend', site['ws_backend']]
+    if ca_key:
+        argv += ['--ca-key', ca_key]
+    args = manager.parser().parse_args(argv)
+    preview = environment.plan(args, manager.safe_state(state), manager.Manager(state, environment).installed)
+    print(json.dumps({'reviewable_plan': preview}, ensure_ascii=False, indent=2))
+    print('将配置独立 HTTPS 入口、随机 CA 口令托管、通讯设置和公共 CA 同步。'
+          + ('本机防火墙保持现状。' if skip_firewall else '将放行此入口的本机 TCP 端口。'))
+    if not confirmed:
+        if simple_confirm:
+            require(input('确认执行以上计划？[y/N]：').strip().lower() in ('y', 'yes'), '已取消，未更改入口或面板设置')
+        else:
+            manager.confirmation('INSTALL ' + selected_host + ':' + str(selected_port))
+    args.confirm = 'INSTALL ' + selected_host + ':' + str(selected_port)
+    args._approved_plan = preview
+    manager.execute(args)
+    committed, after = payload_from_state(state)
+    require(all(committed.get(key) == preview.get(key) for key in ('host', 'port', 'docker_context')),
+            '提交后的入口已被其他操作修改，未写入面板设置')
+    if before:
+        require(after['pem'] == before['pem'] and after['fingerprints'] == before['fingerprints'],
+                '原 CA 信任发生变化，未自动保存面板设置')
+    try:
+        saved = run_helper(ctx, 'endpoint_settings', {'action': 'save', 'host': selected_host,
+                           'port': selected_port, 'ws_mode': 'rewrite' if site['ws_backend'] else 'rest',
+                           'expected': settings})
+    except (RuntimeError, ValueError, OSError):
+        raise ValueError('独立入口已安装，面板设置同步未完成；请核对 APP_KEY、插件和并发修改后重跑同一命令，沿用原 CA') from None
+    require(saved.get('status') in ('saved', 'unchanged') and saved.get('uid') == ctx['uid']
+            and saved.get('settings', {}).get('host') == selected_host
+            and saved.get('settings', {}).get('port') == selected_port
+            and saved.get('settings', {}).get('https') is True,
+            '入口已安装，面板设置未同步；请核对设置后重跑本命令，沿用原 CA')
+    finish_install(skip_firewall)
 
 
 def ask(label, default=''):
@@ -265,11 +424,15 @@ def panel_endpoint_command(plan, check=False):
                 '独立后端缺少 xboard:configure-endpoint，未修改入口')
 
 
-def repair_address(explicit=None, skip_firewall=False, nginx=None):
+def repair_address(explicit=None, skip_firewall=False, nginx=None, ca_key=None):
     """Explicitly renew the server SAN under the existing CA, then save the panel."""
     import manager
     from panel_ca import payload_from_state
     plan, payload = payload_from_state('/var/lib/node-endpoint')
+    if plan.get('deployment') == 'docker':
+        require(plan.get('docker_context'), '旧手动 Docker 入口需要单独审阅，未自动接管')
+        return docker_setup(plan['app'], nginx=nginx, host=explicit, port=plan['port'],
+                            skip_firewall=skip_firewall, ca_key=ca_key)
     from pki import read_json
     metadata = read_json(manager.trusted_file('/var/lib/node-endpoint/pki/state.json'))
     require(metadata.get('active_ca') and metadata.get('host') == plan['host'] and not metadata.get('rotation'),
@@ -299,11 +462,14 @@ def repair_address(explicit=None, skip_firewall=False, nginx=None):
     finish_install(skip_firewall)
 
 
-def refresh_entry(nginx=None):
+def refresh_entry(nginx=None, ca_key=None):
     """Re-audit an owned HTTPS entry without changing its address or CA trust."""
     import manager
     from panel_ca import payload_from_state
     plan, before = payload_from_state('/var/lib/node-endpoint')
+    if plan.get('deployment') == 'docker':
+        require(plan.get('docker_context'), '旧手动 Docker 入口需要单独审阅，未自动接管')
+        return docker_setup(plan['app'], nginx=nginx, host=plan['host'], port=plan['port'], ca_key=ca_key)
     required = ('host', 'source_site', 'site_name', 'include_dir', 'app', 'app_user', 'php', 'deployment', 'backend')
     require(all(isinstance(plan.get(key), str) and plan[key] for key in required),
             'Root 安装记录缺少完整站点参数，未猜测或重建入口')
@@ -428,6 +594,10 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--package-file', help='Offline ZIP; the same built-in SHA256 pin still applies')
     parser.add_argument('--nginx')
+    parser.add_argument('--docker', action='store_true', help='Configure the local Compose panel through host Root and non-root Docker helpers')
+    parser.add_argument('--app-dir', help='Select the Docker Compose project directory when multiple panels exist')
+    parser.add_argument('--port', type=int, default=8443, help='Docker endpoint TCP port (default: 8443)')
+    parser.add_argument('--ca-key', help='Explicit offline CA key for a reviewed Docker container rebind')
     actions = parser.add_mutually_exclusive_group()
     actions.add_argument('--detect-only', action='store_true', help='Prepare verified tool cache and inspect; do not install endpoint or change firewall')
     actions.add_argument('--sync-ca', action='store_true', help='Import public CA from existing Root state into this panel; do not reinstall endpoint')
@@ -447,7 +617,7 @@ def main():
     require(args.detect_only or args.sync_ca or args.configure_firewall or sys.stdin.isatty(), '安装需要 SSH 交互终端，不要将脚本通过管道执行')
     for name in ('openssl', 'ss', 'runuser'):
         require(shutil.which(name), '缺少依赖：' + name + '，请先通过本机包管理器安装')
-    print('校验固定 tools v1.0.5（随机 CA 口令加密托管 + 本机 TCP 端口放行 + CA 自动导入）；不更新 Xboard、Node 或系统软件。')
+    print('校验固定 tools v1.0.6（Docker 宿主机自动配置 + 随机 CA 口令托管 + TCP 端口放行 + CA 导入）；不更新 Xboard、Node 或系统软件。')
     data = Path(args.package_file).read_bytes() if args.package_file else download()
     directory = install_cache(verified_members(data))
     sys.dont_write_bytecode = True
@@ -469,16 +639,29 @@ def main():
     if not selected_nginx and Path('/www/server/nginx/sbin/nginx').is_file():
         selected_nginx = '/www/server/nginx/sbin/nginx'
     if args.refresh_entry:
-        return refresh_entry(selected_nginx)
+        return refresh_entry(selected_nginx, ca_key=args.ca_key) if args.ca_key else refresh_entry(selected_nginx)
     if args.repair_address:
-        return repair_address(args.host, args.skip_firewall, selected_nginx)
+        return repair_address(args.host, args.skip_firewall, selected_nginx, ca_key=args.ca_key) if args.ca_key else repair_address(args.host, args.skip_firewall, selected_nginx)
+    recorded = Path('/var/lib/node-endpoint/installation.json')
+    if not args.detect_only and not args.docker and recorded.exists():
+        from panel_ca import payload_from_state
+        installed, _ = payload_from_state(recorded.parent)
+        if installed.get('deployment') == 'docker':
+            return docker_setup(args.app_dir or installed['app'], nginx=selected_nginx, host=args.host,
+                                port=args.port, skip_firewall=args.skip_firewall, ca_key=args.ca_key)
     environment = manager.Environment(selected_nginx)
-    choices = discover(environment, manager)
+    choices = [] if args.docker else discover(environment, manager)
+    docker_choices = discover_docker(environment, args.app_dir) if args.docker or not choices else []
     if args.detect_only:
-        print(json.dumps({'verified_tools_sha256': TOOLS_SHA256, 'fpm_sites': choices, 'endpoint_installation_performed': False}, ensure_ascii=False, indent=2))
+        print(json.dumps({'verified_tools_sha256': TOOLS_SHA256, 'fpm_sites': choices,
+                          'docker_sites': docker_choices, 'endpoint_installation_performed': False}, ensure_ascii=False, indent=2))
         return
+    if docker_choices:
+        return docker_setup(args.app_dir, nginx=selected_nginx, host=args.host, port=args.port,
+                            skip_firewall=args.skip_firewall, ca_key=args.ca_key)
+    require(not args.docker, '未发现符合安全要求的 Docker 面板；请核对回环端口、持久化挂载和宝塔反代')
     if not choices:
-        print('未发现可自动填写的原生 PHP-FPM 站点。Docker/Octane 或特殊布局请在现有菜单核对真实路径和后端；不会按 FPM 猜测安装。')
+        print('未发现可自动填写的原生 PHP-FPM 或受支持 Docker 站点；特殊布局请在现有菜单核对真实路径和后端。')
         print('手工管理菜单不自动配置防火墙或导入 CA。完成入口安装后，分别使用 --configure-firewall 和 --sync-ca。')
         return manager.menu(manager.parser().parse_args((['--nginx', selected_nginx] if selected_nginx else []) + ['menu']))
     site = select(choices, 'Xboard 原站点')

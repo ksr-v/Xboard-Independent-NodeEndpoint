@@ -10,4 +10,4 @@ if ! python3 -I -c 'import sys; sys.exit(0 if sys.version_info >= (3, 10) else 1
   printf '%s\n' 'Python 3.10+ is required; the available interpreter is older.' >&2
   exit 1
 fi
-exec python3 -I "$tool_dir/manager.py" "$@"
+exec python3 -I -B "$tool_dir/manager.py" "$@"

@@ -10,6 +10,8 @@ import shutil
 import ssl
 import stat
 import subprocess
+import sys
+sys.dont_write_bytecode = True
 
 import manager
 from pki import PKI, SafetyError, read_json
@@ -24,7 +26,14 @@ def payload_from_state(state):
     installed = manager.Manager(state, None).assert_owned()
     manager.trusted_file(installed['config_path'])
     plan = installed['plan']
-    if not plan.get('https') or plan.get('deployment') not in ('fpm', 'octane'):
+    if plan.get('https') and plan.get('deployment') == 'docker' and plan.get('docker_context'):
+        from docker_context import validate_context
+        context = validate_context(plan['docker_context'])
+        if (plan.get('container') != context['container_id']
+                or plan.get('backend') != 'http://127.0.0.1:' + str(context['host_port'])
+                or Path(plan.get('app', '')).resolve() != Path(context['working_dir']).resolve()):
+            raise SafetyError('Docker Root plan differs from its recorded execution context')
+    elif not plan.get('https') or plan.get('deployment') not in ('fpm', 'octane'):
         raise SafetyError('自动导入 CA 仅支持同机 HTTPS 的 FPM/Octane 面板')
     manager.trusted_file(state / 'pki/state.json')
     pki = PKI(state)
@@ -53,10 +62,22 @@ def payload_from_state(state):
                   'endpoint': {key: plan[key] for key in ('host', 'port', 'https')}}
 
 
+def _sync_docker_ca(plan, payload):
+    from docker_context import validate_context, run_helper
+    context = validate_context(plan['docker_context'])
+    response = run_helper(context, 'sync_panel_ca', payload)
+    if (not isinstance(response, dict) or set(response) != {'status', 'fingerprints', 'certificates', 'uid'}
+            or response.get('status') not in ('imported', 'unchanged')
+            or response.get('fingerprints') != payload['fingerprints']
+            or type(response.get('certificates')) is not int or response['certificates'] != len(payload['fingerprints'])
+            or type(response.get('uid')) is not int or response['uid'] != context['uid']):
+        raise SafetyError('Docker public CA import response differs from Root trust or application identity')
+    return {key: response[key] for key in ('status', 'fingerprints', 'certificates')}
+
+
 def sync_panel_ca(state='/var/lib/node-endpoint'):
     manager.linux_root()
     import fcntl
-    import pwd
     state = manager.safe_state(state)
     lock = manager.trusted_file(state / 'manager.lock')
     descriptor = os.open(lock, os.O_RDWR | os.O_NOFOLLOW)
@@ -69,6 +90,9 @@ def sync_panel_ca(state='/var/lib/node-endpoint'):
         except BlockingIOError as error:
             raise SafetyError('Another Root manager operation is in progress') from error
         plan, payload = payload_from_state(state)
+        if plan.get('deployment') == 'docker':
+            return _sync_docker_ca(plan, payload)
+        import pwd
         try:
             owner = pwd.getpwnam(plan.get('app_user') or '')
         except KeyError as error:
