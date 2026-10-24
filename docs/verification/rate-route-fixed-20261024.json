@@ -1,0 +1,2365 @@
+{
+  "test_date": "2026-10-24",
+  "candidate_revision": 2,
+  "binary_sha256": "f597fd8ef29ff046f4313e846879006d43f4f167331e52654d1bce9192a8cf48",
+  "sources": {
+    "standalone-singbox.json": [
+      {
+        "kernel": "singbox",
+        "test": "unlimited-download",
+        "observed": 2089.581,
+        "expected": ">32 Mbps",
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "unlimited-upload",
+        "observed": 3114.564,
+        "expected": ">32 Mbps",
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "8Mbps-download",
+        "observed": 8.006,
+        "expected": "6.4..9.6 Mbps",
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "8Mbps-upload",
+        "observed": 8.002,
+        "expected": "6.4..9.6 Mbps",
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "same-user-two-connections",
+        "observed": 8.002,
+        "expected": "6.4..9.6 Mbps total",
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "different-users-two-connections",
+        "observed": 16.001,
+        "expected": "12.8..19.2 Mbps total",
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "1Mbps-large-transfer-download",
+        "observed": 1.0,
+        "expected": "0.8..1.2 Mbps; complete",
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "1Mbps-large-transfer-upload",
+        "observed": 1.0,
+        "expected": "0.8..1.2 Mbps; complete",
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "custom-outbound-port-1",
+        "observed": "OUTBOUND",
+        "expected": "OUTBOUND",
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "custom-outbound-port-2",
+        "observed": "OTHER",
+        "expected": "OTHER",
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "block-port-1",
+        "observed": "BLOCKED",
+        "expected": "BLOCKED",
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "block-port-2",
+        "observed": "OTHER",
+        "expected": "OTHER",
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "exact-domain-1",
+        "observed": "OUTBOUND",
+        "expected": "OUTBOUND",
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "exact-domain-2",
+        "observed": "CLOSED",
+        "expected": "BLOCKED",
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "suffix-domain-1",
+        "observed": "OUTBOUND",
+        "expected": "OUTBOUND",
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "suffix-domain-2",
+        "observed": "OUTBOUND",
+        "expected": "OUTBOUND",
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "combined-port-network-OR-observation-1",
+        "observed": "OUTBOUND",
+        "expected": "OUTBOUND",
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "combined-port-network-OR-observation-2",
+        "observed": "OUTBOUND",
+        "expected": "OUTBOUND",
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "first-match-1",
+        "observed": "BLOCKED",
+        "expected": "BLOCKED",
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "controlled-outbound-actually-used",
+        "observed": 6,
+        "expected": ">0 CONNECT requests",
+        "pass": true
+      }
+    ],
+    "standalone-xray.json": [
+      {
+        "kernel": "xray",
+        "test": "unlimited-download",
+        "observed": 10217.666,
+        "expected": ">32 Mbps",
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "unlimited-upload",
+        "observed": 3833.731,
+        "expected": ">32 Mbps",
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "8Mbps-download",
+        "observed": 7.998,
+        "expected": "6.4..9.6 Mbps",
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "8Mbps-upload",
+        "observed": 8.0,
+        "expected": "6.4..9.6 Mbps",
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "same-user-two-connections",
+        "observed": 8.0,
+        "expected": "6.4..9.6 Mbps total",
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "different-users-two-connections",
+        "observed": 16.001,
+        "expected": "12.8..19.2 Mbps total",
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "1Mbps-large-transfer-download",
+        "observed": 1.0,
+        "expected": "0.8..1.2 Mbps; complete",
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "1Mbps-large-transfer-upload",
+        "observed": 1.0,
+        "expected": "0.8..1.2 Mbps; complete",
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "custom-outbound-port-1",
+        "observed": "OUTBOUND",
+        "expected": "OUTBOUND",
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "custom-outbound-port-2",
+        "observed": "OTHER",
+        "expected": "OTHER",
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "block-port-1",
+        "observed": "CLOSED",
+        "expected": "BLOCKED",
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "block-port-2",
+        "observed": "OTHER",
+        "expected": "OTHER",
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "exact-domain-1",
+        "observed": "OUTBOUND",
+        "expected": "OUTBOUND",
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "exact-domain-2",
+        "observed": "CLOSED",
+        "expected": "BLOCKED",
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "suffix-domain-1",
+        "observed": "OUTBOUND",
+        "expected": "OUTBOUND",
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "suffix-domain-2",
+        "observed": "OUTBOUND",
+        "expected": "OUTBOUND",
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "combined-port-network-OR-observation-1",
+        "observed": "OUTBOUND",
+        "expected": "OUTBOUND",
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "combined-port-network-OR-observation-2",
+        "observed": "OUTBOUND",
+        "expected": "OUTBOUND",
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "first-match-1",
+        "observed": "CLOSED",
+        "expected": "BLOCKED",
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "controlled-outbound-actually-used",
+        "observed": 6,
+        "expected": ">0 CONNECT requests",
+        "pass": true
+      }
+    ],
+    "managed-report.json": [
+      {
+        "kernel": "singbox",
+        "test": "panel-unlimited-download",
+        "observed": 4372.973,
+        "expected": ">64 Mbps",
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "enable-limit-existing-download",
+        "observed": {
+          "samples": [
+            {
+              "mbps": 2608.901,
+              "elapsed_ms": 3.2
+            },
+            {
+              "mbps": 179.6,
+              "elapsed_ms": 50.0
+            },
+            {
+              "mbps": 15.983,
+              "elapsed_ms": 574.8
+            },
+            {
+              "mbps": 15.991,
+              "elapsed_ms": 1099.4
+            }
+          ],
+          "first_observed_ms": 574.8,
+          "save_call_ms": 339.7,
+          "same_tcp_stream": true,
+          "transfer_error": null
+        },
+        "expected": "same TCP stream; two 12.8..19.2 Mbps samples; first <=5000 ms",
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "panel-limit-payload-download",
+        "observed": 16,
+        "expected": 16,
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "change-positive-existing-download",
+        "observed": {
+          "samples": [
+            {
+              "mbps": 2635.304,
+              "elapsed_ms": 3.2
+            },
+            {
+              "mbps": 15.747,
+              "elapsed_ms": 535.9
+            },
+            {
+              "mbps": 11.995,
+              "elapsed_ms": 1235.3
+            },
+            {
+              "mbps": 11.999,
+              "elapsed_ms": 1934.4
+            }
+          ],
+          "first_observed_ms": 1235.3,
+          "save_call_ms": 335.9,
+          "same_tcp_stream": true,
+          "transfer_error": null
+        },
+        "expected": "same TCP stream; two 9.600000000000001..14.399999999999999 Mbps samples; first <=5000 ms",
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "disable-limit-existing-download",
+        "observed": {
+          "samples": [
+            {
+              "mbps": 3899.494,
+              "elapsed_ms": 8.6
+            },
+            {
+              "mbps": 6193.982,
+              "elapsed_ms": 14.0
+            }
+          ],
+          "first_observed_ms": 8.6,
+          "save_call_ms": 317.1,
+          "same_tcp_stream": true,
+          "transfer_error": null
+        },
+        "expected": "same TCP stream; two >64 Mbps samples; first <=5000 ms",
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "panel-unlimited-upload",
+        "observed": 3024.715,
+        "expected": ">64 Mbps",
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "enable-limit-existing-upload",
+        "observed": {
+          "samples": [
+            {
+              "mbps": 2719.803,
+              "elapsed_ms": 3.1
+            },
+            {
+              "mbps": 179.596,
+              "elapsed_ms": 49.8
+            },
+            {
+              "mbps": 15.979,
+              "elapsed_ms": 574.8
+            },
+            {
+              "mbps": 16.026,
+              "elapsed_ms": 1098.3
+            }
+          ],
+          "first_observed_ms": 574.8,
+          "save_call_ms": 336.7,
+          "same_tcp_stream": true,
+          "transfer_error": null
+        },
+        "expected": "same TCP stream; two 12.8..19.2 Mbps samples; first <=5000 ms",
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "panel-limit-payload-upload",
+        "observed": 16,
+        "expected": 16,
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "change-positive-existing-upload",
+        "observed": {
+          "samples": [
+            {
+              "mbps": 3177.289,
+              "elapsed_ms": 2.8
+            },
+            {
+              "mbps": 15.574,
+              "elapsed_ms": 541.4
+            },
+            {
+              "mbps": 12.003,
+              "elapsed_ms": 1240.4
+            },
+            {
+              "mbps": 11.979,
+              "elapsed_ms": 1940.7
+            }
+          ],
+          "first_observed_ms": 1240.4,
+          "save_call_ms": 323.2,
+          "same_tcp_stream": true,
+          "transfer_error": null
+        },
+        "expected": "same TCP stream; two 9.600000000000001..14.399999999999999 Mbps samples; first <=5000 ms",
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "disable-limit-existing-upload",
+        "observed": {
+          "samples": [
+            {
+              "mbps": 5489.044,
+              "elapsed_ms": 6.1
+            },
+            {
+              "mbps": 4966.507,
+              "elapsed_ms": 12.9
+            }
+          ],
+          "first_observed_ms": 6.1,
+          "save_call_ms": 324.3,
+          "same_tcp_stream": true,
+          "transfer_error": null
+        },
+        "expected": "same TCP stream; two >64 Mbps samples; first <=5000 ms",
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "unlimited-before-routing",
+        "observed": {
+          "samples": [
+            {
+              "mbps": 5317.166,
+              "elapsed_ms": 6.3
+            },
+            {
+              "mbps": 743.11,
+              "elapsed_ms": 51.5
+            }
+          ],
+          "first_observed_ms": 6.3,
+          "save_call_ms": 315.8,
+          "same_tcp_stream": true,
+          "transfer_error": null
+        },
+        "expected": "same TCP stream; two >64 Mbps samples; first <=5000 ms",
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "panel-route-baseline",
+        "observed": "DIRECT",
+        "expected": "DIRECT",
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "panel-native-block-existing-flow-closed",
+        "observed": {
+          "closed": true,
+          "elapsed_ms": 0.0
+        },
+        "expected": "existing TCP closed <=1000 ms",
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "panel-native-block-new-policy",
+        "observed": {
+          "markers": [
+            "BLOCKED",
+            "OTHER"
+          ],
+          "elapsed_ms": 3.4,
+          "attempts": 1
+        },
+        "expected": {
+          "markers": [
+            "BLOCKED",
+            "OTHER"
+          ],
+          "within_ms": 5000
+        },
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "panel-native-new-outbound-existing-flow-closed",
+        "observed": {
+          "closed": true,
+          "elapsed_ms": 0.0
+        },
+        "expected": "existing TCP closed <=1000 ms",
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "panel-native-new-outbound-new-policy",
+        "observed": {
+          "markers": [
+            "OUTBOUND",
+            "OTHER"
+          ],
+          "elapsed_ms": 3.6,
+          "attempts": 1
+        },
+        "expected": {
+          "markers": [
+            "OUTBOUND",
+            "OTHER"
+          ],
+          "within_ms": 5000
+        },
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "panel-route-outbound-payload",
+        "observed": [
+          1,
+          1
+        ],
+        "expected": [
+          1,
+          1
+        ],
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "panel-native-route-removal-existing-flow-closed",
+        "observed": {
+          "closed": true,
+          "elapsed_ms": 0.2
+        },
+        "expected": "existing TCP closed <=1000 ms",
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "panel-native-route-removal-new-policy",
+        "observed": {
+          "markers": [
+            "DIRECT",
+            "OTHER"
+          ],
+          "elapsed_ms": 4.1,
+          "attempts": 1
+        },
+        "expected": {
+          "markers": [
+            "DIRECT",
+            "OTHER"
+          ],
+          "within_ms": 5000
+        },
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "panel-controlled-outbound-actually-used",
+        "observed": 1,
+        "expected": ">0 CONNECT requests",
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "panel-unlimited-download",
+        "observed": 5324.175,
+        "expected": ">64 Mbps",
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "enable-limit-existing-download",
+        "observed": {
+          "samples": [
+            {
+              "mbps": 4906.655,
+              "elapsed_ms": 1.7
+            },
+            {
+              "mbps": 174.275,
+              "elapsed_ms": 49.9
+            },
+            {
+              "mbps": 16.003,
+              "elapsed_ms": 574.1
+            },
+            {
+              "mbps": 16.011,
+              "elapsed_ms": 1098.0
+            }
+          ],
+          "first_observed_ms": 574.1,
+          "save_call_ms": 318.1,
+          "same_tcp_stream": true,
+          "transfer_error": null
+        },
+        "expected": "same TCP stream; two 12.8..19.2 Mbps samples; first <=5000 ms",
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "panel-limit-payload-download",
+        "observed": 16,
+        "expected": 16,
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "change-positive-existing-download",
+        "observed": {
+          "samples": [
+            {
+              "mbps": 4200.843,
+              "elapsed_ms": 2.0
+            },
+            {
+              "mbps": 21.08,
+              "elapsed_ms": 400.0
+            },
+            {
+              "mbps": 11.997,
+              "elapsed_ms": 1099.2
+            },
+            {
+              "mbps": 12.0,
+              "elapsed_ms": 1798.3
+            }
+          ],
+          "first_observed_ms": 1099.2,
+          "save_call_ms": 474.8,
+          "same_tcp_stream": true,
+          "transfer_error": null
+        },
+        "expected": "same TCP stream; two 9.600000000000001..14.399999999999999 Mbps samples; first <=5000 ms",
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "disable-limit-existing-download",
+        "observed": {
+          "samples": [
+            {
+              "mbps": 8127.874,
+              "elapsed_ms": 4.1
+            },
+            {
+              "mbps": 12594.94,
+              "elapsed_ms": 6.8
+            }
+          ],
+          "first_observed_ms": 4.1,
+          "save_call_ms": 317.1,
+          "same_tcp_stream": true,
+          "transfer_error": null
+        },
+        "expected": "same TCP stream; two >64 Mbps samples; first <=5000 ms",
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "panel-unlimited-upload",
+        "observed": 3717.377,
+        "expected": ">64 Mbps",
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "enable-limit-existing-upload",
+        "observed": {
+          "samples": [
+            {
+              "mbps": 3114.402,
+              "elapsed_ms": 2.7
+            },
+            {
+              "mbps": 178.879,
+              "elapsed_ms": 49.6
+            },
+            {
+              "mbps": 15.998,
+              "elapsed_ms": 574.0
+            },
+            {
+              "mbps": 15.986,
+              "elapsed_ms": 1098.8
+            }
+          ],
+          "first_observed_ms": 574.0,
+          "save_call_ms": 313.3,
+          "same_tcp_stream": true,
+          "transfer_error": null
+        },
+        "expected": "same TCP stream; two 12.8..19.2 Mbps samples; first <=5000 ms",
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "panel-limit-payload-upload",
+        "observed": 16,
+        "expected": 16,
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "change-positive-existing-upload",
+        "observed": {
+          "samples": [
+            {
+              "mbps": 2009.882,
+              "elapsed_ms": 4.2
+            },
+            {
+              "mbps": 14.89,
+              "elapsed_ms": 567.6
+            },
+            {
+              "mbps": 11.991,
+              "elapsed_ms": 1267.1
+            },
+            {
+              "mbps": 12.005,
+              "elapsed_ms": 1965.9
+            }
+          ],
+          "first_observed_ms": 1267.1,
+          "save_call_ms": 316.0,
+          "same_tcp_stream": true,
+          "transfer_error": null
+        },
+        "expected": "same TCP stream; two 9.600000000000001..14.399999999999999 Mbps samples; first <=5000 ms",
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "disable-limit-existing-upload",
+        "observed": {
+          "samples": [
+            {
+              "mbps": 3891.431,
+              "elapsed_ms": 8.6
+            },
+            {
+              "mbps": 5497.947,
+              "elapsed_ms": 14.7
+            }
+          ],
+          "first_observed_ms": 8.6,
+          "save_call_ms": 315.9,
+          "same_tcp_stream": true,
+          "transfer_error": null
+        },
+        "expected": "same TCP stream; two >64 Mbps samples; first <=5000 ms",
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "unlimited-before-routing",
+        "observed": {
+          "samples": [
+            {
+              "mbps": 9230.811,
+              "elapsed_ms": 3.6
+            },
+            {
+              "mbps": 7917.563,
+              "elapsed_ms": 7.9
+            }
+          ],
+          "first_observed_ms": 3.6,
+          "save_call_ms": 301.0,
+          "same_tcp_stream": true,
+          "transfer_error": null
+        },
+        "expected": "same TCP stream; two >64 Mbps samples; first <=5000 ms",
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "panel-route-baseline",
+        "observed": "DIRECT",
+        "expected": "DIRECT",
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "panel-native-block-existing-flow-closed",
+        "observed": {
+          "closed": true,
+          "elapsed_ms": 0.0
+        },
+        "expected": "existing TCP closed <=1000 ms",
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "panel-native-block-new-policy",
+        "observed": {
+          "markers": [
+            "CLOSED",
+            "BLOCKED"
+          ],
+          "elapsed_ms": 5124.3,
+          "attempts": 26
+        },
+        "expected": {
+          "markers": [
+            "BLOCKED",
+            "OTHER"
+          ],
+          "within_ms": 5000
+        },
+        "pass": false
+      },
+      {
+        "kernel": "xray",
+        "test": "panel-native-new-outbound-existing-flow-closed",
+        "observed": {
+          "closed": true,
+          "elapsed_ms": 0.0
+        },
+        "expected": "existing TCP closed <=1000 ms",
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "panel-native-new-outbound-new-policy",
+        "observed": {
+          "markers": [
+            "BLOCKED",
+            "BLOCKED"
+          ],
+          "elapsed_ms": 5263.1,
+          "attempts": 16
+        },
+        "expected": {
+          "markers": [
+            "OUTBOUND",
+            "OTHER"
+          ],
+          "within_ms": 5000
+        },
+        "pass": false
+      },
+      {
+        "kernel": "xray",
+        "test": "panel-route-outbound-payload",
+        "observed": [
+          1,
+          1
+        ],
+        "expected": [
+          1,
+          1
+        ],
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "panel-native-route-removal-existing-flow-closed",
+        "observed": {
+          "closed": true,
+          "elapsed_ms": 0.0
+        },
+        "expected": "existing TCP closed <=1000 ms",
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "panel-native-route-removal-new-policy",
+        "observed": {
+          "markers": [
+            "BLOCKED",
+            "BLOCKED"
+          ],
+          "elapsed_ms": 5258.2,
+          "attempts": 16
+        },
+        "expected": {
+          "markers": [
+            "DIRECT",
+            "OTHER"
+          ],
+          "within_ms": 5000
+        },
+        "pass": false
+      },
+      {
+        "kernel": "xray",
+        "test": "panel-controlled-outbound-actually-used",
+        "observed": 12,
+        "expected": ">0 CONNECT requests",
+        "pass": true
+      }
+    ],
+    "managed-routes-report.json": [
+      {
+        "kernel": "singbox",
+        "test": "unlimited-before-routing",
+        "observed": {
+          "samples": [
+            {
+              "mbps": 4194.471,
+              "elapsed_ms": 8.0
+            },
+            {
+              "mbps": 7732.165,
+              "elapsed_ms": 12.4
+            }
+          ],
+          "first_observed_ms": 8.0,
+          "save_call_ms": 325.3,
+          "same_tcp_stream": true,
+          "transfer_error": null
+        },
+        "expected": "same TCP stream; two >64 Mbps samples; first <=5000 ms",
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "panel-route-baseline",
+        "observed": "DIRECT",
+        "expected": "DIRECT",
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "panel-native-block-existing-flow-closed",
+        "observed": {
+          "closed": true,
+          "elapsed_ms": 0.0
+        },
+        "expected": "existing TCP closed <=1000 ms",
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "panel-native-block-new-policy",
+        "observed": {
+          "markers": [
+            "BLOCKED",
+            "OTHER"
+          ],
+          "elapsed_ms": 2.2,
+          "attempts": 1
+        },
+        "expected": {
+          "markers": [
+            "BLOCKED",
+            "OTHER"
+          ],
+          "within_ms": 5000
+        },
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "panel-native-new-outbound-existing-flow-closed",
+        "observed": {
+          "closed": true,
+          "elapsed_ms": 0.2
+        },
+        "expected": "existing TCP closed <=1000 ms",
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "panel-native-new-outbound-new-policy",
+        "observed": {
+          "markers": [
+            "OUTBOUND",
+            "OTHER"
+          ],
+          "elapsed_ms": 3.6,
+          "attempts": 1
+        },
+        "expected": {
+          "markers": [
+            "OUTBOUND",
+            "OTHER"
+          ],
+          "within_ms": 5000
+        },
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "panel-route-outbound-payload",
+        "observed": [
+          1,
+          1
+        ],
+        "expected": [
+          1,
+          1
+        ],
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "panel-native-route-removal-existing-flow-closed",
+        "observed": {
+          "closed": true,
+          "elapsed_ms": 0.0
+        },
+        "expected": "existing TCP closed <=1000 ms",
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "panel-native-route-removal-new-policy",
+        "observed": {
+          "markers": [
+            "DIRECT",
+            "OTHER"
+          ],
+          "elapsed_ms": 2.9,
+          "attempts": 1
+        },
+        "expected": {
+          "markers": [
+            "DIRECT",
+            "OTHER"
+          ],
+          "within_ms": 5000
+        },
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "panel-controlled-outbound-actually-used",
+        "observed": 1,
+        "expected": ">0 CONNECT requests",
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "unlimited-before-routing",
+        "observed": {
+          "samples": [
+            {
+              "mbps": 4720.934,
+              "elapsed_ms": 7.1
+            },
+            {
+              "mbps": 7678.942,
+              "elapsed_ms": 11.5
+            }
+          ],
+          "first_observed_ms": 7.1,
+          "save_call_ms": 327.2,
+          "same_tcp_stream": true,
+          "transfer_error": null
+        },
+        "expected": "same TCP stream; two >64 Mbps samples; first <=5000 ms",
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "panel-route-baseline",
+        "observed": "DIRECT",
+        "expected": "DIRECT",
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "panel-native-block-existing-flow-closed",
+        "observed": {
+          "closed": true,
+          "elapsed_ms": 0.0
+        },
+        "expected": "existing TCP closed <=1000 ms",
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "panel-native-block-new-policy",
+        "observed": {
+          "markers": [
+            "CLOSED",
+            "OTHER"
+          ],
+          "elapsed_ms": 105.4,
+          "attempts": 5
+        },
+        "expected": {
+          "markers": [
+            "BLOCKED",
+            "OTHER"
+          ],
+          "within_ms": 5000
+        },
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "panel-native-new-outbound-existing-flow-closed",
+        "observed": {
+          "closed": true,
+          "elapsed_ms": 0.0
+        },
+        "expected": "existing TCP closed <=1000 ms",
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "panel-native-new-outbound-new-policy",
+        "observed": {
+          "markers": [
+            "OUTBOUND",
+            "OTHER"
+          ],
+          "elapsed_ms": 3.7,
+          "attempts": 1
+        },
+        "expected": {
+          "markers": [
+            "OUTBOUND",
+            "OTHER"
+          ],
+          "within_ms": 5000
+        },
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "panel-route-outbound-payload",
+        "observed": [
+          1,
+          1
+        ],
+        "expected": [
+          1,
+          1
+        ],
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "panel-native-route-removal-existing-flow-closed",
+        "observed": {
+          "closed": true,
+          "elapsed_ms": 0.0
+        },
+        "expected": "existing TCP closed <=1000 ms",
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "panel-native-route-removal-new-policy",
+        "observed": {
+          "markers": [
+            "DIRECT",
+            "OTHER"
+          ],
+          "elapsed_ms": 105.4,
+          "attempts": 5
+        },
+        "expected": {
+          "markers": [
+            "DIRECT",
+            "OTHER"
+          ],
+          "within_ms": 5000
+        },
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "panel-controlled-outbound-actually-used",
+        "observed": 1,
+        "expected": ">0 CONNECT requests",
+        "pass": true
+      }
+    ]
+  },
+  "effective_checks": [
+    {
+      "kernel": "singbox",
+      "test": "unlimited-download",
+      "observed": 2089.581,
+      "expected": ">32 Mbps",
+      "pass": true
+    },
+    {
+      "kernel": "singbox",
+      "test": "unlimited-upload",
+      "observed": 3114.564,
+      "expected": ">32 Mbps",
+      "pass": true
+    },
+    {
+      "kernel": "singbox",
+      "test": "8Mbps-download",
+      "observed": 8.006,
+      "expected": "6.4..9.6 Mbps",
+      "pass": true
+    },
+    {
+      "kernel": "singbox",
+      "test": "8Mbps-upload",
+      "observed": 8.002,
+      "expected": "6.4..9.6 Mbps",
+      "pass": true
+    },
+    {
+      "kernel": "singbox",
+      "test": "same-user-two-connections",
+      "observed": 8.002,
+      "expected": "6.4..9.6 Mbps total",
+      "pass": true
+    },
+    {
+      "kernel": "singbox",
+      "test": "different-users-two-connections",
+      "observed": 16.001,
+      "expected": "12.8..19.2 Mbps total",
+      "pass": true
+    },
+    {
+      "kernel": "singbox",
+      "test": "1Mbps-large-transfer-download",
+      "observed": 1.0,
+      "expected": "0.8..1.2 Mbps; complete",
+      "pass": true
+    },
+    {
+      "kernel": "singbox",
+      "test": "1Mbps-large-transfer-upload",
+      "observed": 1.0,
+      "expected": "0.8..1.2 Mbps; complete",
+      "pass": true
+    },
+    {
+      "kernel": "singbox",
+      "test": "custom-outbound-port-1",
+      "observed": "OUTBOUND",
+      "expected": "OUTBOUND",
+      "pass": true
+    },
+    {
+      "kernel": "singbox",
+      "test": "custom-outbound-port-2",
+      "observed": "OTHER",
+      "expected": "OTHER",
+      "pass": true
+    },
+    {
+      "kernel": "singbox",
+      "test": "block-port-1",
+      "observed": "BLOCKED",
+      "expected": "BLOCKED",
+      "pass": true
+    },
+    {
+      "kernel": "singbox",
+      "test": "block-port-2",
+      "observed": "OTHER",
+      "expected": "OTHER",
+      "pass": true
+    },
+    {
+      "kernel": "singbox",
+      "test": "exact-domain-1",
+      "observed": "OUTBOUND",
+      "expected": "OUTBOUND",
+      "pass": true
+    },
+    {
+      "kernel": "singbox",
+      "test": "exact-domain-2",
+      "observed": "CLOSED",
+      "expected": "BLOCKED",
+      "pass": true
+    },
+    {
+      "kernel": "singbox",
+      "test": "suffix-domain-1",
+      "observed": "OUTBOUND",
+      "expected": "OUTBOUND",
+      "pass": true
+    },
+    {
+      "kernel": "singbox",
+      "test": "suffix-domain-2",
+      "observed": "OUTBOUND",
+      "expected": "OUTBOUND",
+      "pass": true
+    },
+    {
+      "kernel": "singbox",
+      "test": "combined-port-network-OR-observation-1",
+      "observed": "OUTBOUND",
+      "expected": "OUTBOUND",
+      "pass": true
+    },
+    {
+      "kernel": "singbox",
+      "test": "combined-port-network-OR-observation-2",
+      "observed": "OUTBOUND",
+      "expected": "OUTBOUND",
+      "pass": true
+    },
+    {
+      "kernel": "singbox",
+      "test": "first-match-1",
+      "observed": "BLOCKED",
+      "expected": "BLOCKED",
+      "pass": true
+    },
+    {
+      "kernel": "singbox",
+      "test": "controlled-outbound-actually-used",
+      "observed": 6,
+      "expected": ">0 CONNECT requests",
+      "pass": true
+    },
+    {
+      "kernel": "xray",
+      "test": "unlimited-download",
+      "observed": 10217.666,
+      "expected": ">32 Mbps",
+      "pass": true
+    },
+    {
+      "kernel": "xray",
+      "test": "unlimited-upload",
+      "observed": 3833.731,
+      "expected": ">32 Mbps",
+      "pass": true
+    },
+    {
+      "kernel": "xray",
+      "test": "8Mbps-download",
+      "observed": 7.998,
+      "expected": "6.4..9.6 Mbps",
+      "pass": true
+    },
+    {
+      "kernel": "xray",
+      "test": "8Mbps-upload",
+      "observed": 8.0,
+      "expected": "6.4..9.6 Mbps",
+      "pass": true
+    },
+    {
+      "kernel": "xray",
+      "test": "same-user-two-connections",
+      "observed": 8.0,
+      "expected": "6.4..9.6 Mbps total",
+      "pass": true
+    },
+    {
+      "kernel": "xray",
+      "test": "different-users-two-connections",
+      "observed": 16.001,
+      "expected": "12.8..19.2 Mbps total",
+      "pass": true
+    },
+    {
+      "kernel": "xray",
+      "test": "1Mbps-large-transfer-download",
+      "observed": 1.0,
+      "expected": "0.8..1.2 Mbps; complete",
+      "pass": true
+    },
+    {
+      "kernel": "xray",
+      "test": "1Mbps-large-transfer-upload",
+      "observed": 1.0,
+      "expected": "0.8..1.2 Mbps; complete",
+      "pass": true
+    },
+    {
+      "kernel": "xray",
+      "test": "custom-outbound-port-1",
+      "observed": "OUTBOUND",
+      "expected": "OUTBOUND",
+      "pass": true
+    },
+    {
+      "kernel": "xray",
+      "test": "custom-outbound-port-2",
+      "observed": "OTHER",
+      "expected": "OTHER",
+      "pass": true
+    },
+    {
+      "kernel": "xray",
+      "test": "block-port-1",
+      "observed": "CLOSED",
+      "expected": "BLOCKED",
+      "pass": true
+    },
+    {
+      "kernel": "xray",
+      "test": "block-port-2",
+      "observed": "OTHER",
+      "expected": "OTHER",
+      "pass": true
+    },
+    {
+      "kernel": "xray",
+      "test": "exact-domain-1",
+      "observed": "OUTBOUND",
+      "expected": "OUTBOUND",
+      "pass": true
+    },
+    {
+      "kernel": "xray",
+      "test": "exact-domain-2",
+      "observed": "CLOSED",
+      "expected": "BLOCKED",
+      "pass": true
+    },
+    {
+      "kernel": "xray",
+      "test": "suffix-domain-1",
+      "observed": "OUTBOUND",
+      "expected": "OUTBOUND",
+      "pass": true
+    },
+    {
+      "kernel": "xray",
+      "test": "suffix-domain-2",
+      "observed": "OUTBOUND",
+      "expected": "OUTBOUND",
+      "pass": true
+    },
+    {
+      "kernel": "xray",
+      "test": "combined-port-network-OR-observation-1",
+      "observed": "OUTBOUND",
+      "expected": "OUTBOUND",
+      "pass": true
+    },
+    {
+      "kernel": "xray",
+      "test": "combined-port-network-OR-observation-2",
+      "observed": "OUTBOUND",
+      "expected": "OUTBOUND",
+      "pass": true
+    },
+    {
+      "kernel": "xray",
+      "test": "first-match-1",
+      "observed": "CLOSED",
+      "expected": "BLOCKED",
+      "pass": true
+    },
+    {
+      "kernel": "xray",
+      "test": "controlled-outbound-actually-used",
+      "observed": 6,
+      "expected": ">0 CONNECT requests",
+      "pass": true
+    },
+    {
+      "kernel": "singbox",
+      "test": "panel-unlimited-download",
+      "observed": 4372.973,
+      "expected": ">64 Mbps",
+      "pass": true
+    },
+    {
+      "kernel": "singbox",
+      "test": "enable-limit-existing-download",
+      "observed": {
+        "samples": [
+          {
+            "mbps": 2608.901,
+            "elapsed_ms": 3.2
+          },
+          {
+            "mbps": 179.6,
+            "elapsed_ms": 50.0
+          },
+          {
+            "mbps": 15.983,
+            "elapsed_ms": 574.8
+          },
+          {
+            "mbps": 15.991,
+            "elapsed_ms": 1099.4
+          }
+        ],
+        "first_observed_ms": 574.8,
+        "save_call_ms": 339.7,
+        "same_tcp_stream": true,
+        "transfer_error": null
+      },
+      "expected": "same TCP stream; two 12.8..19.2 Mbps samples; first <=5000 ms",
+      "pass": true
+    },
+    {
+      "kernel": "singbox",
+      "test": "panel-limit-payload-download",
+      "observed": 16,
+      "expected": 16,
+      "pass": true
+    },
+    {
+      "kernel": "singbox",
+      "test": "change-positive-existing-download",
+      "observed": {
+        "samples": [
+          {
+            "mbps": 2635.304,
+            "elapsed_ms": 3.2
+          },
+          {
+            "mbps": 15.747,
+            "elapsed_ms": 535.9
+          },
+          {
+            "mbps": 11.995,
+            "elapsed_ms": 1235.3
+          },
+          {
+            "mbps": 11.999,
+            "elapsed_ms": 1934.4
+          }
+        ],
+        "first_observed_ms": 1235.3,
+        "save_call_ms": 335.9,
+        "same_tcp_stream": true,
+        "transfer_error": null
+      },
+      "expected": "same TCP stream; two 9.600000000000001..14.399999999999999 Mbps samples; first <=5000 ms",
+      "pass": true
+    },
+    {
+      "kernel": "singbox",
+      "test": "disable-limit-existing-download",
+      "observed": {
+        "samples": [
+          {
+            "mbps": 3899.494,
+            "elapsed_ms": 8.6
+          },
+          {
+            "mbps": 6193.982,
+            "elapsed_ms": 14.0
+          }
+        ],
+        "first_observed_ms": 8.6,
+        "save_call_ms": 317.1,
+        "same_tcp_stream": true,
+        "transfer_error": null
+      },
+      "expected": "same TCP stream; two >64 Mbps samples; first <=5000 ms",
+      "pass": true
+    },
+    {
+      "kernel": "singbox",
+      "test": "panel-unlimited-upload",
+      "observed": 3024.715,
+      "expected": ">64 Mbps",
+      "pass": true
+    },
+    {
+      "kernel": "singbox",
+      "test": "enable-limit-existing-upload",
+      "observed": {
+        "samples": [
+          {
+            "mbps": 2719.803,
+            "elapsed_ms": 3.1
+          },
+          {
+            "mbps": 179.596,
+            "elapsed_ms": 49.8
+          },
+          {
+            "mbps": 15.979,
+            "elapsed_ms": 574.8
+          },
+          {
+            "mbps": 16.026,
+            "elapsed_ms": 1098.3
+          }
+        ],
+        "first_observed_ms": 574.8,
+        "save_call_ms": 336.7,
+        "same_tcp_stream": true,
+        "transfer_error": null
+      },
+      "expected": "same TCP stream; two 12.8..19.2 Mbps samples; first <=5000 ms",
+      "pass": true
+    },
+    {
+      "kernel": "singbox",
+      "test": "panel-limit-payload-upload",
+      "observed": 16,
+      "expected": 16,
+      "pass": true
+    },
+    {
+      "kernel": "singbox",
+      "test": "change-positive-existing-upload",
+      "observed": {
+        "samples": [
+          {
+            "mbps": 3177.289,
+            "elapsed_ms": 2.8
+          },
+          {
+            "mbps": 15.574,
+            "elapsed_ms": 541.4
+          },
+          {
+            "mbps": 12.003,
+            "elapsed_ms": 1240.4
+          },
+          {
+            "mbps": 11.979,
+            "elapsed_ms": 1940.7
+          }
+        ],
+        "first_observed_ms": 1240.4,
+        "save_call_ms": 323.2,
+        "same_tcp_stream": true,
+        "transfer_error": null
+      },
+      "expected": "same TCP stream; two 9.600000000000001..14.399999999999999 Mbps samples; first <=5000 ms",
+      "pass": true
+    },
+    {
+      "kernel": "singbox",
+      "test": "disable-limit-existing-upload",
+      "observed": {
+        "samples": [
+          {
+            "mbps": 5489.044,
+            "elapsed_ms": 6.1
+          },
+          {
+            "mbps": 4966.507,
+            "elapsed_ms": 12.9
+          }
+        ],
+        "first_observed_ms": 6.1,
+        "save_call_ms": 324.3,
+        "same_tcp_stream": true,
+        "transfer_error": null
+      },
+      "expected": "same TCP stream; two >64 Mbps samples; first <=5000 ms",
+      "pass": true
+    },
+    {
+      "kernel": "singbox",
+      "test": "unlimited-before-routing",
+      "observed": {
+        "samples": [
+          {
+            "mbps": 4194.471,
+            "elapsed_ms": 8.0
+          },
+          {
+            "mbps": 7732.165,
+            "elapsed_ms": 12.4
+          }
+        ],
+        "first_observed_ms": 8.0,
+        "save_call_ms": 325.3,
+        "same_tcp_stream": true,
+        "transfer_error": null
+      },
+      "expected": "same TCP stream; two >64 Mbps samples; first <=5000 ms",
+      "pass": true
+    },
+    {
+      "kernel": "singbox",
+      "test": "panel-route-baseline",
+      "observed": "DIRECT",
+      "expected": "DIRECT",
+      "pass": true
+    },
+    {
+      "kernel": "singbox",
+      "test": "panel-native-block-existing-flow-closed",
+      "observed": {
+        "closed": true,
+        "elapsed_ms": 0.0
+      },
+      "expected": "existing TCP closed <=1000 ms",
+      "pass": true
+    },
+    {
+      "kernel": "singbox",
+      "test": "panel-native-block-new-policy",
+      "observed": {
+        "markers": [
+          "BLOCKED",
+          "OTHER"
+        ],
+        "elapsed_ms": 2.2,
+        "attempts": 1
+      },
+      "expected": {
+        "markers": [
+          "BLOCKED",
+          "OTHER"
+        ],
+        "within_ms": 5000
+      },
+      "pass": true
+    },
+    {
+      "kernel": "singbox",
+      "test": "panel-native-new-outbound-existing-flow-closed",
+      "observed": {
+        "closed": true,
+        "elapsed_ms": 0.2
+      },
+      "expected": "existing TCP closed <=1000 ms",
+      "pass": true
+    },
+    {
+      "kernel": "singbox",
+      "test": "panel-native-new-outbound-new-policy",
+      "observed": {
+        "markers": [
+          "OUTBOUND",
+          "OTHER"
+        ],
+        "elapsed_ms": 3.6,
+        "attempts": 1
+      },
+      "expected": {
+        "markers": [
+          "OUTBOUND",
+          "OTHER"
+        ],
+        "within_ms": 5000
+      },
+      "pass": true
+    },
+    {
+      "kernel": "singbox",
+      "test": "panel-route-outbound-payload",
+      "observed": [
+        1,
+        1
+      ],
+      "expected": [
+        1,
+        1
+      ],
+      "pass": true
+    },
+    {
+      "kernel": "singbox",
+      "test": "panel-native-route-removal-existing-flow-closed",
+      "observed": {
+        "closed": true,
+        "elapsed_ms": 0.0
+      },
+      "expected": "existing TCP closed <=1000 ms",
+      "pass": true
+    },
+    {
+      "kernel": "singbox",
+      "test": "panel-native-route-removal-new-policy",
+      "observed": {
+        "markers": [
+          "DIRECT",
+          "OTHER"
+        ],
+        "elapsed_ms": 2.9,
+        "attempts": 1
+      },
+      "expected": {
+        "markers": [
+          "DIRECT",
+          "OTHER"
+        ],
+        "within_ms": 5000
+      },
+      "pass": true
+    },
+    {
+      "kernel": "singbox",
+      "test": "panel-controlled-outbound-actually-used",
+      "observed": 1,
+      "expected": ">0 CONNECT requests",
+      "pass": true
+    },
+    {
+      "kernel": "xray",
+      "test": "panel-unlimited-download",
+      "observed": 5324.175,
+      "expected": ">64 Mbps",
+      "pass": true
+    },
+    {
+      "kernel": "xray",
+      "test": "enable-limit-existing-download",
+      "observed": {
+        "samples": [
+          {
+            "mbps": 4906.655,
+            "elapsed_ms": 1.7
+          },
+          {
+            "mbps": 174.275,
+            "elapsed_ms": 49.9
+          },
+          {
+            "mbps": 16.003,
+            "elapsed_ms": 574.1
+          },
+          {
+            "mbps": 16.011,
+            "elapsed_ms": 1098.0
+          }
+        ],
+        "first_observed_ms": 574.1,
+        "save_call_ms": 318.1,
+        "same_tcp_stream": true,
+        "transfer_error": null
+      },
+      "expected": "same TCP stream; two 12.8..19.2 Mbps samples; first <=5000 ms",
+      "pass": true
+    },
+    {
+      "kernel": "xray",
+      "test": "panel-limit-payload-download",
+      "observed": 16,
+      "expected": 16,
+      "pass": true
+    },
+    {
+      "kernel": "xray",
+      "test": "change-positive-existing-download",
+      "observed": {
+        "samples": [
+          {
+            "mbps": 4200.843,
+            "elapsed_ms": 2.0
+          },
+          {
+            "mbps": 21.08,
+            "elapsed_ms": 400.0
+          },
+          {
+            "mbps": 11.997,
+            "elapsed_ms": 1099.2
+          },
+          {
+            "mbps": 12.0,
+            "elapsed_ms": 1798.3
+          }
+        ],
+        "first_observed_ms": 1099.2,
+        "save_call_ms": 474.8,
+        "same_tcp_stream": true,
+        "transfer_error": null
+      },
+      "expected": "same TCP stream; two 9.600000000000001..14.399999999999999 Mbps samples; first <=5000 ms",
+      "pass": true
+    },
+    {
+      "kernel": "xray",
+      "test": "disable-limit-existing-download",
+      "observed": {
+        "samples": [
+          {
+            "mbps": 8127.874,
+            "elapsed_ms": 4.1
+          },
+          {
+            "mbps": 12594.94,
+            "elapsed_ms": 6.8
+          }
+        ],
+        "first_observed_ms": 4.1,
+        "save_call_ms": 317.1,
+        "same_tcp_stream": true,
+        "transfer_error": null
+      },
+      "expected": "same TCP stream; two >64 Mbps samples; first <=5000 ms",
+      "pass": true
+    },
+    {
+      "kernel": "xray",
+      "test": "panel-unlimited-upload",
+      "observed": 3717.377,
+      "expected": ">64 Mbps",
+      "pass": true
+    },
+    {
+      "kernel": "xray",
+      "test": "enable-limit-existing-upload",
+      "observed": {
+        "samples": [
+          {
+            "mbps": 3114.402,
+            "elapsed_ms": 2.7
+          },
+          {
+            "mbps": 178.879,
+            "elapsed_ms": 49.6
+          },
+          {
+            "mbps": 15.998,
+            "elapsed_ms": 574.0
+          },
+          {
+            "mbps": 15.986,
+            "elapsed_ms": 1098.8
+          }
+        ],
+        "first_observed_ms": 574.0,
+        "save_call_ms": 313.3,
+        "same_tcp_stream": true,
+        "transfer_error": null
+      },
+      "expected": "same TCP stream; two 12.8..19.2 Mbps samples; first <=5000 ms",
+      "pass": true
+    },
+    {
+      "kernel": "xray",
+      "test": "panel-limit-payload-upload",
+      "observed": 16,
+      "expected": 16,
+      "pass": true
+    },
+    {
+      "kernel": "xray",
+      "test": "change-positive-existing-upload",
+      "observed": {
+        "samples": [
+          {
+            "mbps": 2009.882,
+            "elapsed_ms": 4.2
+          },
+          {
+            "mbps": 14.89,
+            "elapsed_ms": 567.6
+          },
+          {
+            "mbps": 11.991,
+            "elapsed_ms": 1267.1
+          },
+          {
+            "mbps": 12.005,
+            "elapsed_ms": 1965.9
+          }
+        ],
+        "first_observed_ms": 1267.1,
+        "save_call_ms": 316.0,
+        "same_tcp_stream": true,
+        "transfer_error": null
+      },
+      "expected": "same TCP stream; two 9.600000000000001..14.399999999999999 Mbps samples; first <=5000 ms",
+      "pass": true
+    },
+    {
+      "kernel": "xray",
+      "test": "disable-limit-existing-upload",
+      "observed": {
+        "samples": [
+          {
+            "mbps": 3891.431,
+            "elapsed_ms": 8.6
+          },
+          {
+            "mbps": 5497.947,
+            "elapsed_ms": 14.7
+          }
+        ],
+        "first_observed_ms": 8.6,
+        "save_call_ms": 315.9,
+        "same_tcp_stream": true,
+        "transfer_error": null
+      },
+      "expected": "same TCP stream; two >64 Mbps samples; first <=5000 ms",
+      "pass": true
+    },
+    {
+      "kernel": "xray",
+      "test": "unlimited-before-routing",
+      "observed": {
+        "samples": [
+          {
+            "mbps": 4720.934,
+            "elapsed_ms": 7.1
+          },
+          {
+            "mbps": 7678.942,
+            "elapsed_ms": 11.5
+          }
+        ],
+        "first_observed_ms": 7.1,
+        "save_call_ms": 327.2,
+        "same_tcp_stream": true,
+        "transfer_error": null
+      },
+      "expected": "same TCP stream; two >64 Mbps samples; first <=5000 ms",
+      "pass": true
+    },
+    {
+      "kernel": "xray",
+      "test": "panel-route-baseline",
+      "observed": "DIRECT",
+      "expected": "DIRECT",
+      "pass": true
+    },
+    {
+      "kernel": "xray",
+      "test": "panel-native-block-existing-flow-closed",
+      "observed": {
+        "closed": true,
+        "elapsed_ms": 0.0
+      },
+      "expected": "existing TCP closed <=1000 ms",
+      "pass": true
+    },
+    {
+      "kernel": "xray",
+      "test": "panel-native-block-new-policy",
+      "observed": {
+        "markers": [
+          "CLOSED",
+          "OTHER"
+        ],
+        "elapsed_ms": 105.4,
+        "attempts": 5
+      },
+      "expected": {
+        "markers": [
+          "BLOCKED",
+          "OTHER"
+        ],
+        "within_ms": 5000
+      },
+      "pass": true
+    },
+    {
+      "kernel": "xray",
+      "test": "panel-native-new-outbound-existing-flow-closed",
+      "observed": {
+        "closed": true,
+        "elapsed_ms": 0.0
+      },
+      "expected": "existing TCP closed <=1000 ms",
+      "pass": true
+    },
+    {
+      "kernel": "xray",
+      "test": "panel-native-new-outbound-new-policy",
+      "observed": {
+        "markers": [
+          "OUTBOUND",
+          "OTHER"
+        ],
+        "elapsed_ms": 3.7,
+        "attempts": 1
+      },
+      "expected": {
+        "markers": [
+          "OUTBOUND",
+          "OTHER"
+        ],
+        "within_ms": 5000
+      },
+      "pass": true
+    },
+    {
+      "kernel": "xray",
+      "test": "panel-route-outbound-payload",
+      "observed": [
+        1,
+        1
+      ],
+      "expected": [
+        1,
+        1
+      ],
+      "pass": true
+    },
+    {
+      "kernel": "xray",
+      "test": "panel-native-route-removal-existing-flow-closed",
+      "observed": {
+        "closed": true,
+        "elapsed_ms": 0.0
+      },
+      "expected": "existing TCP closed <=1000 ms",
+      "pass": true
+    },
+    {
+      "kernel": "xray",
+      "test": "panel-native-route-removal-new-policy",
+      "observed": {
+        "markers": [
+          "DIRECT",
+          "OTHER"
+        ],
+        "elapsed_ms": 105.4,
+        "attempts": 5
+      },
+      "expected": {
+        "markers": [
+          "DIRECT",
+          "OTHER"
+        ],
+        "within_ms": 5000
+      },
+      "pass": true
+    },
+    {
+      "kernel": "xray",
+      "test": "panel-controlled-outbound-actually-used",
+      "observed": 1,
+      "expected": ">0 CONNECT requests",
+      "pass": true
+    }
+  ],
+  "summary": {
+    "checks": 80,
+    "passed": 80,
+    "failed": 0
+  },
+  "supersession": "Final managed-routes-report uses HTTP Content-Length to detect response completion; it replaces the earlier EOF-waiting marker assertions in managed-report.",
+  "backend_audit": {
+    "audit": {
+      "actual_route_order": [
+        2,
+        1
+      ],
+      "hidden_enabled_node_runs": false,
+      "negative_user_limit_accepted": false,
+      "requested_route_order": [
+        2,
+        1
+      ],
+      "route_order_preserved": true
+    },
+    "observer-audit": {
+      "before_commit_events": [],
+      "database_changes_restored": true,
+      "hidden_enabled_node_runs": true,
+      "hidden_route_update_events": [
+        {
+          "event": "sync.config",
+          "node_id": 1,
+          "transaction_level": 0
+        }
+      ],
+      "visible_route_update_events": [
+        {
+          "event": "sync.config",
+          "node_id": 1,
+          "transaction_level": 0
+        }
+      ]
+    }
+  },
+  "linux_race": {
+    "result": "PASS",
+    "phase": "linux-race",
+    "exit_code": 0,
+    "toolchain": "go version go1.26.5 linux/amd64",
+    "source_archive_sha256": "d9be27591e53093752676e2963866a9c0cc3fa3af8d38333e385fe710a555e2f",
+    "duration_seconds": 31.77,
+    "packages": [
+      "./internal/limiter",
+      "./internal/kernel/singbox",
+      "./internal/kernel/xray",
+      "./internal/service"
+    ],
+    "go_source_cache_network": "off after local module file proxy",
+    "panel_data_accessed": false,
+    "additional_test_source_sha256": {
+      "internal/kernel/singbox/low_speed_stream_test.go": "5237691cf588f1b57becc3ad587dc6436b22e849363b5b2533257a14e3e20d0f",
+      "internal/kernel/xray/http_policy_test.go": "a32e8491e78423d67264130a5bd8e6aac50ab654c37a05852a1ef08d6a875989"
+    }
+  },
+  "known_initial_observation": {
+    "test": "singbox 1Mbps short download sample",
+    "initial_mbps": 195.09,
+    "status": "not reproduced in final original-suite replay, three same-stream 1MiB windows, or Linux race socket regression",
+    "separate_same_stream_samples_mbps": [
+      1.00003,
+      1.00006,
+      0.99995
+    ],
+    "long_duration_pressure": "not verified"
+  },
+  "private_diagnostic_log_read": {
+    "initial_automatic_review": "rejected; no read performed before explicit reauthorization",
+    "explicit_user_authorization": "allowed this sanitized diagnostic",
+    "scope": [
+      "managed-xray/node.private.log",
+      "managed-xray/stdout.private"
+    ],
+    "maximum_tail_bytes_per_file": 262144,
+    "output": "predefined error classes only; no raw lines or credentials",
+    "result": "SANITIZED_DIAGNOSTIC",
+    "errors": [],
+    "recorded_at_utc": "2026-10-24T06:56:23Z"
+  },
+  "final_backend_scenarios": {
+    "result": "PASS",
+    "phase": "final-backend-linux-docker",
+    "scenarios": 13,
+    "source_archive_sha256": "f9303cb42e972674e6141ff6e87541763d99ed5425363a1c841eb7fd09d3aa63",
+    "source_files": 259,
+    "image": "sha256:fd4991a3653e3c57dc71e9e2d6e79f3bbd7cf4cfd7cde048cfdbada4736a456f",
+    "network": "none",
+    "database": "fresh in-memory SQLite",
+    "production_data_accessed": false,
+    "private_runtime_logs_read": false,
+    "checks": [
+      "PASS selected route priority survives SQL order, missing IDs and duplicates",
+      "PASS route save notifies visible and hidden running nodes after commit",
+      "PASS route rollback publishes nothing",
+      "PASS node route reordering publishes the new priority before save returns",
+      "PASS negative speed is rejected; zero, positive and null remain valid",
+      "PASS limit enable, change and disable push committed users without a queue worker",
+      "PASS limit rollback publishes and dispatches nothing",
+      "PASS device limit is immediate while other user changes retain the async path",
+      "PASS route deletion synchronously removes its config on running nodes",
+      "PASS plan force update publishes every changed user before returning without a queue worker",
+      "PASS plan force update synchronizes both old and new permission groups",
+      "PASS nested plan force update waits for the outer transaction and rollback publishes nothing",
+      "PASS plan save without force update leaves existing users and node pushes unchanged"
+    ]
+  },
+  "final_node_verification_attempts": [
+    {
+      "result": "FAIL",
+      "phase": "final-source-linux-race",
+      "exit_code": 1,
+      "toolchain": "go version go1.26.5 linux/amd64",
+      "source_archive_sha256": "6aa184bba32067588dfdfaddcb6517ee7c392eb89ccafbb02c0095709d5a1ccb",
+      "source_files": 156,
+      "duration_seconds": 59.39,
+      "packages": [
+        "./internal/limiter",
+        "./internal/kernel/singbox",
+        "./internal/kernel/xray",
+        "./internal/service"
+      ],
+      "network": "offline local module proxy only",
+      "panel_data_accessed": false,
+      "private_runtime_logs_read": false,
+      "finding": "Concurrent mutation of frozen sing-box authentication tables detected; superseded by the final verified source below."
+    },
+    {
+      "result": "PASS",
+      "phase": "final-source-linux-race",
+      "exit_code": 0,
+      "toolchain": "go version go1.26.5 linux/amd64",
+      "source_archive_sha256": "e61931b82d5e0567a85f38a35218bbadb96f90e096780344a36d9a1f6bd4243d",
+      "source_files": 156,
+      "duration_seconds": 61.5,
+      "packages": [
+        "./internal/limiter",
+        "./internal/kernel/singbox",
+        "./internal/kernel/xray",
+        "./internal/service"
+      ],
+      "network": "offline local module proxy only",
+      "panel_data_accessed": false,
+      "private_runtime_logs_read": false
+    }
+  ],
+  "final_node_verification": {
+    "result": "PASS",
+    "phase": "final-source-linux-race",
+    "exit_code": 0,
+    "toolchain": "go version go1.26.5 linux/amd64",
+    "source_archive_sha256": "e61931b82d5e0567a85f38a35218bbadb96f90e096780344a36d9a1f6bd4243d",
+    "source_files": 156,
+    "duration_seconds": 61.5,
+    "packages": [
+      "./internal/limiter",
+      "./internal/kernel/singbox",
+      "./internal/kernel/xray",
+      "./internal/service"
+    ],
+    "network": "offline local module proxy only",
+    "panel_data_accessed": false,
+    "private_runtime_logs_read": false
+  },
+  "source_commits": {
+    "node": "6e1d5c0cf176f106438bfdc40e81ff85ead2971e",
+    "backend": "eab523520f2e1da9cc959a008df2fd2d4602f442"
+  },
+  "final_validation_scope": "80 effective checks used candidate revision 2; supplemental final-source Linux race and 13 backend Docker scenarios validate the later ingress/authentication/plan-update fixes. The 80-check traffic suite was not rerun after those supplemental fixes.",
+  "after_final_source_tests": {
+    "result": "PASS",
+    "phase": "after-final-source-tests",
+    "test_ports_free": {
+      "17005": true,
+      "19090": true,
+      "19091": true
+    },
+    "owned_node_or_go_processes": 0,
+    "fixed_test_image_running_containers": 0,
+    "original_panel_http_status": 200,
+    "private_logs_read_by_this_check": false
+  }
+}

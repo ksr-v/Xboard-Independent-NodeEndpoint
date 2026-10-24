@@ -2,6 +2,10 @@
 
 2026-10-24 的独立 aaPanel/Docker 限速与路由测试另见 [测试报告](../../docs/RATE_ROUTE_TEST_REPORT.md)。`rate_route_*` 四个辅助程序使用新 SQLite 容器及前台 Node，不使用下述历史标准服务实验的数据库或绑定；固定路径、镜像和日期仅适用于本轮专用 VM，不能直接作为生产命令执行。
 
+后续修复使用 `rate_route_fixed_*`，结果见 [修复验证](../../docs/RATE_ROUTE_FIX_REPORT.md)。machine 模式在同一 TCP 上测量限速开启/修改/取消，并检查路由保存后旧流关闭及新出口。HTTP 测试响应按 Content-Length 完成，避免把 VLESS 半关闭等待当成路由失败。
+
+`rate_route_fixed_backend.py` 使用已有测试镜像、只读最终应用源码和内存数据库运行 13 个后端场景；`rate_route_fixed_final_linux.py` 使用同一归属确认目录中的离线 Go 缓存，核对最终源码归档后运行限速、两内核及服务层的并发测试。两者不读取面板运行日志，也不连接实际面板数据库。
+
 此目录是验收辅助程序，不是生产安装器。它直接启动已安装 Xboard 的 Laravel、数据库、Redis、队列和原版 NodeWorker，使用摘要固定的实际 Go Node 与 Xray / sing-box 内核；不模拟面板 API 或 WebSocket 服务。
 
 本轮固定面板为 `192.168.128.128`，节点为 `192.168.128.129`，通过用户明确授权的 `codex` 免密 SSH / sudo 操作。程序中的路径、日期、端口和 callback 限制与本轮实验对应；在其他环境必须先重新审查实际部署和归属，不能原样复制运行。执行结果和未测范围见根目录 `FULL_E2E_TEST_REPORT.md`。
