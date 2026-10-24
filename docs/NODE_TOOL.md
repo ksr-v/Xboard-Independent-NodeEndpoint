@@ -2,7 +2,17 @@
 
 版本：NodeEndpoint 1.0.0。入口：`tools/node/node_endpoint.py`，Python 3.9+ 标准库；CA 验证另需 `openssl`。工具不运行上游安装器、不自动升级已有二进制，不改变面板绑定、流量历史或 FlowScope 采集器。
 
-## 源码及发布审计
+## 当前发行锁（2026-10-25）
+
+NodeEndpoint 1.0.8 随附的独立 tools 1.0.7 将 Node 下载版本更新为 **v1.13-orphan.5**。以包内 `tools/node/release-lock.json` 的 source commit 与逐资产 SHA-256 为当前依据，`audited-SHA256SUMS` 同步记录发行清单。工具的保守迁移实现与 CLI 版本 1.0.0 保持，未改成自动替换已有二进制。
+
+发行源码 commit 以当前 `release-lock.json` 的 `source_commit` 为准；二进制构建于 `6e1d5c0cf176f106438bfdc40e81ff85ead2971e`，随后发行提交补齐安装器固定资产摘要、域名 / 私有 CA 通用下载校验和文档，不改变 Go 业务代码。该构建来源另记为 `binary_source_commit`，不把安装器自身的摘要误当成二进制编译来源。
+
+已有节点升级到本次限速 / 路由修复版本使用[配套更新教程](UPGRADE.zh-CN.md)中的明确 `upgrade`，不使用 `prepare / install-new` 或面板新装命令。下方 v1.13-orphan.4 的审计摘要与联测结果是历史证据，不能视为 v1.13-orphan.5 的实机验收。
+
+Root 面板入口继续固定 root-installer-v1.0.9 / tools 1.0.6，它不负责 Node 二进制升级。不要把两个工具包版本差异当成需要重建面板 CA 的信号。
+
+## 历史源码及发布审计（v1.13-orphan.4）
 
 2026-10-09 只读审计 [独立 Node](https://github.com/ksr-v/Xboard-Node--Custom-Source/tree/8dbee14fb2f32a4f9324929fc24828cea6e29b38)，commit `8dbee14fb2f32a4f9324929fc24828cea6e29b38`，发布 [v1.13-orphan.4](https://github.com/ksr-v/Xboard-Node--Custom-Source/releases/tag/v1.13-orphan.4)。该 GitHub Release 当前 `immutable=false`，因此版本名本身不足以防止附件被替换。本工具将 GitHub API 获取的附件 digest 固定在 `release-lock.json`；实际下载 `SHA256SUMS` 后核对一致，源码 `install.sh` 的实际 SHA-256 也一致。
 

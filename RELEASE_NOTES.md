@@ -1,13 +1,11 @@
-# NodeEndpoint 1.0.7 / root-installer-v1.0.9
+# NodeEndpoint 1.0.8
 
-宝塔 / aaPanel + Docker 部署现可通过 SSH 以宿主机 Root 一次确认，自动配置 IP 私有证书入口、随机 CA 口令托管、通讯设置、公共 CA 与本机防火墙。全新四插件后端提供 `bash docker-install.sh`，默认宝塔 MySQL / MariaDB 和内置 Redis，可选 SQLite。
+正式 Node 发行程序的 80 项联测已再次全部通过，AMD64 原生及 ARM64 QEMU 版本检查通过，详见[本次发行验证](docs/RELEASE_VALIDATION_20261025.md)。
 
-已有标准 Docker 面板使用：
+配套独立后端 **v2026.10.25.1** 与独立 **xboard-node v1.13-orphan.5**，修复限速与路由更新。插件将机器管理中域名 / IP 两种安装命令固定到新 Node 的私有部署源；独立 Node 迁移工具包 tools 1.0.7 同步固定版本和资产摘要。
 
-```bash
-curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.9/install.sh | bash -s -- --docker
-```
+**已有面板必须同时更新后端和 Node 才能获得完整修复。** 请按[更新教程](docs/UPGRADE.zh-CN.md)先备份、更新后端，再逐台运行 Node 的 `upgrade`。全插件后端已包含插件；其他兼容后端可原生上传 `NodeEndpoint-1.0.8.zip` 升级。无需卸载其他插件、重建 CA、更换 Token 或重新初始化数据库。面板复制的新装命令会替换旧绑定，不能用于已有节点升级。
 
-详细步骤见 [Docker 简化安装](docs/DOCKER_INSTALL.md)。容器重建后需重新审阅计划，用原 CA 私钥匹配托管口令后换绑；不生成替代 CA 或重置 APP_KEY。旧的手动 Docker 入口、宿主网络和非标准挂载布局需单独迁移。
+修复后，用户限速可在原连接上开启、修改和取消；路由 / 出站更新关闭旧流，让重连使用新规则，候选失败时恢复已接受配置。面板数据库提交后及时通知运行节点；离线和 HTTP 轮询仍受重连 / 轮询周期影响。专用 VM 的 80 项有效 TCP 联测、Linux 并发检查与 13 个后端场景通过；原连接 1 MiB 速率窗口约 0.57–1.27 秒进入新速率，路由新请求约 2–106 ms 验证生效，均为隔离同机结果。完整证据和未测范围见[修复报告](docs/RATE_ROUTE_FIX_REPORT.md)。
 
-插件 ZIP 可原生升级并保留设置；无需卸载其它插件。四插件后端 v2026.10.23.1 包含 NodeEndpoint 1.0.7、SmartExpiry 1.2.0、二维码审计副本 1.2.0 和 FlowScope 2.4.0。Node 二进制保持 v1.13-orphan.4。
+Root 面板入口继续使用 **root-installer-v1.0.9 / tools 1.0.6**；其配置功能未变，不需要为本次修复重复执行。Docker 更换容器后仍按既有流程核对原 CA 并重新绑定容器。二维码继续固定审计副本 1.2.0，SmartExpiry 1.2.0、FlowScope 2.4.0 保持。

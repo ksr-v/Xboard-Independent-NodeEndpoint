@@ -1,6 +1,6 @@
 # 宝塔 / aaPanel + Docker：安装与私有节点入口
 
-本说明配套 NodeEndpoint 1.0.7、Root `root-installer-v1.0.9` / tools 1.0.6，以及独立全插件后端 `v2026.10.23.1`。原生 PHP-FPM 安装仍使用原教程；Docker 操作在**宿主机 Root SSH**中执行。
+本说明配套 NodeEndpoint 1.0.8、Root `root-installer-v1.0.9` / tools 1.0.6，以及独立全插件后端 `v2026.10.25.1`。原生 PHP-FPM 安装仍使用原教程；Docker 操作在**宿主机 Root SSH**中执行。
 
 ## 新建面板：一个安装入口
 
@@ -29,7 +29,7 @@ location / {
 
 ```bash
 cd /www/wwwroot/panel.example.com
-git clone --branch v2026.10.23.1 --single-branch \
+git clone --branch v2026.10.25.1 --single-branch \
   https://github.com/ksr-v/Xboard-Custom-Source.git .
 bash docker-install.sh
 ```
@@ -82,4 +82,4 @@ Root 配置完成后，在原生机器管理选择“IP + 私有证书”并复�
 
 私钥保存在宿主机网站目录之外的 Root 私有状态中，面板只保存公共 CA 和由原 `APP_KEY` 加密的口令。Web 进程不持有 Docker socket 或 sudo 权限。云安全组 / 服务商防火墙仍需允许实际节点通讯端口。
 
-首版自动流程不支持 host-network、分离容器、远程 Docker、任意服务名或公开 HTTP 后端。未知布局会停止，不自动套用旧手工参数。完整面板教程见[独立后端 Docker 指南](https://github.com/ksr-v/Xboard-Custom-Source/blob/v2026.10.23.1/docs/installation/aapanel-docker.zh-CN.md)。自动流程的实际测试范围以本次 Release 验证记录为准；历史手工 Docker 验证不能代替新自动流程的验证。
+首版自动流程不支持 host-network、分离容器、远程 Docker、任意服务名或公开 HTTP 后端。未知布局会停止，不自动套用旧手工参数。完整面板教程见[独立后端 Docker 指南](https://github.com/ksr-v/Xboard-Custom-Source/blob/v2026.10.25.1/docs/installation/aapanel-docker.zh-CN.md)。自动流程的实际测试范围以本次 Release 验证记录为准；历史手工 Docker 验证不能代替新自动流程的验证。

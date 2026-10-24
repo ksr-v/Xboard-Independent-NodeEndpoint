@@ -1,12 +1,12 @@
 # Linux Root 管理工具
 
-底层入口管理器位于 `tools/panel/node-endpoint-panel.sh`，管理器版本 **1.0.0**；当前补充工具包为 **tools 1.0.6**，一键引导版本为 **root-installer-v1.0.9**。仅由管理员通过 SSH 使用；Web 插件不执行 Shell、不持有 Root 权限。依赖 Linux、Python 3.10+、OpenSSL 1.1.1+、Nginx/OpenResty、`ss`；原生 PHP 部署需要 `php`、`runuser`，Docker 部署需要 Docker CLI。工具不安装依赖、不升级系统、不下载或替换 Node 二进制。
+底层入口管理器位于 `tools/panel/node-endpoint-panel.sh`，管理器版本 **1.0.0**；一键引导继续固定 **root-installer-v1.0.9 / tools 1.0.6**。NodeEndpoint 1.0.8 另附独立 tools 1.0.7，更新 Node 下载锁；面板 Root 配置功能保持，无需重复配置已工作的入口。仅由管理员通过 SSH 使用；Web 插件不执行 Shell、不持有 Root 权限。依赖 Linux、Python 3.10+、OpenSSL 1.1.1+、Nginx/OpenResty、`ss`；原生 PHP 部署需要 `php`、`runuser`，Docker 部署需要 Docker CLI。面板工具不安装依赖、不升级系统、不下载或替换 Node 二进制。
 
 ## 一键安装与防火墙
 
 标准 Docker 部署可使用同一入口加 `--docker`，一次确认后自动同步通讯设置、公共 CA 和本机防火墙，详见 [Docker 简化安装](DOCKER_INSTALL.md)。全新独立后端的 `bash docker-install.sh` 将面板安装和该 Root 流程合并；不要在已有面板运行全新初始化。容器没有 Docker socket、sudo 或宿主 Root 私钥挂载。
 
-先上传并启用 **NodeEndpoint-1.0.7.zip**，保存通讯地址 / 端口 / HTTPS。可直接点击页面“SSH 配置入口”中的“一键复制 Root 工具命令”，在面板服务器以 Root 登录交互 SSH 后执行；命令预填已保存的 IP / 域名，端口及 WS 模式仍需在向导中核对。未保存的修改不会用于生成命令。通用安装命令也可手工执行：
+先上传并启用 **NodeEndpoint-1.0.8.zip**，保存通讯地址 / 端口 / HTTPS。可直接点击页面“SSH 配置入口”中的“一键复制 Root 工具命令”，在面板服务器以 Root 登录交互 SSH 后执行；命令预填已保存的 IP / 域名，端口及 WS 模式仍需在向导中核对。未保存的修改不会用于生成命令。通用安装命令也可手工执行：
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.9/install.sh | bash
@@ -57,9 +57,9 @@ curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoi
 
 原生 HTTPS FPM / Octane 的 `--refresh-entry` 校验安装记录，读取当前站点、PHP、IP、端口和 WS 模式，完整确认后刷新规则，不写插件设置或防火墙，保留 CA、服务器证书及托管口令。标准 Docker 会转入宿主 Root 自动流程，一次确认后核对容器绑定并补齐通讯设置、防火墙和公共 CA，详见 Docker 教程。
 
-也可先原生升级 NodeEndpoint 1.0.7，用网页按钮复制普通 Root 向导，对已有入口选择修改并保留当前参数。只上传插件、只同步 CA 或只补防火墙均不会更新已加载的 Nginx 配置。修改通讯 IP 仍使用普通向导，并按新地址更新服务器证书。
+也可先原生升级 NodeEndpoint 1.0.8，用网页按钮复制普通 Root 向导，对已有入口选择修改并保留当前参数。只上传插件、只同步 CA 或只补防火墙均不会更新已加载的 Nginx 配置。修改通讯 IP 仍使用普通向导，并按新地址更新服务器证书。
 
-确认 FlowScope 2.4.0 启用，并使用含自动 IPv4 上报的独立 Node v1.13-orphan.4。Node 缓存 404 结果 10 分钟，修复后等待自动重试并刷新详情；不必重装节点、改 Token 或强制重启。公共 IPv4 检测服务不可达也会导致暂时待获取。诊断与本轮验证记录见 [FLOWSCOPE_PRIVATE_ENDPOINT_TEST_REPORT.md](FLOWSCOPE_PRIVATE_ENDPOINT_TEST_REPORT.md)。
+确认 FlowScope 2.4.0 启用，并使用含自动 IPv4 上报的独立 Node v1.13-orphan.5。Node 缓存 404 结果 10 分钟，修复后等待自动重试并刷新详情；不必重装节点、改 Token 或强制重启。公共 IPv4 检测服务不可达也会导致暂时待获取。诊断与本轮验证记录见 [FLOWSCOPE_PRIVATE_ENDPOINT_TEST_REPORT.md](FLOWSCOPE_PRIVATE_ENDPOINT_TEST_REPORT.md)。
 
 ## 修复已安装独立面板的通讯地址
 
