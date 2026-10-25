@@ -1,0 +1,102 @@
+{
+  "result": "PASS",
+  "checked_at_utc": "2026-10-25T08:58:29.782007+00:00",
+  "releases": {
+    "node": {
+      "repository": "ksr-v/Xboard-Node--Custom-Source",
+      "tag": "v1.13-orphan.6",
+      "commit": "9394b235fe0665ab6e29a2281b9295a9fc5ddeaf",
+      "url": "https://github.com/ksr-v/Xboard-Node--Custom-Source/releases/tag/v1.13-orphan.6",
+      "latest": true,
+      "published_at": "2026-10-25T08:55:39Z",
+      "asset_count": 10,
+      "server_and_download_sha256_verified": true,
+      "asset_sha256": {
+        "xboard-node-linux-amd64": "ffe4878de3fcb16b16279e4b883e0e4d845e16ec16639a265903c270165978b9",
+        "xboard-node-linux-arm64": "ffc93d22a75713528292f45c1b459c03a456275c33662d14db48fee135ec99c2",
+        "xbctl-linux-amd64": "18efe4e1cba9988dcbbdff14532986b9b352637001acf585e8d6066b8f8bb7d0",
+        "xbctl-linux-arm64": "518e2164dea5735a848f1f90edfeeb1fdc5222421ba773fce7fde49c73ea9c89",
+        "install.sh": "5824ea367a0268501d934221d0392ae14007c6f0500586cba5d6c316425ca908",
+        "SHA256SUMS": "f7cfc906911b88abf27aa99fc3ee74fa7c1592ef63bc5306575a2f09614e9a34",
+        "VERIFICATION.json": "821be926b37bee59553ca3ae82006ec855ecdffcce5c4e0d7985694d05e0120f",
+        "UPGRADE-v1.13-orphan.6.zh-CN.md": "16dea6c963544eba3f24f6d478fdae18a289a4c064c46422e83ad3d05da18aca",
+        "NODE_MANAGEMENT.zh-CN.md": "2ed859321df2a3cb2e1dc28dfe045baea102b07d8bc605fe115290c32feb7afe",
+        "HY2_PORT_HOPPING.md": "cd01f5ce99b9e06d0d68a9dfc01de1f4e2ed76f04e4527450e71413a2230ec66"
+      }
+    },
+    "endpoint": {
+      "repository": "ksr-v/Xboard-Independent-NodeEndpoint",
+      "tag": "v1.0.9",
+      "commit": "97df1bf60a43e70dd9f09f200b0c585fcb1d8107",
+      "url": "https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/tag/v1.0.9",
+      "latest": true,
+      "published_at": "2026-10-25T08:56:04Z",
+      "asset_count": 9,
+      "server_and_download_sha256_verified": true,
+      "asset_sha256": {
+        "NodeEndpoint-1.0.9.zip": "ad2b4c7de60ddaf03cc83c4c839d166d2b4d01eaeb87d391aa56f6ad5444e53b",
+        "node-endpoint-tools-1.0.8.zip": "2639106ae087ab75224442990d8c63a805cff09e0f3db070379fe03161dc8718",
+        "README.md": "f263d6708c2cc133543710de5f29b9ee9140f587acbb54eafe72b2dfd7e55def",
+        "UPGRADE.zh-CN.md": "a86ef2a8b4a9fbfca4137db5c9235e5deed0cefaef106ed548f9c6403c68693e",
+        "RELEASE_VALIDATION.md": "fc39e82bfc6e0f4bf91a0f4bff28a5c9a0af0cf896b47f9c6987991d5cad8ef7",
+        "NODE_MANAGEMENT_TEST_REPORT.md": "a4ce25e4a150941be649521fae1946cbbfdfbdd5c152269942e298df8e6c4fa5",
+        "HYSTERIA2_AUTO_FORWARDING_REPORT.md": "a181fc7241c75d426ccd9ad44cd276d5d5fff6856f97098d237e0777b31997d5",
+        "VERIFICATION.json": "821be926b37bee59553ca3ae82006ec855ecdffcce5c4e0d7985694d05e0120f",
+        "SHA256SUMS": "d9b6d84646367686e7bb664ae90d9aeb15fbb4ec37a2d81c4bc64eaa361bc15e"
+      }
+    },
+    "backend": {
+      "repository": "ksr-v/Xboard-Custom-Source",
+      "tag": "v2026.10.25.2",
+      "commit": "d1c3bb575b60bb74f78fadc7b21ef718dcee8f15",
+      "url": "https://github.com/ksr-v/Xboard-Custom-Source/releases/tag/v2026.10.25.2",
+      "latest": true,
+      "published_at": "2026-10-25T08:55:52Z",
+      "asset_count": 14,
+      "server_and_download_sha256_verified": true,
+      "asset_sha256": {
+        "xboard.tar.gz": "1f3a598ede33647b305f583fe07ec50789723249486edcd0eb270226d80a5329",
+        "latest.json": "17671ee42cd74cf70f15a6b8089cfbe7f8db0916bb24d61ddd5d6de274540f3c",
+        "plugin-source-lock.json": "c20995f52cf4a854917807aee096e016bbde09d87d1d68cd6a33abef5463d2a7",
+        "VALIDATION.md": "d493e584a4fe3bdb494d23b3410f6649ada86a3bca94d2ae6f25182976b2831e",
+        "VERIFICATION.json": "b0cbb963d14eb3afee11080e0cb6e22158a7a6a6fab6161f70bdb74a9508033f",
+        "README.md": "5d9e0050a84437280d57e905397ae4aef5e0ecfa66bbf2873bb50958bef0a486",
+        "INSTALL.zh-CN.md": "7d3551b73347f177c658450a6f1e3ec393ee0ea546ba932f8b70a15c804a8dc3",
+        "AAPANEL.zh-CN.md": "3fb0e86f6721275d8ffc20278f0cb05802bc33c83598c11126e7dabd272e3875",
+        "AAPANEL.en.md": "a0c98c5bcbd04a036a024717f683b6c92facc6af201806561c1b1332c13dfe8d",
+        "AAPANEL-DOCKER.zh-CN.md": "9aea68db545de5b878cd718487110a7f388bb56df7c40cb98fa9608d0ee82798",
+        "AAPANEL-DOCKER.en.md": "7f90b6fe5030a6f5989874f491099fb0f4c5eebf5ad148c0b84f9aec5468785e",
+        "UPGRADE.zh-CN.md": "bf0f2c541ffd5bac5e4053da84d99560ea7ff248603bd04b6acaaf66304c871e",
+        "NODE-MANAGEMENT-HY2.zh-CN.md": "46d5a68f7a05ad48abf145a1d0876f20b83b44db7c95717785a5977871a996a4",
+        "SHA256SUMS": "67596bbf7d7eb2236dfbb7ec8ee3543b04450457cf7afa4b8fdac6cadcf12169"
+      }
+    }
+  },
+  "total_asset_downloads_verified": 33,
+  "formal_node_vm_checks": 17,
+  "backend_plugin_integration_checks": 14,
+  "plugin_components": 36,
+  "plugin_zip_upload_checks": 6,
+  "root_updater_executed_from_public_release": false,
+  "production_deployment_performed": false,
+  "remote_node_ci_at_check": [
+    {
+      "id": 40178524615,
+      "url": "https://github.com/ksr-v/Xboard-Node--Custom-Source/actions/runs/40178524615",
+      "head_sha": "9394b235fe0665ab6e29a2281b9295a9fc5ddeaf",
+      "head_branch": "v1.13-orphan.6",
+      "status": "in_progress",
+      "conclusion": null
+    },
+    {
+      "id": 40178354434,
+      "url": "https://github.com/ksr-v/Xboard-Node--Custom-Source/actions/runs/40178354434",
+      "head_sha": "9394b235fe0665ab6e29a2281b9295a9fc5ddeaf",
+      "head_branch": "dev",
+      "status": "in_progress",
+      "conclusion": null
+    }
+  ],
+  "remote_ci_note": "Snapshot only; in-progress is not PASS. Other repositories have no run for their current release commits.",
+  "old_releases_or_assets_overwritten": false
+}

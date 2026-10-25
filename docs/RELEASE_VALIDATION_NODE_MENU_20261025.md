@@ -2,6 +2,8 @@
 
 本次配套版本：Node `v1.13-orphan.6`、全插件后端 `v2026.10.25.2`、NodeEndpoint `1.0.9`、独立迁移工具 `1.0.8`。Root入口仍为 `root-installer-v1.0.9 / tools1.0.6`。二维码插件固定1.2.0审计副本，SmartExpiry1.2.0和FlowScope2.4.0不变。
 
+三个仓库的正式Release已发布并设为latest；33项公开下载资产逐SHA核对通过，Node核心清单再次通过安装器pin及ELF架构校验。没有覆盖旧tag或资产，没有执行公网Root更新器。发布后的实际URL、tag、摘要及CI状态快照见[发布记录](verification/node-menu-publication-20261025.json)。CI在记录时仍进行中，不能表述为全部通过。
+
 ## 已验证的功能与资产
 
 - 自动UDP转发候选源码47/47真实检查：两内核QUIC/TLS及持续跳跃TCP/UDP字节校验、真实面板/NodeWorker配置更新、规则撤销、权限和冲突拒绝、退出清理。后端12项新增检查、原13项限速/路由回归通过。见[自动转发报告](HYSTERIA2_AUTO_FORWARDING_REPORT.md)。
