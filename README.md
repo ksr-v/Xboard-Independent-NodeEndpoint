@@ -231,4 +231,6 @@ CA 轮换时，面板导入只影响后续复制的新机器命令，不会自�
 
 已有插件与安装源验证分别见 [NATIVE_DOMAIN_TEST_REPORT.md](NATIVE_DOMAIN_TEST_REPORT.md)、[NATIVE_INSTALL_CHOICES_TEST_REPORT.md](NATIVE_INSTALL_CHOICES_TEST_REPORT.md)、[NATIVE_MACHINE_TEST_REPORT.md](NATIVE_MACHINE_TEST_REPORT.md)；Root / Linux 权限历史证据见 [TEST_REPORT.md](TEST_REPORT.md) 和 [VM_TEST_REPORT.md](VM_TEST_REPORT.md)。Root 防火墙补丁的实际测试范围以同次 Release 报告为准。
 
+[Hysteria2 端口跳跃实测](docs/HYSTERIA2_PORT_HOPPING_TEST_REPORT.md)：两内核在节点 UDP 范围转发配置后均通过持续跳跃；当前安装器不自动建立该转发，面板 TCP 8443 放行不能替代节点 UDP 映射。报告包含客户端订阅兼容差异和输入校验缺口。
+
 开发者可运行 `python3 tools/build/build.py --plugin-only` 与 `python3 tools/build/verify.py --plugin-only` 构建和核验当前插件，输出在 `dist/v1.0.8/`。Root 工具独立发布，保留已发布的插件与历史包字节。
