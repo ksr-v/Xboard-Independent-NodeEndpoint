@@ -1,0 +1,183 @@
+{
+  "date": "2026-10-25",
+  "status": "local implemented and verified; not pushed or formally released",
+  "node_base_commit": "efa0904634f0d488157350fae7579be0fae44b2c",
+  "node_commit": "34c524e50977ec0bbc60ce46f4a30ad0af76a0d1",
+  "backend_commit_unchanged": "8d0dfbc88cdff6ef99b01e831f05800bc62d12d8",
+  "published_node_unchanged": "v1.13-orphan.5; does not include this feature",
+  "runtime": {
+    "result": "PASS",
+    "tests": [
+      {
+        "test": "empty-edit-cancels-without-restart",
+        "pass": true
+      },
+      {
+        "test": "log-option-is-bounded-synthetic-output",
+        "pass": true,
+        "actual_root_logs_read": false
+      },
+      {
+        "test": "menu-restarts-real-owned-node",
+        "pass": true
+      },
+      {
+        "test": "wrong-token-preflight-preserves-running-install",
+        "pass": true
+      },
+      {
+        "test": "unreachable-panel-preserves-running-install",
+        "pass": true
+      },
+      {
+        "test": "address-and-token-change-authenticates-and-restarts",
+        "pass": true,
+        "token_echoed": false
+      },
+      {
+        "test": "binding-id-machine-and-ca-preserved",
+        "pass": true
+      },
+      {
+        "test": "failed-restart-restores-all-active-files",
+        "pass": true
+      },
+      {
+        "test": "online-release-verifies-and-updates-real-binaries",
+        "pass": true,
+        "network_source": "controlled release fixtures; no public updater executed"
+      },
+      {
+        "test": "online-update-retains-binding-health-and-private-ca",
+        "pass": true
+      },
+      {
+        "test": "tampered-online-updater-never-replaces-install",
+        "pass": true
+      },
+      {
+        "test": "editing-stopped-service-does-not-start-it",
+        "pass": true
+      },
+      {
+        "test": "private-files-and-backups-have-required-permissions",
+        "pass": true
+      }
+    ],
+    "host_nftables_unchanged": true,
+    "private_runtime_logs_read": false,
+    "service_stopped": true,
+    "candidate": {
+      "files": {
+        "xboard-node-linux-amd64": "da728d47f550cc350d86dbdd7f2a6ab057b029e25401513fa497f6e03b0eca11",
+        "xbctl-linux-amd64": "9f920cfefbdd024de36b6a05f4130af4fc2edbcf3cd7a66d0b5acf1a487e1ea0",
+        "updated-xboard-node-linux-amd64": "afea8c0e05b2de244270ad3e199ad87b5cde0855427a9ea01acb1247dcfcedfa",
+        "updated-xbctl-linux-amd64": "9996191f302b2a26c53eeb01e086cd50246c230aa8e253e9e815c125683be234",
+        "install.sh": "fee606df8dd6eed8034e5998e6140e9933ca1141bef3f8f4138d3e47b7c9c2e1",
+        "vm_menu_fixture_final.py": "2c2d23ab5b3f08b127e1a03eb41c1ce1eccfad78c7bc2d43daf5694fcfa86b5d"
+      },
+      "candidate": "node-menu-candidate",
+      "update_fixture_version": "v9.99.0 (test-only)"
+    }
+  },
+  "linux_race": {
+    "result": "PASS",
+    "exit_code": 0,
+    "packages": [
+      "./cmd/xbctl",
+      "./internal/config",
+      "./internal/controlplane",
+      "./internal/service",
+      "./internal/portforward"
+    ],
+    "tags": "with_quic,with_utls,with_wireguard,with_acme,with_clash_api",
+    "duration_seconds": 54.51,
+    "source_archive_sha256": "1244eaefeb29e40ef93b1c6252ec26615ac585317549f8af2835d95f6f583518",
+    "source_files": 175,
+    "toolchain": "go version go1.26.5 linux/amd64",
+    "network": "offline local module proxy only",
+    "private_runtime_logs_read": false,
+    "panel_data_accessed": false
+  },
+  "source_integrity": {
+    "result": "PASS",
+    "business_source_files_compared_to_tested_archive": 142,
+    "comparison": "exact bytes for Go, shell, Python and module files; documentation subsequently expanded",
+    "final_installer_sha256": "fee606df8dd6eed8034e5998e6140e9933ca1141bef3f8f4138d3e47b7c9c2e1"
+  },
+  "windows_go": {
+    "result": "PASS",
+    "packages": [
+      "./cmd/xbctl",
+      "./internal/config",
+      "./internal/service",
+      "./internal/portforward"
+    ],
+    "command": "go test -count=1 ./cmd/xbctl ./internal/config ./internal/service ./internal/portforward"
+  },
+  "installer_checks": {
+    "result": "PASS with one documented skip",
+    "total": 26,
+    "passed": 25,
+    "skipped": 1,
+    "skip_reason": "Independent distribution workspace not present"
+  },
+  "management_shell_checks": {
+    "result": "PASS",
+    "total": 7,
+    "passed": 7
+  },
+  "cleanup": {
+    "result": "PASS",
+    "units": [
+      {
+        "unit": "codex-node-menu-20261025.service",
+        "file_removed": true,
+        "inactive": true
+      },
+      {
+        "unit": "codex-node-menu-20261025-r2.service",
+        "file_removed": true,
+        "inactive": true
+      },
+      {
+        "unit": "codex-node-menu-20261025-r3.service",
+        "file_removed": true,
+        "inactive": true
+      }
+    ],
+    "ports": [
+      {
+        "port": 17006,
+        "protocol": "tcp",
+        "released": true
+      },
+      {
+        "port": 19631,
+        "protocol": "tcp",
+        "released": true
+      },
+      {
+        "port": 42443,
+        "protocol": "udp",
+        "released": true
+      }
+    ],
+    "test_container_removed": true,
+    "host_managed_hy2_tables": 0,
+    "original_panel_http_status": 200,
+    "private_runtime_logs_read": false,
+    "private_test_data_retained": true
+  },
+  "private_runtime_logs_read": false,
+  "public_updater_executed": false,
+  "test_release_published": false,
+  "deferred": [
+    "public formal Release upgrade",
+    "ARM64 execution",
+    "production migration",
+    "custom systemd deployment",
+    "long term load",
+    "new Node Docker image build and run"
+  ]
+}

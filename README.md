@@ -233,4 +233,6 @@ CA 轮换时，面板导入只影响后续复制的新机器命令，不会自�
 
 [Hysteria2 端口跳跃实测](docs/HYSTERIA2_PORT_HOPPING_TEST_REPORT.md)：v1.13-orphan.5 两内核在配置节点 UDP 范围转发后均通过持续跳跃；该发行版本不自动建立转发。开发代码已新增[按面板配置自动管理 UDP 转发](docs/HYSTERIA2_AUTO_FORWARDING_REPORT.md)，47项实际联测通过，需配套更新后端和 Node；尚未发布新版。面板 TCP 8443 放行不能替代节点 UDP 映射及网络放行。
 
+开发版新增[完整 node 管理菜单](docs/NODE_MANAGEMENT_TEST_REPORT.md)：修改对接地址／Token、查看日志、重启、状态和在线更新。13项 VM 联测通过；首次需配套升级 Node、xbctl 和管理脚本。当前 v1.13-orphan.5 及全插件发行包尚未包含本轮功能。
+
 开发者可运行 `python3 tools/build/build.py --plugin-only` 与 `python3 tools/build/verify.py --plugin-only` 构建和核验当前插件，输出在 `dist/v1.0.8/`。Root 工具独立发布，保留已发布的插件与历史包字节。
