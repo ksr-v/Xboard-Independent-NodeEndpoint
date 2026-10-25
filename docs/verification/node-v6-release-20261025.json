@@ -1,0 +1,169 @@
+{
+  "result": "PASS",
+  "version": "v1.13-orphan.6",
+  "date": "2026-10-25",
+  "node_business_source_commit": "34c524e50977ec0bbc60ce46f4a30ad0af76a0d1",
+  "checks": 17,
+  "runtime": {
+    "result": "PASS",
+    "tests": [
+      {
+        "test": "empty-edit-cancels-without-restart",
+        "pass": true
+      },
+      {
+        "test": "log-option-is-bounded-synthetic-output",
+        "pass": true,
+        "actual_root_logs_read": false
+      },
+      {
+        "test": "menu-restarts-real-owned-node",
+        "pass": true
+      },
+      {
+        "test": "wrong-token-preflight-preserves-running-install",
+        "pass": true
+      },
+      {
+        "test": "unreachable-panel-preserves-running-install",
+        "pass": true
+      },
+      {
+        "test": "address-and-token-change-authenticates-and-restarts",
+        "pass": true,
+        "token_echoed": false
+      },
+      {
+        "test": "binding-id-machine-and-ca-preserved",
+        "pass": true
+      },
+      {
+        "test": "failed-restart-restores-all-active-files",
+        "pass": true
+      },
+      {
+        "test": "online-release-verifies-and-updates-real-binaries",
+        "pass": true,
+        "network_source": "controlled latest-release transport; exact formal binaries, installer changes only fixture paths"
+      },
+      {
+        "test": "online-update-retains-binding-health-and-private-ca",
+        "pass": true
+      },
+      {
+        "test": "tampered-online-updater-never-replaces-install",
+        "pass": true
+      },
+      {
+        "test": "editing-stopped-service-does-not-start-it",
+        "pass": true
+      },
+      {
+        "test": "private-files-and-backups-have-required-permissions",
+        "pass": true
+      }
+    ],
+    "host_nftables_unchanged": true,
+    "private_runtime_logs_read": false,
+    "service_stopped": true,
+    "candidate": {
+      "files": {
+        "install.sh": "5824ea367a0268501d934221d0392ae14007c6f0500586cba5d6c316425ca908",
+        "qemu-aarch64-static": "4f55e2e88dc05dc0f619562d5795b8eb25ed2ad2547504fb4835207a6911c350",
+        "SHA256SUMS": "f7cfc906911b88abf27aa99fc3ee74fa7c1592ef63bc5306575a2f09614e9a34",
+        "updated-xbctl-linux-amd64": "18efe4e1cba9988dcbbdff14532986b9b352637001acf585e8d6066b8f8bb7d0",
+        "updated-xboard-node-linux-amd64": "ffe4878de3fcb16b16279e4b883e0e4d845e16ec16639a265903c270165978b9",
+        "vm_release_fixture.py": "462f3af6a987a7d7ebf583fdefccc310af989748efa0a49f2ff189e80759df50",
+        "xbctl-linux-amd64": "18efe4e1cba9988dcbbdff14532986b9b352637001acf585e8d6066b8f8bb7d0",
+        "xbctl-linux-arm64": "518e2164dea5735a848f1f90edfeeb1fdc5222421ba773fce7fde49c73ea9c89",
+        "xboard-node-linux-amd64": "ffe4878de3fcb16b16279e4b883e0e4d845e16ec16639a265903c270165978b9",
+        "xboard-node-linux-arm64": "ffc93d22a75713528292f45c1b459c03a456275c33662d14db48fee135ec99c2"
+      },
+      "candidate": "v1.13-orphan.6",
+      "formal_release_assets": {
+        "xboard-node-linux-amd64": "ffe4878de3fcb16b16279e4b883e0e4d845e16ec16639a265903c270165978b9",
+        "xbctl-linux-amd64": "18efe4e1cba9988dcbbdff14532986b9b352637001acf585e8d6066b8f8bb7d0",
+        "xboard-node-linux-arm64": "ffc93d22a75713528292f45c1b459c03a456275c33662d14db48fee135ec99c2",
+        "xbctl-linux-arm64": "518e2164dea5735a848f1f90edfeeb1fdc5222421ba773fce7fde49c73ea9c89",
+        "install.sh": "5824ea367a0268501d934221d0392ae14007c6f0500586cba5d6c316425ca908",
+        "SHA256SUMS": "f7cfc906911b88abf27aa99fc3ee74fa7c1592ef63bc5306575a2f09614e9a34"
+      },
+      "update_fixture_version": "v1.13-orphan.6",
+      "scope": "13 actual PTY/systemd/SQLite panel checks plus 4 formal binary version checks",
+      "installer_adaptation": "owned filesystem paths only; release version and binary SHA-256 pins unchanged",
+      "public_release_transport_mocked": true
+    },
+    "formal_binary_assets_unchanged": true,
+    "installer_adaptation": "owned filesystem paths only; version and binary SHA-256 pins unchanged"
+  },
+  "binary_smoke": {
+    "result": "PASS",
+    "version": "v1.13-orphan.6",
+    "checks": [
+      {
+        "asset": "xboard-node-linux-amd64",
+        "sha256": "ffe4878de3fcb16b16279e4b883e0e4d845e16ec16639a265903c270165978b9",
+        "execution": "native-linux-amd64",
+        "version": "xboard-node v1.13-orphan.6 (built 2026-10-25T07:21:43Z)",
+        "pass": true
+      },
+      {
+        "asset": "xbctl-linux-amd64",
+        "sha256": "18efe4e1cba9988dcbbdff14532986b9b352637001acf585e8d6066b8f8bb7d0",
+        "execution": "native-linux-amd64",
+        "version": "xbctl v1.13-orphan.6 (built 2026-10-25T07:21:43Z)",
+        "pass": true
+      },
+      {
+        "asset": "xboard-node-linux-arm64",
+        "sha256": "ffc93d22a75713528292f45c1b459c03a456275c33662d14db48fee135ec99c2",
+        "execution": "QEMU-aarch64",
+        "version": "xboard-node v1.13-orphan.6 (built 2026-10-25T07:21:43Z)",
+        "pass": true
+      },
+      {
+        "asset": "xbctl-linux-arm64",
+        "sha256": "518e2164dea5735a848f1f90edfeeb1fdc5222421ba773fce7fde49c73ea9c89",
+        "execution": "QEMU-aarch64",
+        "version": "xbctl v1.13-orphan.6 (built 2026-10-25T07:21:43Z)",
+        "pass": true
+      }
+    ],
+    "native_arm64_functional_test": false
+  },
+  "cleanup": {
+    "result": "PASS",
+    "unit": "codex-node-menu-release-20261025.service",
+    "unit_removed": true,
+    "unit_inactive": true,
+    "ports": [
+      {
+        "port": 17006,
+        "protocol": "tcp",
+        "released": true
+      },
+      {
+        "port": 19631,
+        "protocol": "tcp",
+        "released": true
+      },
+      {
+        "port": 42443,
+        "protocol": "udp",
+        "released": true
+      }
+    ],
+    "test_container_removed": true,
+    "managed_hy2_tables": 0,
+    "original_panel_http_status": 200,
+    "private_runtime_logs_read": false,
+    "existing_private_pty_files_read": false,
+    "private_test_data_retained": true
+  },
+  "public_release_transport_mocked": true,
+  "formal_binary_assets_unchanged": true,
+  "installer_adaptation": "Owned paths only, exact formal binary hashes and version unchanged; adapted private installer/checksum served by controlled latest-release transport",
+  "private_runtime_logs_read": false,
+  "existing_private_pty_files_read": false,
+  "native_arm64_functional_test": false
+}

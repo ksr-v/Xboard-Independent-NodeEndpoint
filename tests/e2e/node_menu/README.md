@@ -41,3 +41,9 @@ sudo python3 -I -B /tmp/codex-node-menu-upload-20261025/vm_menu_fixture_final.py
 源码检查另需 `node-source.tar.gz`、`source-metadata.json`，包含 `source_archive_sha256` 和 `source_files`；使用既有 `/opt/xboard-rate-route-linux-fix-20261024` 离线缓存及Go1.26.5。核对快照后再运行 `linux_source_verify_final.py`。导出的175文件快照含当时文档，测试后仅补充文档；受测Go与Shell业务源码保持一致。
 
 公网正式更新、ARM64运行和生产迁移未在本轮执行；结果不代表这些环境已验收。
+
+## 正式v6资产复核
+
+后续正式字节另以 `formal_vm_release_fixture.py` 和 `formal_final_guard.py` 复核，固定独立 `/opt/xboard-node-menu-release-20261025`。上传时将前者命名为 `vm_release_fixture.py`，清单使用[正式证据](../../../docs/verification/node-v6-release-20261025.json)的 `runtime.candidate`；程序须取同次v6 Release并逐SHA核对，updated两个amd64文件为同一正式程序，QEMU需匹配清单摘要。只适配自有路径，保留正式版本和四二进制pin。
+
+先执行 `smoke` 核对四程序amd64原生／arm64 QEMU版本，再依次 `prepare`、`run`、`cleanup` 和最终只读guard。正式17项全部通过，真实管理13项及版本4项；保留绑定、健康端口和CA的升级实际执行。下载运输为受控Release；未执行公网Root更新。正式夹具仍使用合成日志，不读取Root私有日志和既有PTY，测试后容器／单元移除、端口释放，原面板HTTP200。
