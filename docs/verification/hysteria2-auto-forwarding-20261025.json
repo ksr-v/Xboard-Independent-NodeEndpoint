@@ -1,0 +1,3615 @@
+{
+  "date": "2026-10-25",
+  "status": "local implemented and verified; not pushed or formally released",
+  "node_commit": "efa0904634f0d488157350fae7579be0fae44b2c",
+  "backend_commit": "8d0dfbc88cdff6ef99b01e831f05800bc62d12d8",
+  "candidate": {
+    "node_sha256": "d8310fd9960e732b971e83038945434b6af775390a5582f10655e3ed92f6d5a6",
+    "client_sha256": "115aaf17049a259241fe7c0118f351f39f7d71fba2eff372b63dd06a5d24b86e",
+    "source_archive_sha256": "2dc9f92b61381ce3e95d6195ee6afdf2d6041488a6aa25b704e6ee5de219107f",
+    "candidate": "hy2-auto-candidate"
+  },
+  "standalone": {
+    "result": "PASS",
+    "date": "2026-10-25",
+    "candidate": {
+      "node_sha256": "d8310fd9960e732b971e83038945434b6af775390a5582f10655e3ed92f6d5a6",
+      "client_sha256": "115aaf17049a259241fe7c0118f351f39f7d71fba2eff372b63dd06a5d24b86e",
+      "source_archive_sha256": "2dc9f92b61381ce3e95d6195ee6afdf2d6041488a6aa25b704e6ee5de219107f",
+      "candidate": "hy2-auto-candidate"
+    },
+    "tests": [
+      {
+        "kernel": "singbox",
+        "test": "startup-created-owned-rules",
+        "pass": true,
+        "nft": {
+          "tables": [
+            {
+              "family": "inet",
+              "name": "xbnode_hop_2d006b1e557985bdaebb6dec",
+              "handle": 2,
+              "comment": "xboard-node-portforward:v1:2d006b1e557985bdaebb6decfc3e80d88b5fd828228f000e1f81f86e0ba8faf5"
+            }
+          ],
+          "rules": [
+            {
+              "family": "inet",
+              "table": "xbnode_hop_2d006b1e557985bdaebb6dec",
+              "chain": "prerouting",
+              "handle": 2,
+              "expr": [
+                {
+                  "match": {
+                    "op": "==",
+                    "left": {
+                      "meta": {
+                        "key": "nfproto"
+                      }
+                    },
+                    "right": "ipv4"
+                  }
+                },
+                {
+                  "match": {
+                    "op": "==",
+                    "left": {
+                      "fib": {
+                        "result": "type",
+                        "flags": [
+                          "daddr"
+                        ]
+                      }
+                    },
+                    "right": "local"
+                  }
+                },
+                {
+                  "match": {
+                    "op": "==",
+                    "left": {
+                      "payload": {
+                        "protocol": "udp",
+                        "field": "dport"
+                      }
+                    },
+                    "right": {
+                      "range": [
+                        42450,
+                        42453
+                      ]
+                    }
+                  }
+                },
+                {
+                  "counter": {
+                    "packets": 0,
+                    "bytes": 0
+                  }
+                },
+                {
+                  "redirect": {
+                    "port": 42443
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "kernel": "singbox",
+        "test": "automatic-hopping-same-tcp-and-udp",
+        "pass": true,
+        "client_exit": 0,
+        "client": {
+          "passed": true,
+          "expected_failure": false,
+          "stage": "traffic",
+          "server_ports": [
+            "42450:42453"
+          ],
+          "hop_interval": "5s",
+          "tls_verification": true,
+          "flows": [
+            {
+              "kind": "udp",
+              "passed": true,
+              "dial_count": 1,
+              "rounds": 297,
+              "verified_bytes": 304128,
+              "elapsed_ms": 45120,
+              "maximum_round_trip_ms": 7
+            },
+            {
+              "kind": "tcp",
+              "passed": true,
+              "dial_count": 1,
+              "rounds": 285,
+              "verified_bytes": 9338880,
+              "elapsed_ms": 45148,
+              "maximum_round_trip_ms": 46
+            }
+          ]
+        },
+        "wire": {
+          "allowed_destination_ports": [
+            42443,
+            42450,
+            42451,
+            42452,
+            42453,
+            42454,
+            42455,
+            42456,
+            42457
+          ],
+          "destination_changes": 8,
+          "destination_ip": "10.213.25.1",
+          "distinct_destination_ports": [
+            42450,
+            42451,
+            42452,
+            42453
+          ],
+          "distinct_source_ports": [
+            34904,
+            38359,
+            41525,
+            42282,
+            44462,
+            50424,
+            52898,
+            55106,
+            59351,
+            60770
+          ],
+          "elapsed_seconds": 45.514012,
+          "interface": "hys-1025",
+          "ip_bytes": 10131492,
+          "mode": "observe",
+          "observed_endpoints": [
+            {
+              "destination_port": 42451,
+              "first_seconds": 0.107333,
+              "ip_bytes": 1148050,
+              "last_seconds": 5.096583,
+              "packets": 912,
+              "source_port": 44462,
+              "udp_bytes": 1129810
+            },
+            {
+              "destination_port": 42452,
+              "first_seconds": 5.141918,
+              "ip_bytes": 1102184,
+              "last_seconds": 9.994675,
+              "packets": 892,
+              "source_port": 59351,
+              "udp_bytes": 1084344
+            },
+            {
+              "destination_port": 42450,
+              "first_seconds": 10.140615,
+              "ip_bytes": 1136827,
+              "last_seconds": 15.093217,
+              "packets": 925,
+              "source_port": 34904,
+              "udp_bytes": 1118327
+            },
+            {
+              "destination_port": 42453,
+              "first_seconds": 15.141084,
+              "ip_bytes": 1101858,
+              "last_seconds": 20.002631,
+              "packets": 892,
+              "source_port": 52898,
+              "udp_bytes": 1084018
+            },
+            {
+              "destination_port": 42452,
+              "first_seconds": 20.144145,
+              "ip_bytes": 1135449,
+              "last_seconds": 25.106492,
+              "packets": 907,
+              "source_port": 50424,
+              "udp_bytes": 1117309
+            },
+            {
+              "destination_port": 42453,
+              "first_seconds": 25.152244,
+              "ip_bytes": 1101401,
+              "last_seconds": 30.039153,
+              "packets": 886,
+              "source_port": 42282,
+              "udp_bytes": 1083681
+            },
+            {
+              "destination_port": 42451,
+              "first_seconds": 30.109616,
+              "ip_bytes": 1135712,
+              "last_seconds": 35.102517,
+              "packets": 913,
+              "source_port": 60770,
+              "udp_bytes": 1117452
+            },
+            {
+              "destination_port": 42451,
+              "first_seconds": 35.179335,
+              "ip_bytes": 1135460,
+              "last_seconds": 40.098601,
+              "packets": 908,
+              "source_port": 41525,
+              "udp_bytes": 1117300
+            },
+            {
+              "destination_port": 42450,
+              "first_seconds": 40.202595,
+              "ip_bytes": 1134497,
+              "last_seconds": 45.105173,
+              "packets": 890,
+              "source_port": 55106,
+              "udp_bytes": 1116697
+            },
+            {
+              "destination_port": 42452,
+              "first_seconds": 45.257135,
+              "ip_bytes": 54,
+              "last_seconds": 45.257135,
+              "packets": 1,
+              "source_port": 38359,
+              "udp_bytes": 34
+            }
+          ],
+          "packets": 8126,
+          "payload_storage": false,
+          "raw_capture_storage": false,
+          "source_ip": "10.213.25.2",
+          "source_socket_changes": 9,
+          "time_periods": [
+            {
+              "destination_port": 42451,
+              "first_seconds": 0.107333,
+              "ip_bytes": 1148050,
+              "last_seconds": 5.096583,
+              "packets": 912,
+              "source_port": 44462,
+              "udp_bytes": 1129810
+            },
+            {
+              "destination_port": 42452,
+              "first_seconds": 5.141918,
+              "ip_bytes": 1102184,
+              "last_seconds": 9.994675,
+              "packets": 892,
+              "source_port": 59351,
+              "udp_bytes": 1084344
+            },
+            {
+              "destination_port": 42450,
+              "first_seconds": 10.140615,
+              "ip_bytes": 1136827,
+              "last_seconds": 15.093217,
+              "packets": 925,
+              "source_port": 34904,
+              "udp_bytes": 1118327
+            },
+            {
+              "destination_port": 42453,
+              "first_seconds": 15.141084,
+              "ip_bytes": 1101858,
+              "last_seconds": 20.002631,
+              "packets": 892,
+              "source_port": 52898,
+              "udp_bytes": 1084018
+            },
+            {
+              "destination_port": 42452,
+              "first_seconds": 20.144145,
+              "ip_bytes": 1135449,
+              "last_seconds": 25.106492,
+              "packets": 907,
+              "source_port": 50424,
+              "udp_bytes": 1117309
+            },
+            {
+              "destination_port": 42453,
+              "first_seconds": 25.152244,
+              "ip_bytes": 1101401,
+              "last_seconds": 30.039153,
+              "packets": 886,
+              "source_port": 42282,
+              "udp_bytes": 1083681
+            },
+            {
+              "destination_port": 42451,
+              "first_seconds": 30.109616,
+              "ip_bytes": 1135712,
+              "last_seconds": 35.102517,
+              "packets": 913,
+              "source_port": 60770,
+              "udp_bytes": 1117452
+            },
+            {
+              "destination_port": 42451,
+              "first_seconds": 35.179335,
+              "ip_bytes": 1135460,
+              "last_seconds": 40.098601,
+              "packets": 908,
+              "source_port": 41525,
+              "udp_bytes": 1117300
+            },
+            {
+              "destination_port": 42450,
+              "first_seconds": 40.202595,
+              "ip_bytes": 1134497,
+              "last_seconds": 45.105173,
+              "packets": 890,
+              "source_port": 55106,
+              "udp_bytes": 1116697
+            },
+            {
+              "destination_port": 42452,
+              "first_seconds": 45.257135,
+              "ip_bytes": 54,
+              "last_seconds": 45.257135,
+              "packets": 1,
+              "source_port": 38359,
+              "udp_bytes": 34
+            }
+          ],
+          "udp_bytes": 9968972
+        },
+        "mapping_source": "xboard-node-managed",
+        "fixture_installed_nat": false
+      },
+      {
+        "kernel": "singbox",
+        "test": "live-range-replaced-without-process-restart",
+        "pass": true,
+        "elapsed_ms": 6166,
+        "nft": {
+          "tables": [
+            {
+              "family": "inet",
+              "name": "xbnode_hop_2d006b1e557985bdaebb6dec",
+              "handle": 3,
+              "comment": "xboard-node-portforward:v1:2d006b1e557985bdaebb6decfc3e80d88b5fd828228f000e1f81f86e0ba8faf5"
+            }
+          ],
+          "rules": [
+            {
+              "family": "inet",
+              "table": "xbnode_hop_2d006b1e557985bdaebb6dec",
+              "chain": "prerouting",
+              "handle": 2,
+              "expr": [
+                {
+                  "match": {
+                    "op": "==",
+                    "left": {
+                      "meta": {
+                        "key": "nfproto"
+                      }
+                    },
+                    "right": "ipv4"
+                  }
+                },
+                {
+                  "match": {
+                    "op": "==",
+                    "left": {
+                      "fib": {
+                        "result": "type",
+                        "flags": [
+                          "daddr"
+                        ]
+                      }
+                    },
+                    "right": "local"
+                  }
+                },
+                {
+                  "match": {
+                    "op": "==",
+                    "left": {
+                      "payload": {
+                        "protocol": "udp",
+                        "field": "dport"
+                      }
+                    },
+                    "right": {
+                      "range": [
+                        42454,
+                        42457
+                      ]
+                    }
+                  }
+                },
+                {
+                  "counter": {
+                    "packets": 0,
+                    "bytes": 0
+                  }
+                },
+                {
+                  "redirect": {
+                    "port": 42443
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "update_method": "standalone file watcher; services restart inside same Go process"
+      },
+      {
+        "kernel": "singbox",
+        "test": "old-range-rejected-after-change",
+        "pass": true,
+        "client_exit": 0,
+        "client": {
+          "passed": true,
+          "expected_failure": true,
+          "stage": "traffic",
+          "server_ports": [
+            "42450:42453"
+          ],
+          "hop_interval": "5s",
+          "tls_verification": true,
+          "flows": [
+            {
+              "kind": "udp",
+              "passed": false,
+              "error_class": "connection_refused",
+              "dial_count": 1,
+              "rounds": 0,
+              "verified_bytes": 0,
+              "elapsed_ms": 5,
+              "maximum_round_trip_ms": 0
+            },
+            {
+              "kind": "tcp",
+              "passed": false,
+              "error_class": "connection_refused",
+              "dial_count": 1,
+              "rounds": 0,
+              "verified_bytes": 0,
+              "elapsed_ms": 5,
+              "maximum_round_trip_ms": 0
+            }
+          ]
+        },
+        "wire": {
+          "allowed_destination_ports": [
+            42443,
+            42450,
+            42451,
+            42452,
+            42453,
+            42454,
+            42455,
+            42456,
+            42457
+          ],
+          "destination_changes": 1,
+          "destination_ip": "10.213.25.1",
+          "distinct_destination_ports": [
+            42450,
+            42453
+          ],
+          "distinct_source_ports": [
+            40239,
+            58110
+          ],
+          "elapsed_seconds": 0.358011,
+          "interface": "hys-1025",
+          "ip_bytes": 2616,
+          "mode": "observe",
+          "observed_endpoints": [
+            {
+              "destination_port": 42453,
+              "first_seconds": 0.101995,
+              "ip_bytes": 1308,
+              "last_seconds": 0.101995,
+              "packets": 1,
+              "source_port": 58110,
+              "udp_bytes": 1288
+            },
+            {
+              "destination_port": 42450,
+              "first_seconds": 0.102027,
+              "ip_bytes": 1308,
+              "last_seconds": 0.102027,
+              "packets": 1,
+              "source_port": 40239,
+              "udp_bytes": 1288
+            }
+          ],
+          "packets": 2,
+          "payload_storage": false,
+          "raw_capture_storage": false,
+          "source_ip": "10.213.25.2",
+          "source_socket_changes": 1,
+          "time_periods": [
+            {
+              "destination_port": 42453,
+              "first_seconds": 0.101995,
+              "ip_bytes": 1308,
+              "last_seconds": 0.101995,
+              "packets": 1,
+              "source_port": 58110,
+              "udp_bytes": 1288
+            },
+            {
+              "destination_port": 42450,
+              "first_seconds": 0.102027,
+              "ip_bytes": 1308,
+              "last_seconds": 0.102027,
+              "packets": 1,
+              "source_port": 40239,
+              "udp_bytes": 1288
+            }
+          ],
+          "udp_bytes": 2576
+        },
+        "mapping_source": "xboard-node-managed",
+        "fixture_installed_nat": false
+      },
+      {
+        "kernel": "singbox",
+        "test": "changed-range-continuous-tcp-and-udp",
+        "pass": true,
+        "client_exit": 0,
+        "client": {
+          "passed": true,
+          "expected_failure": false,
+          "stage": "traffic",
+          "server_ports": [
+            "42454:42457"
+          ],
+          "hop_interval": "5s",
+          "tls_verification": true,
+          "flows": [
+            {
+              "kind": "udp",
+              "passed": true,
+              "dial_count": 1,
+              "rounds": 79,
+              "verified_bytes": 80896,
+              "elapsed_ms": 12036,
+              "maximum_round_trip_ms": 5
+            },
+            {
+              "kind": "tcp",
+              "passed": true,
+              "dial_count": 1,
+              "rounds": 77,
+              "verified_bytes": 2523136,
+              "elapsed_ms": 12179,
+              "maximum_round_trip_ms": 46
+            }
+          ]
+        },
+        "wire": {
+          "allowed_destination_ports": [
+            42443,
+            42450,
+            42451,
+            42452,
+            42453,
+            42454,
+            42455,
+            42456,
+            42457
+          ],
+          "destination_changes": 2,
+          "destination_ip": "10.213.25.1",
+          "distinct_destination_ports": [
+            42454,
+            42455
+          ],
+          "distinct_source_ports": [
+            40868,
+            50532,
+            52932
+          ],
+          "elapsed_seconds": 12.52205,
+          "interface": "hys-1025",
+          "ip_bytes": 2743289,
+          "mode": "observe",
+          "observed_endpoints": [
+            {
+              "destination_port": 42455,
+              "first_seconds": 0.086904,
+              "ip_bytes": 1147066,
+              "last_seconds": 4.991865,
+              "packets": 926,
+              "source_port": 52932,
+              "udp_bytes": 1128546
+            },
+            {
+              "destination_port": 42454,
+              "first_seconds": 5.104341,
+              "ip_bytes": 1134898,
+              "last_seconds": 10.059633,
+              "packets": 901,
+              "source_port": 50532,
+              "udp_bytes": 1116878
+            },
+            {
+              "destination_port": 42455,
+              "first_seconds": 10.144424,
+              "ip_bytes": 461325,
+              "last_seconds": 12.266111,
+              "packets": 378,
+              "source_port": 40868,
+              "udp_bytes": 453765
+            }
+          ],
+          "packets": 2205,
+          "payload_storage": false,
+          "raw_capture_storage": false,
+          "source_ip": "10.213.25.2",
+          "source_socket_changes": 2,
+          "time_periods": [
+            {
+              "destination_port": 42455,
+              "first_seconds": 0.086904,
+              "ip_bytes": 1147066,
+              "last_seconds": 4.991865,
+              "packets": 926,
+              "source_port": 52932,
+              "udp_bytes": 1128546
+            },
+            {
+              "destination_port": 42454,
+              "first_seconds": 5.104341,
+              "ip_bytes": 1134898,
+              "last_seconds": 10.059633,
+              "packets": 901,
+              "source_port": 50532,
+              "udp_bytes": 1116878
+            },
+            {
+              "destination_port": 42455,
+              "first_seconds": 10.144424,
+              "ip_bytes": 461325,
+              "last_seconds": 12.266111,
+              "packets": 378,
+              "source_port": 40868,
+              "udp_bytes": 453765
+            }
+          ],
+          "udp_bytes": 2699189
+        },
+        "mapping_source": "xboard-node-managed",
+        "fixture_installed_nat": false
+      },
+      {
+        "kernel": "singbox",
+        "test": "disable-removed-owned-table",
+        "pass": true,
+        "elapsed_ms": 6097
+      },
+      {
+        "kernel": "singbox",
+        "test": "disabled-range-rejected",
+        "pass": true,
+        "client_exit": 0,
+        "client": {
+          "passed": true,
+          "expected_failure": true,
+          "stage": "traffic",
+          "server_ports": [
+            "42454:42457"
+          ],
+          "hop_interval": "5s",
+          "tls_verification": true,
+          "flows": [
+            {
+              "kind": "udp",
+              "passed": false,
+              "error_class": "connection_refused",
+              "dial_count": 1,
+              "rounds": 0,
+              "verified_bytes": 0,
+              "elapsed_ms": 0,
+              "maximum_round_trip_ms": 0
+            },
+            {
+              "kind": "tcp",
+              "passed": false,
+              "error_class": "connection_refused",
+              "dial_count": 1,
+              "rounds": 0,
+              "verified_bytes": 0,
+              "elapsed_ms": 1,
+              "maximum_round_trip_ms": 0
+            }
+          ]
+        },
+        "wire": {
+          "allowed_destination_ports": [
+            42443,
+            42450,
+            42451,
+            42452,
+            42453,
+            42454,
+            42455,
+            42456,
+            42457
+          ],
+          "destination_changes": 1,
+          "destination_ip": "10.213.25.1",
+          "distinct_destination_ports": [
+            42454,
+            42457
+          ],
+          "distinct_source_ports": [
+            33242,
+            50483
+          ],
+          "elapsed_seconds": 0.357082,
+          "interface": "hys-1025",
+          "ip_bytes": 2616,
+          "mode": "observe",
+          "observed_endpoints": [
+            {
+              "destination_port": 42457,
+              "first_seconds": 0.100389,
+              "ip_bytes": 1308,
+              "last_seconds": 0.100389,
+              "packets": 1,
+              "source_port": 50483,
+              "udp_bytes": 1288
+            },
+            {
+              "destination_port": 42454,
+              "first_seconds": 0.100713,
+              "ip_bytes": 1308,
+              "last_seconds": 0.100713,
+              "packets": 1,
+              "source_port": 33242,
+              "udp_bytes": 1288
+            }
+          ],
+          "packets": 2,
+          "payload_storage": false,
+          "raw_capture_storage": false,
+          "source_ip": "10.213.25.2",
+          "source_socket_changes": 1,
+          "time_periods": [
+            {
+              "destination_port": 42457,
+              "first_seconds": 0.100389,
+              "ip_bytes": 1308,
+              "last_seconds": 0.100389,
+              "packets": 1,
+              "source_port": 50483,
+              "udp_bytes": 1288
+            },
+            {
+              "destination_port": 42454,
+              "first_seconds": 0.100713,
+              "ip_bytes": 1308,
+              "last_seconds": 0.100713,
+              "packets": 1,
+              "source_port": 33242,
+              "udp_bytes": 1288
+            }
+          ],
+          "udp_bytes": 2576
+        },
+        "mapping_source": "xboard-node-managed",
+        "fixture_installed_nat": false
+      },
+      {
+        "kernel": "singbox",
+        "test": "disabled-primary-port-still-works",
+        "pass": true,
+        "client_exit": 0,
+        "client": {
+          "passed": true,
+          "expected_failure": false,
+          "stage": "traffic",
+          "tls_verification": true,
+          "flows": [
+            {
+              "kind": "tcp",
+              "passed": true,
+              "dial_count": 1,
+              "rounds": 24,
+              "verified_bytes": 786432,
+              "elapsed_ms": 4005,
+              "maximum_round_trip_ms": 46
+            },
+            {
+              "kind": "udp",
+              "passed": true,
+              "dial_count": 1,
+              "rounds": 27,
+              "verified_bytes": 27648,
+              "elapsed_ms": 4101,
+              "maximum_round_trip_ms": 3
+            }
+          ]
+        },
+        "wire": {
+          "allowed_destination_ports": [
+            42443,
+            42450,
+            42451,
+            42452,
+            42453,
+            42454,
+            42455,
+            42456,
+            42457
+          ],
+          "destination_changes": 0,
+          "destination_ip": "10.213.25.1",
+          "distinct_destination_ports": [
+            42443
+          ],
+          "distinct_source_ports": [
+            44711
+          ],
+          "elapsed_seconds": 4.434713,
+          "interface": "hys-1025",
+          "ip_bytes": 866506,
+          "mode": "observe",
+          "observed_endpoints": [
+            {
+              "destination_port": 42443,
+              "first_seconds": 0.078492,
+              "ip_bytes": 866506,
+              "last_seconds": 4.179352,
+              "packets": 708,
+              "source_port": 44711,
+              "udp_bytes": 852346
+            }
+          ],
+          "packets": 708,
+          "payload_storage": false,
+          "raw_capture_storage": false,
+          "source_ip": "10.213.25.2",
+          "source_socket_changes": 0,
+          "time_periods": [
+            {
+              "destination_port": 42443,
+              "first_seconds": 0.078492,
+              "ip_bytes": 866506,
+              "last_seconds": 4.179352,
+              "packets": 708,
+              "source_port": 44711,
+              "udp_bytes": 852346
+            }
+          ],
+          "udp_bytes": 852346
+        },
+        "mapping_source": "xboard-node-managed",
+        "fixture_installed_nat": false
+      },
+      {
+        "kernel": "singbox",
+        "test": "sigterm-cleaned-owned-table",
+        "pass": true,
+        "exit_code": 0
+      },
+      {
+        "kernel": "singbox",
+        "test": "invalid-reversed-range-rejected-at-startup",
+        "pass": true,
+        "exit_code": 1,
+        "remaining_nft_tables": []
+      },
+      {
+        "kernel": "xray",
+        "test": "startup-created-owned-rules",
+        "pass": true,
+        "nft": {
+          "tables": [
+            {
+              "family": "inet",
+              "name": "xbnode_hop_80fd9a9d99382ae291bdd2e7",
+              "handle": 1,
+              "comment": "xboard-node-portforward:v1:80fd9a9d99382ae291bdd2e7b1c555fa47fbde98d4f0b739abd572a7c93c06a9"
+            }
+          ],
+          "rules": [
+            {
+              "family": "inet",
+              "table": "xbnode_hop_80fd9a9d99382ae291bdd2e7",
+              "chain": "prerouting",
+              "handle": 2,
+              "expr": [
+                {
+                  "match": {
+                    "op": "==",
+                    "left": {
+                      "meta": {
+                        "key": "nfproto"
+                      }
+                    },
+                    "right": "ipv4"
+                  }
+                },
+                {
+                  "match": {
+                    "op": "==",
+                    "left": {
+                      "fib": {
+                        "result": "type",
+                        "flags": [
+                          "daddr"
+                        ]
+                      }
+                    },
+                    "right": "local"
+                  }
+                },
+                {
+                  "match": {
+                    "op": "==",
+                    "left": {
+                      "payload": {
+                        "protocol": "udp",
+                        "field": "dport"
+                      }
+                    },
+                    "right": {
+                      "range": [
+                        42450,
+                        42453
+                      ]
+                    }
+                  }
+                },
+                {
+                  "counter": {
+                    "packets": 0,
+                    "bytes": 0
+                  }
+                },
+                {
+                  "redirect": {
+                    "port": 42443
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "kernel": "xray",
+        "test": "automatic-hopping-same-tcp-and-udp",
+        "pass": true,
+        "client_exit": 0,
+        "client": {
+          "passed": true,
+          "expected_failure": false,
+          "stage": "traffic",
+          "server_ports": [
+            "42450:42453"
+          ],
+          "hop_interval": "5s",
+          "tls_verification": true,
+          "flows": [
+            {
+              "kind": "tcp",
+              "passed": true,
+              "dial_count": 1,
+              "rounds": 280,
+              "verified_bytes": 9175040,
+              "elapsed_ms": 45011,
+              "maximum_round_trip_ms": 46
+            },
+            {
+              "kind": "udp",
+              "passed": true,
+              "dial_count": 1,
+              "rounds": 297,
+              "verified_bytes": 304128,
+              "elapsed_ms": 45091,
+              "maximum_round_trip_ms": 4
+            }
+          ]
+        },
+        "wire": {
+          "allowed_destination_ports": [
+            42443,
+            42450,
+            42451,
+            42452,
+            42453,
+            42454,
+            42455,
+            42456,
+            42457
+          ],
+          "destination_changes": 9,
+          "destination_ip": "10.213.25.1",
+          "distinct_destination_ports": [
+            42450,
+            42451,
+            42453
+          ],
+          "distinct_source_ports": [
+            35018,
+            35070,
+            36789,
+            38236,
+            39535,
+            45184,
+            47255,
+            49652,
+            58165,
+            59908
+          ],
+          "elapsed_seconds": 45.439343,
+          "interface": "hys-1025",
+          "ip_bytes": 9983574,
+          "mode": "observe",
+          "observed_endpoints": [
+            {
+              "destination_port": 42453,
+              "first_seconds": 0.0908,
+              "ip_bytes": 1149597,
+              "last_seconds": 4.991177,
+              "packets": 966,
+              "source_port": 38236,
+              "udp_bytes": 1130277
+            },
+            {
+              "destination_port": 42451,
+              "first_seconds": 5.107601,
+              "ip_bytes": 1138714,
+              "last_seconds": 10.034794,
+              "packets": 964,
+              "source_port": 45184,
+              "udp_bytes": 1119434
+            },
+            {
+              "destination_port": 42450,
+              "first_seconds": 10.121413,
+              "ip_bytes": 1104729,
+              "last_seconds": 14.980863,
+              "packets": 945,
+              "source_port": 35070,
+              "udp_bytes": 1085829
+            },
+            {
+              "destination_port": 42451,
+              "first_seconds": 15.131732,
+              "ip_bytes": 1103675,
+              "last_seconds": 20.032385,
+              "packets": 925,
+              "source_port": 59908,
+              "udp_bytes": 1085175
+            },
+            {
+              "destination_port": 42450,
+              "first_seconds": 20.152691,
+              "ip_bytes": 1103158,
+              "last_seconds": 25.050383,
+              "packets": 917,
+              "source_port": 39535,
+              "udp_bytes": 1084818
+            },
+            {
+              "destination_port": 42451,
+              "first_seconds": 25.102266,
+              "ip_bytes": 1138395,
+              "last_seconds": 30.081727,
+              "packets": 958,
+              "source_port": 49652,
+              "udp_bytes": 1119235
+            },
+            {
+              "destination_port": 42450,
+              "first_seconds": 30.186963,
+              "ip_bytes": 1069777,
+              "last_seconds": 35.053647,
+              "packets": 901,
+              "source_port": 47255,
+              "udp_bytes": 1051757
+            },
+            {
+              "destination_port": 42451,
+              "first_seconds": 35.184603,
+              "ip_bytes": 1104651,
+              "last_seconds": 40.061581,
+              "packets": 935,
+              "source_port": 35018,
+              "udp_bytes": 1085951
+            },
+            {
+              "destination_port": 42450,
+              "first_seconds": 40.181518,
+              "ip_bytes": 1070706,
+              "last_seconds": 45.054996,
+              "packets": 916,
+              "source_port": 58165,
+              "udp_bytes": 1052386
+            },
+            {
+              "destination_port": 42451,
+              "first_seconds": 45.101785,
+              "ip_bytes": 172,
+              "last_seconds": 45.181477,
+              "packets": 3,
+              "source_port": 36789,
+              "udp_bytes": 112
+            }
+          ],
+          "packets": 8430,
+          "payload_storage": false,
+          "raw_capture_storage": false,
+          "source_ip": "10.213.25.2",
+          "source_socket_changes": 9,
+          "time_periods": [
+            {
+              "destination_port": 42453,
+              "first_seconds": 0.0908,
+              "ip_bytes": 1149597,
+              "last_seconds": 4.991177,
+              "packets": 966,
+              "source_port": 38236,
+              "udp_bytes": 1130277
+            },
+            {
+              "destination_port": 42451,
+              "first_seconds": 5.107601,
+              "ip_bytes": 1138714,
+              "last_seconds": 10.034794,
+              "packets": 964,
+              "source_port": 45184,
+              "udp_bytes": 1119434
+            },
+            {
+              "destination_port": 42450,
+              "first_seconds": 10.121413,
+              "ip_bytes": 1104729,
+              "last_seconds": 14.980863,
+              "packets": 945,
+              "source_port": 35070,
+              "udp_bytes": 1085829
+            },
+            {
+              "destination_port": 42451,
+              "first_seconds": 15.131732,
+              "ip_bytes": 1103675,
+              "last_seconds": 20.032385,
+              "packets": 925,
+              "source_port": 59908,
+              "udp_bytes": 1085175
+            },
+            {
+              "destination_port": 42450,
+              "first_seconds": 20.152691,
+              "ip_bytes": 1103158,
+              "last_seconds": 25.050383,
+              "packets": 917,
+              "source_port": 39535,
+              "udp_bytes": 1084818
+            },
+            {
+              "destination_port": 42451,
+              "first_seconds": 25.102266,
+              "ip_bytes": 1138395,
+              "last_seconds": 30.081727,
+              "packets": 958,
+              "source_port": 49652,
+              "udp_bytes": 1119235
+            },
+            {
+              "destination_port": 42450,
+              "first_seconds": 30.186963,
+              "ip_bytes": 1069777,
+              "last_seconds": 35.053647,
+              "packets": 901,
+              "source_port": 47255,
+              "udp_bytes": 1051757
+            },
+            {
+              "destination_port": 42451,
+              "first_seconds": 35.184603,
+              "ip_bytes": 1104651,
+              "last_seconds": 40.061581,
+              "packets": 935,
+              "source_port": 35018,
+              "udp_bytes": 1085951
+            },
+            {
+              "destination_port": 42450,
+              "first_seconds": 40.181518,
+              "ip_bytes": 1070706,
+              "last_seconds": 45.054996,
+              "packets": 916,
+              "source_port": 58165,
+              "udp_bytes": 1052386
+            },
+            {
+              "destination_port": 42451,
+              "first_seconds": 45.101785,
+              "ip_bytes": 172,
+              "last_seconds": 45.181477,
+              "packets": 3,
+              "source_port": 36789,
+              "udp_bytes": 112
+            }
+          ],
+          "udp_bytes": 9814974
+        },
+        "mapping_source": "xboard-node-managed",
+        "fixture_installed_nat": false
+      },
+      {
+        "kernel": "xray",
+        "test": "live-range-replaced-without-process-restart",
+        "pass": true,
+        "elapsed_ms": 1139,
+        "nft": {
+          "tables": [
+            {
+              "family": "inet",
+              "name": "xbnode_hop_80fd9a9d99382ae291bdd2e7",
+              "handle": 2,
+              "comment": "xboard-node-portforward:v1:80fd9a9d99382ae291bdd2e7b1c555fa47fbde98d4f0b739abd572a7c93c06a9"
+            }
+          ],
+          "rules": [
+            {
+              "family": "inet",
+              "table": "xbnode_hop_80fd9a9d99382ae291bdd2e7",
+              "chain": "prerouting",
+              "handle": 2,
+              "expr": [
+                {
+                  "match": {
+                    "op": "==",
+                    "left": {
+                      "meta": {
+                        "key": "nfproto"
+                      }
+                    },
+                    "right": "ipv4"
+                  }
+                },
+                {
+                  "match": {
+                    "op": "==",
+                    "left": {
+                      "fib": {
+                        "result": "type",
+                        "flags": [
+                          "daddr"
+                        ]
+                      }
+                    },
+                    "right": "local"
+                  }
+                },
+                {
+                  "match": {
+                    "op": "==",
+                    "left": {
+                      "payload": {
+                        "protocol": "udp",
+                        "field": "dport"
+                      }
+                    },
+                    "right": {
+                      "range": [
+                        42454,
+                        42457
+                      ]
+                    }
+                  }
+                },
+                {
+                  "counter": {
+                    "packets": 0,
+                    "bytes": 0
+                  }
+                },
+                {
+                  "redirect": {
+                    "port": 42443
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "update_method": "standalone file watcher; services restart inside same Go process"
+      },
+      {
+        "kernel": "xray",
+        "test": "old-range-rejected-after-change",
+        "pass": true,
+        "client_exit": 0,
+        "client": {
+          "passed": true,
+          "expected_failure": true,
+          "stage": "traffic",
+          "server_ports": [
+            "42450:42453"
+          ],
+          "hop_interval": "5s",
+          "tls_verification": true,
+          "flows": [
+            {
+              "kind": "udp",
+              "passed": false,
+              "error_class": "connection_refused",
+              "dial_count": 1,
+              "rounds": 0,
+              "verified_bytes": 0,
+              "elapsed_ms": 2,
+              "maximum_round_trip_ms": 0
+            },
+            {
+              "kind": "tcp",
+              "passed": false,
+              "error_class": "connection_refused",
+              "dial_count": 1,
+              "rounds": 0,
+              "verified_bytes": 0,
+              "elapsed_ms": 3,
+              "maximum_round_trip_ms": 0
+            }
+          ]
+        },
+        "wire": {
+          "allowed_destination_ports": [
+            42443,
+            42450,
+            42451,
+            42452,
+            42453,
+            42454,
+            42455,
+            42456,
+            42457
+          ],
+          "destination_changes": 1,
+          "destination_ip": "10.213.25.1",
+          "distinct_destination_ports": [
+            42451,
+            42453
+          ],
+          "distinct_source_ports": [
+            38914,
+            40110
+          ],
+          "elapsed_seconds": 0.335062,
+          "interface": "hys-1025",
+          "ip_bytes": 2616,
+          "mode": "observe",
+          "observed_endpoints": [
+            {
+              "destination_port": 42453,
+              "first_seconds": 0.076511,
+              "ip_bytes": 1308,
+              "last_seconds": 0.076511,
+              "packets": 1,
+              "source_port": 40110,
+              "udp_bytes": 1288
+            },
+            {
+              "destination_port": 42451,
+              "first_seconds": 0.077998,
+              "ip_bytes": 1308,
+              "last_seconds": 0.077998,
+              "packets": 1,
+              "source_port": 38914,
+              "udp_bytes": 1288
+            }
+          ],
+          "packets": 2,
+          "payload_storage": false,
+          "raw_capture_storage": false,
+          "source_ip": "10.213.25.2",
+          "source_socket_changes": 1,
+          "time_periods": [
+            {
+              "destination_port": 42453,
+              "first_seconds": 0.076511,
+              "ip_bytes": 1308,
+              "last_seconds": 0.076511,
+              "packets": 1,
+              "source_port": 40110,
+              "udp_bytes": 1288
+            },
+            {
+              "destination_port": 42451,
+              "first_seconds": 0.077998,
+              "ip_bytes": 1308,
+              "last_seconds": 0.077998,
+              "packets": 1,
+              "source_port": 38914,
+              "udp_bytes": 1288
+            }
+          ],
+          "udp_bytes": 2576
+        },
+        "mapping_source": "xboard-node-managed",
+        "fixture_installed_nat": false
+      },
+      {
+        "kernel": "xray",
+        "test": "changed-range-continuous-tcp-and-udp",
+        "pass": true,
+        "client_exit": 0,
+        "client": {
+          "passed": true,
+          "expected_failure": false,
+          "stage": "traffic",
+          "server_ports": [
+            "42454:42457"
+          ],
+          "hop_interval": "5s",
+          "tls_verification": true,
+          "flows": [
+            {
+              "kind": "tcp",
+              "passed": true,
+              "dial_count": 1,
+              "rounds": 76,
+              "verified_bytes": 2490368,
+              "elapsed_ms": 12105,
+              "maximum_round_trip_ms": 45
+            },
+            {
+              "kind": "udp",
+              "passed": true,
+              "dial_count": 1,
+              "rounds": 80,
+              "verified_bytes": 81920,
+              "elapsed_ms": 12123,
+              "maximum_round_trip_ms": 2
+            }
+          ]
+        },
+        "wire": {
+          "allowed_destination_ports": [
+            42443,
+            42450,
+            42451,
+            42452,
+            42453,
+            42454,
+            42455,
+            42456,
+            42457
+          ],
+          "destination_changes": 2,
+          "destination_ip": "10.213.25.1",
+          "distinct_destination_ports": [
+            42454,
+            42455,
+            42456
+          ],
+          "distinct_source_ports": [
+            40086,
+            43521,
+            43897
+          ],
+          "elapsed_seconds": 12.463124,
+          "interface": "hys-1025",
+          "ip_bytes": 2719782,
+          "mode": "observe",
+          "observed_endpoints": [
+            {
+              "destination_port": 42454,
+              "first_seconds": 0.086672,
+              "ip_bytes": 1150723,
+              "last_seconds": 5.028166,
+              "packets": 979,
+              "source_port": 43521,
+              "udp_bytes": 1131143
+            },
+            {
+              "destination_port": 42455,
+              "first_seconds": 5.088157,
+              "ip_bytes": 1104718,
+              "last_seconds": 10.030452,
+              "packets": 937,
+              "source_port": 43897,
+              "udp_bytes": 1085978
+            },
+            {
+              "destination_port": 42456,
+              "first_seconds": 10.086669,
+              "ip_bytes": 464341,
+              "last_seconds": 12.208156,
+              "packets": 409,
+              "source_port": 40086,
+              "udp_bytes": 456161
+            }
+          ],
+          "packets": 2325,
+          "payload_storage": false,
+          "raw_capture_storage": false,
+          "source_ip": "10.213.25.2",
+          "source_socket_changes": 2,
+          "time_periods": [
+            {
+              "destination_port": 42454,
+              "first_seconds": 0.086672,
+              "ip_bytes": 1150723,
+              "last_seconds": 5.028166,
+              "packets": 979,
+              "source_port": 43521,
+              "udp_bytes": 1131143
+            },
+            {
+              "destination_port": 42455,
+              "first_seconds": 5.088157,
+              "ip_bytes": 1104718,
+              "last_seconds": 10.030452,
+              "packets": 937,
+              "source_port": 43897,
+              "udp_bytes": 1085978
+            },
+            {
+              "destination_port": 42456,
+              "first_seconds": 10.086669,
+              "ip_bytes": 464341,
+              "last_seconds": 12.208156,
+              "packets": 409,
+              "source_port": 40086,
+              "udp_bytes": 456161
+            }
+          ],
+          "udp_bytes": 2673282
+        },
+        "mapping_source": "xboard-node-managed",
+        "fixture_installed_nat": false
+      },
+      {
+        "kernel": "xray",
+        "test": "disable-removed-owned-table",
+        "pass": true,
+        "elapsed_ms": 1122
+      },
+      {
+        "kernel": "xray",
+        "test": "disabled-range-rejected",
+        "pass": true,
+        "client_exit": 0,
+        "client": {
+          "passed": true,
+          "expected_failure": true,
+          "stage": "traffic",
+          "server_ports": [
+            "42454:42457"
+          ],
+          "hop_interval": "5s",
+          "tls_verification": true,
+          "flows": [
+            {
+              "kind": "udp",
+              "passed": false,
+              "error_class": "connection_refused",
+              "dial_count": 1,
+              "rounds": 0,
+              "verified_bytes": 0,
+              "elapsed_ms": 2,
+              "maximum_round_trip_ms": 0
+            },
+            {
+              "kind": "tcp",
+              "passed": false,
+              "error_class": "timeout",
+              "dial_count": 1,
+              "rounds": 0,
+              "verified_bytes": 0,
+              "elapsed_ms": 9994,
+              "maximum_round_trip_ms": 0
+            }
+          ]
+        },
+        "wire": {
+          "allowed_destination_ports": [
+            42443,
+            42450,
+            42451,
+            42452,
+            42453,
+            42454,
+            42455,
+            42456,
+            42457
+          ],
+          "destination_changes": 1,
+          "destination_ip": "10.213.25.1",
+          "distinct_destination_ports": [
+            42454,
+            42456
+          ],
+          "distinct_source_ports": [
+            36379,
+            51218
+          ],
+          "elapsed_seconds": 10.11515,
+          "interface": "hys-1025",
+          "ip_bytes": 3924,
+          "mode": "observe",
+          "observed_endpoints": [
+            {
+              "destination_port": 42456,
+              "first_seconds": 0.085164,
+              "ip_bytes": 1308,
+              "last_seconds": 0.085164,
+              "packets": 1,
+              "source_port": 36379,
+              "udp_bytes": 1288
+            },
+            {
+              "destination_port": 42454,
+              "first_seconds": 0.085763,
+              "ip_bytes": 2616,
+              "last_seconds": 0.085877,
+              "packets": 2,
+              "source_port": 51218,
+              "udp_bytes": 2576
+            }
+          ],
+          "packets": 3,
+          "payload_storage": false,
+          "raw_capture_storage": false,
+          "source_ip": "10.213.25.2",
+          "source_socket_changes": 1,
+          "time_periods": [
+            {
+              "destination_port": 42456,
+              "first_seconds": 0.085164,
+              "ip_bytes": 1308,
+              "last_seconds": 0.085164,
+              "packets": 1,
+              "source_port": 36379,
+              "udp_bytes": 1288
+            },
+            {
+              "destination_port": 42454,
+              "first_seconds": 0.085763,
+              "ip_bytes": 2616,
+              "last_seconds": 0.085877,
+              "packets": 2,
+              "source_port": 51218,
+              "udp_bytes": 2576
+            }
+          ],
+          "udp_bytes": 3864
+        },
+        "mapping_source": "xboard-node-managed",
+        "fixture_installed_nat": false
+      },
+      {
+        "kernel": "xray",
+        "test": "disabled-primary-port-still-works",
+        "pass": true,
+        "client_exit": 0,
+        "client": {
+          "passed": true,
+          "expected_failure": false,
+          "stage": "traffic",
+          "tls_verification": true,
+          "flows": [
+            {
+              "kind": "tcp",
+              "passed": true,
+              "dial_count": 1,
+              "rounds": 25,
+              "verified_bytes": 819200,
+              "elapsed_ms": 4065,
+              "maximum_round_trip_ms": 45
+            },
+            {
+              "kind": "udp",
+              "passed": true,
+              "dial_count": 1,
+              "rounds": 27,
+              "verified_bytes": 27648,
+              "elapsed_ms": 4092,
+              "maximum_round_trip_ms": 1
+            }
+          ]
+        },
+        "wire": {
+          "allowed_destination_ports": [
+            42443,
+            42450,
+            42451,
+            42452,
+            42453,
+            42454,
+            42455,
+            42456,
+            42457
+          ],
+          "destination_changes": 0,
+          "destination_ip": "10.213.25.1",
+          "distinct_destination_ports": [
+            42443
+          ],
+          "distinct_source_ports": [
+            45063
+          ],
+          "elapsed_seconds": 4.438767,
+          "interface": "hys-1025",
+          "ip_bytes": 901818,
+          "mode": "observe",
+          "observed_endpoints": [
+            {
+              "destination_port": 42443,
+              "first_seconds": 0.088531,
+              "ip_bytes": 901818,
+              "last_seconds": 4.182068,
+              "packets": 758,
+              "source_port": 45063,
+              "udp_bytes": 886658
+            }
+          ],
+          "packets": 758,
+          "payload_storage": false,
+          "raw_capture_storage": false,
+          "source_ip": "10.213.25.2",
+          "source_socket_changes": 0,
+          "time_periods": [
+            {
+              "destination_port": 42443,
+              "first_seconds": 0.088531,
+              "ip_bytes": 901818,
+              "last_seconds": 4.182068,
+              "packets": 758,
+              "source_port": 45063,
+              "udp_bytes": 886658
+            }
+          ],
+          "udp_bytes": 886658
+        },
+        "mapping_source": "xboard-node-managed",
+        "fixture_installed_nat": false
+      },
+      {
+        "kernel": "xray",
+        "test": "sigterm-cleaned-owned-table",
+        "pass": true,
+        "exit_code": 0
+      },
+      {
+        "kernel": "xray",
+        "test": "invalid-reversed-range-rejected-at-startup",
+        "pass": true,
+        "exit_code": 1,
+        "remaining_nft_tables": []
+      }
+    ],
+    "host_nftables_unchanged": true,
+    "original_panel_http_status": 200,
+    "test_namespaces_removed": true,
+    "owned_processes_exited": true,
+    "private_runtime_logs_read": false,
+    "fixture_installed_nat": false,
+    "traffic_scope": "isolated IPv4 veth; actual QUIC; node-owned nftables only; no public network"
+  },
+  "real_panel": {
+    "result": "PASS",
+    "date": "2026-10-25",
+    "node_sha256": "d8310fd9960e732b971e83038945434b6af775390a5582f10655e3ed92f6d5a6",
+    "tests": [
+      {
+        "kernel": "singbox",
+        "test": "real-machine-api-bootstrap-created-rules",
+        "pass": true,
+        "nft": {
+          "tables": [
+            {
+              "family": "inet",
+              "name": "xbnode_hop_539bf89fa6e00a0346f1d0f2",
+              "handle": 2,
+              "comment": "xboard-node-portforward:v1:539bf89fa6e00a0346f1d0f2a18e315f93a87aa66688b69f8a341a0f1122a0ca"
+            }
+          ],
+          "rules": [
+            {
+              "family": "inet",
+              "table": "xbnode_hop_539bf89fa6e00a0346f1d0f2",
+              "chain": "prerouting",
+              "handle": 2,
+              "expr": [
+                {
+                  "match": {
+                    "op": "==",
+                    "left": {
+                      "meta": {
+                        "key": "nfproto"
+                      }
+                    },
+                    "right": "ipv4"
+                  }
+                },
+                {
+                  "match": {
+                    "op": "==",
+                    "left": {
+                      "fib": {
+                        "result": "type",
+                        "flags": [
+                          "daddr"
+                        ]
+                      }
+                    },
+                    "right": "local"
+                  }
+                },
+                {
+                  "match": {
+                    "op": "==",
+                    "left": {
+                      "payload": {
+                        "protocol": "udp",
+                        "field": "dport"
+                      }
+                    },
+                    "right": {
+                      "range": [
+                        42450,
+                        42453
+                      ]
+                    }
+                  }
+                },
+                {
+                  "counter": {
+                    "packets": 0,
+                    "bytes": 0
+                  }
+                },
+                {
+                  "redirect": {
+                    "port": 42443
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "config_source": "real owned panel machine HTTP API; no standalone config"
+      },
+      {
+        "kernel": "singbox",
+        "test": "real-panel-websocket-connected",
+        "pass": true,
+        "safe_backend_state": {
+          "node_id": 1,
+          "protocol": "hysteria",
+          "version": 2,
+          "advertised_port": "42450-42453",
+          "server_port": 42443,
+          "port_hopping": {
+            "start": 42450,
+            "end": 42453
+          },
+          "hop_interval": 5,
+          "enabled": true,
+          "ws_node_alive": true,
+          "ws_worker_heartbeat": true,
+          "pull_interval": 2
+        },
+        "ws_alive_before_start": false
+      },
+      {
+        "kernel": "singbox",
+        "test": "real-panel-initial-range-traffic",
+        "pass": true,
+        "client_exit": 0,
+        "client": {
+          "passed": true,
+          "expected_failure": false,
+          "stage": "traffic",
+          "server_ports": [
+            "42450:42453"
+          ],
+          "hop_interval": "5s",
+          "tls_verification": true,
+          "flows": [
+            {
+              "kind": "tcp",
+              "passed": true,
+              "dial_count": 1,
+              "rounds": 76,
+              "verified_bytes": 2490368,
+              "elapsed_ms": 12027,
+              "maximum_round_trip_ms": 45
+            },
+            {
+              "kind": "udp",
+              "passed": true,
+              "dial_count": 1,
+              "rounds": 80,
+              "verified_bytes": 81920,
+              "elapsed_ms": 12122,
+              "maximum_round_trip_ms": 2
+            }
+          ]
+        },
+        "wire": {
+          "allowed_destination_ports": [
+            42443,
+            42450,
+            42451,
+            42452,
+            42453,
+            42454,
+            42455,
+            42456,
+            42457
+          ],
+          "destination_changes": 1,
+          "destination_ip": "10.213.25.1",
+          "distinct_destination_ports": [
+            42450,
+            42453
+          ],
+          "distinct_source_ports": [
+            33361,
+            36092,
+            56586
+          ],
+          "elapsed_seconds": 12.460835,
+          "interface": "hys-1025",
+          "ip_bytes": 2713163,
+          "mode": "observe",
+          "observed_endpoints": [
+            {
+              "destination_port": 42450,
+              "first_seconds": 0.083244,
+              "ip_bytes": 1114201,
+              "last_seconds": 4.94385,
+              "packets": 916,
+              "source_port": 33361,
+              "udp_bytes": 1095881
+            },
+            {
+              "destination_port": 42450,
+              "first_seconds": 5.085308,
+              "ip_bytes": 1135824,
+              "last_seconds": 9.959113,
+              "packets": 905,
+              "source_port": 36092,
+              "udp_bytes": 1117724
+            },
+            {
+              "destination_port": 42453,
+              "first_seconds": 10.084123,
+              "ip_bytes": 463138,
+              "last_seconds": 12.204271,
+              "packets": 388,
+              "source_port": 56586,
+              "udp_bytes": 455378
+            }
+          ],
+          "packets": 2209,
+          "payload_storage": false,
+          "raw_capture_storage": false,
+          "source_ip": "10.213.25.2",
+          "source_socket_changes": 2,
+          "time_periods": [
+            {
+              "destination_port": 42450,
+              "first_seconds": 0.083244,
+              "ip_bytes": 1114201,
+              "last_seconds": 4.94385,
+              "packets": 916,
+              "source_port": 33361,
+              "udp_bytes": 1095881
+            },
+            {
+              "destination_port": 42450,
+              "first_seconds": 5.085308,
+              "ip_bytes": 1135824,
+              "last_seconds": 9.959113,
+              "packets": 905,
+              "source_port": 36092,
+              "udp_bytes": 1117724
+            },
+            {
+              "destination_port": 42453,
+              "first_seconds": 10.084123,
+              "ip_bytes": 463138,
+              "last_seconds": 12.204271,
+              "packets": 388,
+              "source_port": 56586,
+              "udp_bytes": 455378
+            }
+          ],
+          "udp_bytes": 2668983
+        },
+        "mapping_source": "xboard-node-managed",
+        "fixture_installed_nat": false
+      },
+      {
+        "kernel": "singbox",
+        "test": "live-real-panel-range-replaced-same-process",
+        "pass": true,
+        "observed_after_save_ms": 10,
+        "save_command_ms": 341,
+        "controller_save_ms": 21.058,
+        "ws_alive_at_save": true,
+        "ws_alive_after": true,
+        "update_transport": "real backend WS connected; REST fallback configured at 2 seconds",
+        "nft": {
+          "tables": [
+            {
+              "family": "inet",
+              "name": "xbnode_hop_539bf89fa6e00a0346f1d0f2",
+              "handle": 3,
+              "comment": "xboard-node-portforward:v1:539bf89fa6e00a0346f1d0f2a18e315f93a87aa66688b69f8a341a0f1122a0ca"
+            }
+          ],
+          "rules": [
+            {
+              "family": "inet",
+              "table": "xbnode_hop_539bf89fa6e00a0346f1d0f2",
+              "chain": "prerouting",
+              "handle": 2,
+              "expr": [
+                {
+                  "match": {
+                    "op": "==",
+                    "left": {
+                      "meta": {
+                        "key": "nfproto"
+                      }
+                    },
+                    "right": "ipv4"
+                  }
+                },
+                {
+                  "match": {
+                    "op": "==",
+                    "left": {
+                      "fib": {
+                        "result": "type",
+                        "flags": [
+                          "daddr"
+                        ]
+                      }
+                    },
+                    "right": "local"
+                  }
+                },
+                {
+                  "match": {
+                    "op": "==",
+                    "left": {
+                      "payload": {
+                        "protocol": "udp",
+                        "field": "dport"
+                      }
+                    },
+                    "right": {
+                      "range": [
+                        42454,
+                        42457
+                      ]
+                    }
+                  }
+                },
+                {
+                  "counter": {
+                    "packets": 0,
+                    "bytes": 0
+                  }
+                },
+                {
+                  "redirect": {
+                    "port": 42443
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "kernel": "singbox",
+        "test": "managed-old-range-rejected",
+        "pass": true,
+        "client_exit": 0,
+        "client": {
+          "passed": true,
+          "expected_failure": true,
+          "stage": "traffic",
+          "server_ports": [
+            "42450:42453"
+          ],
+          "hop_interval": "5s",
+          "tls_verification": true,
+          "flows": [
+            {
+              "kind": "udp",
+              "passed": false,
+              "error_class": "timeout",
+              "dial_count": 1,
+              "rounds": 0,
+              "verified_bytes": 0,
+              "elapsed_ms": 9996,
+              "maximum_round_trip_ms": 0
+            },
+            {
+              "kind": "tcp",
+              "passed": false,
+              "error_class": "timeout",
+              "dial_count": 1,
+              "rounds": 0,
+              "verified_bytes": 0,
+              "elapsed_ms": 9996,
+              "maximum_round_trip_ms": 0
+            }
+          ]
+        },
+        "wire": {
+          "allowed_destination_ports": [
+            42443,
+            42450,
+            42451,
+            42452,
+            42453,
+            42454,
+            42455,
+            42456,
+            42457
+          ],
+          "destination_changes": 0,
+          "destination_ip": "10.213.25.1",
+          "distinct_destination_ports": [
+            42453
+          ],
+          "distinct_source_ports": [
+            38093
+          ],
+          "elapsed_seconds": 10.112004,
+          "interface": "hys-1025",
+          "ip_bytes": 2616,
+          "mode": "observe",
+          "observed_endpoints": [
+            {
+              "destination_port": 42453,
+              "first_seconds": 0.077581,
+              "ip_bytes": 2616,
+              "last_seconds": 0.077796,
+              "packets": 2,
+              "source_port": 38093,
+              "udp_bytes": 2576
+            }
+          ],
+          "packets": 2,
+          "payload_storage": false,
+          "raw_capture_storage": false,
+          "source_ip": "10.213.25.2",
+          "source_socket_changes": 0,
+          "time_periods": [
+            {
+              "destination_port": 42453,
+              "first_seconds": 0.077581,
+              "ip_bytes": 2616,
+              "last_seconds": 0.077796,
+              "packets": 2,
+              "source_port": 38093,
+              "udp_bytes": 2576
+            }
+          ],
+          "udp_bytes": 2576
+        },
+        "mapping_source": "xboard-node-managed",
+        "fixture_installed_nat": false
+      },
+      {
+        "kernel": "singbox",
+        "test": "real-panel-changed-range-traffic",
+        "pass": true,
+        "client_exit": 0,
+        "client": {
+          "passed": true,
+          "expected_failure": false,
+          "stage": "traffic",
+          "server_ports": [
+            "42454:42457"
+          ],
+          "hop_interval": "5s",
+          "tls_verification": true,
+          "flows": [
+            {
+              "kind": "udp",
+              "passed": true,
+              "dial_count": 1,
+              "rounds": 80,
+              "verified_bytes": 81920,
+              "elapsed_ms": 12118,
+              "maximum_round_trip_ms": 1
+            },
+            {
+              "kind": "tcp",
+              "passed": true,
+              "dial_count": 1,
+              "rounds": 76,
+              "verified_bytes": 2490368,
+              "elapsed_ms": 12124,
+              "maximum_round_trip_ms": 46
+            }
+          ]
+        },
+        "wire": {
+          "allowed_destination_ports": [
+            42443,
+            42450,
+            42451,
+            42452,
+            42453,
+            42454,
+            42455,
+            42456,
+            42457
+          ],
+          "destination_changes": 1,
+          "destination_ip": "10.213.25.1",
+          "distinct_destination_ports": [
+            42456,
+            42457
+          ],
+          "distinct_source_ports": [
+            34525,
+            45799,
+            54746
+          ],
+          "elapsed_seconds": 12.462822,
+          "interface": "hys-1025",
+          "ip_bytes": 2714702,
+          "mode": "observe",
+          "observed_endpoints": [
+            {
+              "destination_port": 42457,
+              "first_seconds": 0.081708,
+              "ip_bytes": 1149329,
+              "last_seconds": 5.081102,
+              "packets": 931,
+              "source_port": 34525,
+              "udp_bytes": 1130709
+            },
+            {
+              "destination_port": 42456,
+              "first_seconds": 5.107467,
+              "ip_bytes": 1103182,
+              "last_seconds": 10.08008,
+              "packets": 910,
+              "source_port": 45799,
+              "udp_bytes": 1084982
+            },
+            {
+              "destination_port": 42456,
+              "first_seconds": 10.10694,
+              "ip_bytes": 462191,
+              "last_seconds": 12.205291,
+              "packets": 390,
+              "source_port": 54746,
+              "udp_bytes": 454391
+            }
+          ],
+          "packets": 2231,
+          "payload_storage": false,
+          "raw_capture_storage": false,
+          "source_ip": "10.213.25.2",
+          "source_socket_changes": 2,
+          "time_periods": [
+            {
+              "destination_port": 42457,
+              "first_seconds": 0.081708,
+              "ip_bytes": 1149329,
+              "last_seconds": 5.081102,
+              "packets": 931,
+              "source_port": 34525,
+              "udp_bytes": 1130709
+            },
+            {
+              "destination_port": 42456,
+              "first_seconds": 5.107467,
+              "ip_bytes": 1103182,
+              "last_seconds": 10.08008,
+              "packets": 910,
+              "source_port": 45799,
+              "udp_bytes": 1084982
+            },
+            {
+              "destination_port": 42456,
+              "first_seconds": 10.10694,
+              "ip_bytes": 462191,
+              "last_seconds": 12.205291,
+              "packets": 390,
+              "source_port": 54746,
+              "udp_bytes": 454391
+            }
+          ],
+          "udp_bytes": 2670082
+        },
+        "mapping_source": "xboard-node-managed",
+        "fixture_installed_nat": false
+      },
+      {
+        "kernel": "singbox",
+        "test": "live-real-panel-disable-removed-own-table",
+        "pass": true,
+        "observed_after_save_ms": 9,
+        "save_command_ms": 339,
+        "controller_save_ms": 19.621,
+        "ws_alive_at_save": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "real-panel-disabled-primary-port-works",
+        "pass": true,
+        "client_exit": 0,
+        "client": {
+          "passed": true,
+          "expected_failure": false,
+          "stage": "traffic",
+          "hop_interval": "5s",
+          "tls_verification": true,
+          "flows": [
+            {
+              "kind": "tcp",
+              "passed": true,
+              "dial_count": 1,
+              "rounds": 25,
+              "verified_bytes": 819200,
+              "elapsed_ms": 4025,
+              "maximum_round_trip_ms": 45
+            },
+            {
+              "kind": "udp",
+              "passed": true,
+              "dial_count": 1,
+              "rounds": 27,
+              "verified_bytes": 27648,
+              "elapsed_ms": 4101,
+              "maximum_round_trip_ms": 2
+            }
+          ]
+        },
+        "wire": {
+          "allowed_destination_ports": [
+            42443,
+            42450,
+            42451,
+            42452,
+            42453,
+            42454,
+            42455,
+            42456,
+            42457
+          ],
+          "destination_changes": 0,
+          "destination_ip": "10.213.25.1",
+          "distinct_destination_ports": [
+            42443
+          ],
+          "distinct_source_ports": [
+            39926
+          ],
+          "elapsed_seconds": 4.44544,
+          "interface": "hys-1025",
+          "ip_bytes": 899768,
+          "mode": "observe",
+          "observed_endpoints": [
+            {
+              "destination_port": 42443,
+              "first_seconds": 0.088822,
+              "ip_bytes": 899768,
+              "last_seconds": 4.187586,
+              "packets": 727,
+              "source_port": 39926,
+              "udp_bytes": 885228
+            }
+          ],
+          "packets": 727,
+          "payload_storage": false,
+          "raw_capture_storage": false,
+          "source_ip": "10.213.25.2",
+          "source_socket_changes": 0,
+          "time_periods": [
+            {
+              "destination_port": 42443,
+              "first_seconds": 0.088822,
+              "ip_bytes": 899768,
+              "last_seconds": 4.187586,
+              "packets": 727,
+              "source_port": 39926,
+              "udp_bytes": 885228
+            }
+          ],
+          "udp_bytes": 885228
+        },
+        "mapping_source": "xboard-node-managed",
+        "fixture_installed_nat": false
+      },
+      {
+        "kernel": "singbox",
+        "test": "managed-disabled-range-rejected",
+        "pass": true,
+        "client_exit": 0,
+        "client": {
+          "passed": true,
+          "expected_failure": true,
+          "stage": "traffic",
+          "server_ports": [
+            "42454:42457"
+          ],
+          "hop_interval": "5s",
+          "tls_verification": true,
+          "flows": [
+            {
+              "kind": "udp",
+              "passed": false,
+              "error_class": "timeout",
+              "dial_count": 1,
+              "rounds": 0,
+              "verified_bytes": 0,
+              "elapsed_ms": 9996,
+              "maximum_round_trip_ms": 0
+            },
+            {
+              "kind": "tcp",
+              "passed": false,
+              "error_class": "timeout",
+              "dial_count": 1,
+              "rounds": 0,
+              "verified_bytes": 0,
+              "elapsed_ms": 9996,
+              "maximum_round_trip_ms": 0
+            }
+          ]
+        },
+        "wire": {
+          "allowed_destination_ports": [
+            42443,
+            42450,
+            42451,
+            42452,
+            42453,
+            42454,
+            42455,
+            42456,
+            42457
+          ],
+          "destination_changes": 0,
+          "destination_ip": "10.213.25.1",
+          "distinct_destination_ports": [
+            42455
+          ],
+          "distinct_source_ports": [
+            54305
+          ],
+          "elapsed_seconds": 10.108197,
+          "interface": "hys-1025",
+          "ip_bytes": 2616,
+          "mode": "observe",
+          "observed_endpoints": [
+            {
+              "destination_port": 42455,
+              "first_seconds": 0.077245,
+              "ip_bytes": 2616,
+              "last_seconds": 0.077433,
+              "packets": 2,
+              "source_port": 54305,
+              "udp_bytes": 2576
+            }
+          ],
+          "packets": 2,
+          "payload_storage": false,
+          "raw_capture_storage": false,
+          "source_ip": "10.213.25.2",
+          "source_socket_changes": 0,
+          "time_periods": [
+            {
+              "destination_port": 42455,
+              "first_seconds": 0.077245,
+              "ip_bytes": 2616,
+              "last_seconds": 0.077433,
+              "packets": 2,
+              "source_port": 54305,
+              "udp_bytes": 2576
+            }
+          ],
+          "udp_bytes": 2576
+        },
+        "mapping_source": "xboard-node-managed",
+        "fixture_installed_nat": false
+      },
+      {
+        "kernel": "singbox",
+        "test": "live-real-panel-reenable-created-rules",
+        "pass": true
+      },
+      {
+        "kernel": "singbox",
+        "test": "managed-sigterm-cleaned-own-table",
+        "pass": true,
+        "exit_code": 0
+      },
+      {
+        "kernel": "xray",
+        "test": "real-machine-api-bootstrap-created-rules",
+        "pass": true,
+        "nft": {
+          "tables": [
+            {
+              "family": "inet",
+              "name": "xbnode_hop_02443ee81807694e87341110",
+              "handle": 2,
+              "comment": "xboard-node-portforward:v1:02443ee81807694e87341110b8be45d98639690cbb8d67222dd0e0ff70d859f6"
+            }
+          ],
+          "rules": [
+            {
+              "family": "inet",
+              "table": "xbnode_hop_02443ee81807694e87341110",
+              "chain": "prerouting",
+              "handle": 2,
+              "expr": [
+                {
+                  "match": {
+                    "op": "==",
+                    "left": {
+                      "meta": {
+                        "key": "nfproto"
+                      }
+                    },
+                    "right": "ipv4"
+                  }
+                },
+                {
+                  "match": {
+                    "op": "==",
+                    "left": {
+                      "fib": {
+                        "result": "type",
+                        "flags": [
+                          "daddr"
+                        ]
+                      }
+                    },
+                    "right": "local"
+                  }
+                },
+                {
+                  "match": {
+                    "op": "==",
+                    "left": {
+                      "payload": {
+                        "protocol": "udp",
+                        "field": "dport"
+                      }
+                    },
+                    "right": {
+                      "range": [
+                        42450,
+                        42453
+                      ]
+                    }
+                  }
+                },
+                {
+                  "counter": {
+                    "packets": 0,
+                    "bytes": 0
+                  }
+                },
+                {
+                  "redirect": {
+                    "port": 42443
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "config_source": "real owned panel machine HTTP API; no standalone config"
+      },
+      {
+        "kernel": "xray",
+        "test": "real-panel-websocket-connected",
+        "pass": true,
+        "safe_backend_state": {
+          "node_id": 1,
+          "protocol": "hysteria",
+          "version": 2,
+          "advertised_port": "42450-42453",
+          "server_port": 42443,
+          "port_hopping": {
+            "start": 42450,
+            "end": 42453
+          },
+          "hop_interval": 5,
+          "enabled": true,
+          "ws_node_alive": true,
+          "ws_worker_heartbeat": true,
+          "pull_interval": 2
+        },
+        "ws_alive_before_start": false
+      },
+      {
+        "kernel": "xray",
+        "test": "real-panel-initial-range-traffic",
+        "pass": true,
+        "client_exit": 0,
+        "client": {
+          "passed": true,
+          "expected_failure": false,
+          "stage": "traffic",
+          "server_ports": [
+            "42450:42453"
+          ],
+          "hop_interval": "5s",
+          "tls_verification": true,
+          "flows": [
+            {
+              "kind": "tcp",
+              "passed": true,
+              "dial_count": 1,
+              "rounds": 76,
+              "verified_bytes": 2490368,
+              "elapsed_ms": 12012,
+              "maximum_round_trip_ms": 45
+            },
+            {
+              "kind": "udp",
+              "passed": true,
+              "dial_count": 1,
+              "rounds": 80,
+              "verified_bytes": 81920,
+              "elapsed_ms": 12120,
+              "maximum_round_trip_ms": 1
+            }
+          ]
+        },
+        "wire": {
+          "allowed_destination_ports": [
+            42443,
+            42450,
+            42451,
+            42452,
+            42453,
+            42454,
+            42455,
+            42456,
+            42457
+          ],
+          "destination_changes": 2,
+          "destination_ip": "10.213.25.1",
+          "distinct_destination_ports": [
+            42451,
+            42452
+          ],
+          "distinct_source_ports": [
+            39395,
+            47287,
+            58108
+          ],
+          "elapsed_seconds": 12.462354,
+          "interface": "hys-1025",
+          "ip_bytes": 2719662,
+          "mode": "observe",
+          "observed_endpoints": [
+            {
+              "destination_port": 42452,
+              "first_seconds": 0.085528,
+              "ip_bytes": 1151502,
+              "last_seconds": 5.023299,
+              "packets": 989,
+              "source_port": 39395,
+              "udp_bytes": 1131722
+            },
+            {
+              "destination_port": 42451,
+              "first_seconds": 5.085386,
+              "ip_bytes": 1105365,
+              "last_seconds": 9.968896,
+              "packets": 947,
+              "source_port": 47287,
+              "udp_bytes": 1086425
+            },
+            {
+              "destination_port": 42452,
+              "first_seconds": 10.086009,
+              "ip_bytes": 462795,
+              "last_seconds": 12.204976,
+              "packets": 379,
+              "source_port": 58108,
+              "udp_bytes": 455215
+            }
+          ],
+          "packets": 2315,
+          "payload_storage": false,
+          "raw_capture_storage": false,
+          "source_ip": "10.213.25.2",
+          "source_socket_changes": 2,
+          "time_periods": [
+            {
+              "destination_port": 42452,
+              "first_seconds": 0.085528,
+              "ip_bytes": 1151502,
+              "last_seconds": 5.023299,
+              "packets": 989,
+              "source_port": 39395,
+              "udp_bytes": 1131722
+            },
+            {
+              "destination_port": 42451,
+              "first_seconds": 5.085386,
+              "ip_bytes": 1105365,
+              "last_seconds": 9.968896,
+              "packets": 947,
+              "source_port": 47287,
+              "udp_bytes": 1086425
+            },
+            {
+              "destination_port": 42452,
+              "first_seconds": 10.086009,
+              "ip_bytes": 462795,
+              "last_seconds": 12.204976,
+              "packets": 379,
+              "source_port": 58108,
+              "udp_bytes": 455215
+            }
+          ],
+          "udp_bytes": 2673362
+        },
+        "mapping_source": "xboard-node-managed",
+        "fixture_installed_nat": false
+      },
+      {
+        "kernel": "xray",
+        "test": "live-real-panel-range-replaced-same-process",
+        "pass": true,
+        "observed_after_save_ms": 17,
+        "save_command_ms": 333,
+        "controller_save_ms": 20.329,
+        "ws_alive_at_save": true,
+        "ws_alive_after": true,
+        "update_transport": "real backend WS connected; REST fallback configured at 2 seconds",
+        "nft": {
+          "tables": [
+            {
+              "family": "inet",
+              "name": "xbnode_hop_02443ee81807694e87341110",
+              "handle": 3,
+              "comment": "xboard-node-portforward:v1:02443ee81807694e87341110b8be45d98639690cbb8d67222dd0e0ff70d859f6"
+            }
+          ],
+          "rules": [
+            {
+              "family": "inet",
+              "table": "xbnode_hop_02443ee81807694e87341110",
+              "chain": "prerouting",
+              "handle": 2,
+              "expr": [
+                {
+                  "match": {
+                    "op": "==",
+                    "left": {
+                      "meta": {
+                        "key": "nfproto"
+                      }
+                    },
+                    "right": "ipv4"
+                  }
+                },
+                {
+                  "match": {
+                    "op": "==",
+                    "left": {
+                      "fib": {
+                        "result": "type",
+                        "flags": [
+                          "daddr"
+                        ]
+                      }
+                    },
+                    "right": "local"
+                  }
+                },
+                {
+                  "match": {
+                    "op": "==",
+                    "left": {
+                      "payload": {
+                        "protocol": "udp",
+                        "field": "dport"
+                      }
+                    },
+                    "right": {
+                      "range": [
+                        42454,
+                        42457
+                      ]
+                    }
+                  }
+                },
+                {
+                  "counter": {
+                    "packets": 0,
+                    "bytes": 0
+                  }
+                },
+                {
+                  "redirect": {
+                    "port": 42443
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "kernel": "xray",
+        "test": "managed-old-range-rejected",
+        "pass": true,
+        "client_exit": 0,
+        "client": {
+          "passed": true,
+          "expected_failure": true,
+          "stage": "traffic",
+          "server_ports": [
+            "42450:42453"
+          ],
+          "hop_interval": "5s",
+          "tls_verification": true,
+          "flows": [
+            {
+              "kind": "udp",
+              "passed": false,
+              "error_class": "connection_refused",
+              "dial_count": 1,
+              "rounds": 0,
+              "verified_bytes": 0,
+              "elapsed_ms": 1,
+              "maximum_round_trip_ms": 0
+            },
+            {
+              "kind": "tcp",
+              "passed": false,
+              "error_class": "connection_refused",
+              "dial_count": 1,
+              "rounds": 0,
+              "verified_bytes": 0,
+              "elapsed_ms": 2,
+              "maximum_round_trip_ms": 0
+            }
+          ]
+        },
+        "wire": {
+          "allowed_destination_ports": [
+            42443,
+            42450,
+            42451,
+            42452,
+            42453,
+            42454,
+            42455,
+            42456,
+            42457
+          ],
+          "destination_changes": 1,
+          "destination_ip": "10.213.25.1",
+          "distinct_destination_ports": [
+            42452,
+            42453
+          ],
+          "distinct_source_ports": [
+            48009,
+            53524
+          ],
+          "elapsed_seconds": 0.348074,
+          "interface": "hys-1025",
+          "ip_bytes": 2616,
+          "mode": "observe",
+          "observed_endpoints": [
+            {
+              "destination_port": 42452,
+              "first_seconds": 0.086304,
+              "ip_bytes": 1308,
+              "last_seconds": 0.086304,
+              "packets": 1,
+              "source_port": 53524,
+              "udp_bytes": 1288
+            },
+            {
+              "destination_port": 42453,
+              "first_seconds": 0.086499,
+              "ip_bytes": 1308,
+              "last_seconds": 0.086499,
+              "packets": 1,
+              "source_port": 48009,
+              "udp_bytes": 1288
+            }
+          ],
+          "packets": 2,
+          "payload_storage": false,
+          "raw_capture_storage": false,
+          "source_ip": "10.213.25.2",
+          "source_socket_changes": 1,
+          "time_periods": [
+            {
+              "destination_port": 42452,
+              "first_seconds": 0.086304,
+              "ip_bytes": 1308,
+              "last_seconds": 0.086304,
+              "packets": 1,
+              "source_port": 53524,
+              "udp_bytes": 1288
+            },
+            {
+              "destination_port": 42453,
+              "first_seconds": 0.086499,
+              "ip_bytes": 1308,
+              "last_seconds": 0.086499,
+              "packets": 1,
+              "source_port": 48009,
+              "udp_bytes": 1288
+            }
+          ],
+          "udp_bytes": 2576
+        },
+        "mapping_source": "xboard-node-managed",
+        "fixture_installed_nat": false
+      },
+      {
+        "kernel": "xray",
+        "test": "real-panel-changed-range-traffic",
+        "pass": true,
+        "client_exit": 0,
+        "client": {
+          "passed": true,
+          "expected_failure": false,
+          "stage": "traffic",
+          "server_ports": [
+            "42454:42457"
+          ],
+          "hop_interval": "5s",
+          "tls_verification": true,
+          "flows": [
+            {
+              "kind": "udp",
+              "passed": true,
+              "dial_count": 1,
+              "rounds": 80,
+              "verified_bytes": 81920,
+              "elapsed_ms": 12127,
+              "maximum_round_trip_ms": 2
+            },
+            {
+              "kind": "tcp",
+              "passed": true,
+              "dial_count": 1,
+              "rounds": 76,
+              "verified_bytes": 2490368,
+              "elapsed_ms": 12135,
+              "maximum_round_trip_ms": 46
+            }
+          ]
+        },
+        "wire": {
+          "allowed_destination_ports": [
+            42443,
+            42450,
+            42451,
+            42452,
+            42453,
+            42454,
+            42455,
+            42456,
+            42457
+          ],
+          "destination_changes": 2,
+          "destination_ip": "10.213.25.1",
+          "distinct_destination_ports": [
+            42454,
+            42455,
+            42457
+          ],
+          "distinct_source_ports": [
+            43026,
+            55892,
+            57445
+          ],
+          "elapsed_seconds": 12.473155,
+          "interface": "hys-1025",
+          "ip_bytes": 2717834,
+          "mode": "observe",
+          "observed_endpoints": [
+            {
+              "destination_port": 42457,
+              "first_seconds": 0.082604,
+              "ip_bytes": 1148854,
+              "last_seconds": 4.992717,
+              "packets": 960,
+              "source_port": 43026,
+              "udp_bytes": 1129654
+            },
+            {
+              "destination_port": 42454,
+              "first_seconds": 5.083032,
+              "ip_bytes": 1105101,
+              "last_seconds": 9.979893,
+              "packets": 941,
+              "source_port": 57445,
+              "udp_bytes": 1086281
+            },
+            {
+              "destination_port": 42455,
+              "first_seconds": 10.084615,
+              "ip_bytes": 463879,
+              "last_seconds": 12.216346,
+              "packets": 400,
+              "source_port": 55892,
+              "udp_bytes": 455879
+            }
+          ],
+          "packets": 2301,
+          "payload_storage": false,
+          "raw_capture_storage": false,
+          "source_ip": "10.213.25.2",
+          "source_socket_changes": 2,
+          "time_periods": [
+            {
+              "destination_port": 42457,
+              "first_seconds": 0.082604,
+              "ip_bytes": 1148854,
+              "last_seconds": 4.992717,
+              "packets": 960,
+              "source_port": 43026,
+              "udp_bytes": 1129654
+            },
+            {
+              "destination_port": 42454,
+              "first_seconds": 5.083032,
+              "ip_bytes": 1105101,
+              "last_seconds": 9.979893,
+              "packets": 941,
+              "source_port": 57445,
+              "udp_bytes": 1086281
+            },
+            {
+              "destination_port": 42455,
+              "first_seconds": 10.084615,
+              "ip_bytes": 463879,
+              "last_seconds": 12.216346,
+              "packets": 400,
+              "source_port": 55892,
+              "udp_bytes": 455879
+            }
+          ],
+          "udp_bytes": 2671814
+        },
+        "mapping_source": "xboard-node-managed",
+        "fixture_installed_nat": false
+      },
+      {
+        "kernel": "xray",
+        "test": "live-real-panel-disable-removed-own-table",
+        "pass": true,
+        "observed_after_save_ms": 16,
+        "save_command_ms": 332,
+        "controller_save_ms": 19.784,
+        "ws_alive_at_save": true
+      },
+      {
+        "kernel": "xray",
+        "test": "real-panel-disabled-primary-port-works",
+        "pass": true,
+        "client_exit": 0,
+        "client": {
+          "passed": true,
+          "expected_failure": false,
+          "stage": "traffic",
+          "hop_interval": "5s",
+          "tls_verification": true,
+          "flows": [
+            {
+              "kind": "tcp",
+              "passed": true,
+              "dial_count": 1,
+              "rounds": 25,
+              "verified_bytes": 819200,
+              "elapsed_ms": 4015,
+              "maximum_round_trip_ms": 45
+            },
+            {
+              "kind": "udp",
+              "passed": true,
+              "dial_count": 1,
+              "rounds": 27,
+              "verified_bytes": 27648,
+              "elapsed_ms": 4090,
+              "maximum_round_trip_ms": 1
+            }
+          ]
+        },
+        "wire": {
+          "allowed_destination_ports": [
+            42443,
+            42450,
+            42451,
+            42452,
+            42453,
+            42454,
+            42455,
+            42456,
+            42457
+          ],
+          "destination_changes": 0,
+          "destination_ip": "10.213.25.1",
+          "distinct_destination_ports": [
+            42443
+          ],
+          "distinct_source_ports": [
+            38302
+          ],
+          "elapsed_seconds": 4.428291,
+          "interface": "hys-1025",
+          "ip_bytes": 903145,
+          "mode": "observe",
+          "observed_endpoints": [
+            {
+              "destination_port": 42443,
+              "first_seconds": 0.081544,
+              "ip_bytes": 903145,
+              "last_seconds": 4.17154,
+              "packets": 784,
+              "source_port": 38302,
+              "udp_bytes": 887465
+            }
+          ],
+          "packets": 784,
+          "payload_storage": false,
+          "raw_capture_storage": false,
+          "source_ip": "10.213.25.2",
+          "source_socket_changes": 0,
+          "time_periods": [
+            {
+              "destination_port": 42443,
+              "first_seconds": 0.081544,
+              "ip_bytes": 903145,
+              "last_seconds": 4.17154,
+              "packets": 784,
+              "source_port": 38302,
+              "udp_bytes": 887465
+            }
+          ],
+          "udp_bytes": 887465
+        },
+        "mapping_source": "xboard-node-managed",
+        "fixture_installed_nat": false
+      },
+      {
+        "kernel": "xray",
+        "test": "managed-disabled-range-rejected",
+        "pass": true,
+        "client_exit": 0,
+        "client": {
+          "passed": true,
+          "expected_failure": true,
+          "stage": "traffic",
+          "server_ports": [
+            "42454:42457"
+          ],
+          "hop_interval": "5s",
+          "tls_verification": true,
+          "flows": [
+            {
+              "kind": "udp",
+              "passed": false,
+              "error_class": "connection_refused",
+              "dial_count": 1,
+              "rounds": 0,
+              "verified_bytes": 0,
+              "elapsed_ms": 1,
+              "maximum_round_trip_ms": 0
+            },
+            {
+              "kind": "tcp",
+              "passed": false,
+              "error_class": "connection_refused",
+              "dial_count": 1,
+              "rounds": 0,
+              "verified_bytes": 0,
+              "elapsed_ms": 0,
+              "maximum_round_trip_ms": 0
+            }
+          ]
+        },
+        "wire": {
+          "allowed_destination_ports": [
+            42443,
+            42450,
+            42451,
+            42452,
+            42453,
+            42454,
+            42455,
+            42456,
+            42457
+          ],
+          "destination_changes": 0,
+          "destination_ip": "10.213.25.1",
+          "distinct_destination_ports": [
+            42455
+          ],
+          "distinct_source_ports": [
+            42048,
+            48455
+          ],
+          "elapsed_seconds": 0.339067,
+          "interface": "hys-1025",
+          "ip_bytes": 2616,
+          "mode": "observe",
+          "observed_endpoints": [
+            {
+              "destination_port": 42455,
+              "first_seconds": 0.079029,
+              "ip_bytes": 1308,
+              "last_seconds": 0.079029,
+              "packets": 1,
+              "source_port": 42048,
+              "udp_bytes": 1288
+            },
+            {
+              "destination_port": 42455,
+              "first_seconds": 0.079682,
+              "ip_bytes": 1308,
+              "last_seconds": 0.079682,
+              "packets": 1,
+              "source_port": 48455,
+              "udp_bytes": 1288
+            }
+          ],
+          "packets": 2,
+          "payload_storage": false,
+          "raw_capture_storage": false,
+          "source_ip": "10.213.25.2",
+          "source_socket_changes": 1,
+          "time_periods": [
+            {
+              "destination_port": 42455,
+              "first_seconds": 0.079029,
+              "ip_bytes": 1308,
+              "last_seconds": 0.079029,
+              "packets": 1,
+              "source_port": 42048,
+              "udp_bytes": 1288
+            },
+            {
+              "destination_port": 42455,
+              "first_seconds": 0.079682,
+              "ip_bytes": 1308,
+              "last_seconds": 0.079682,
+              "packets": 1,
+              "source_port": 48455,
+              "udp_bytes": 1288
+            }
+          ],
+          "udp_bytes": 2576
+        },
+        "mapping_source": "xboard-node-managed",
+        "fixture_installed_nat": false
+      },
+      {
+        "kernel": "xray",
+        "test": "live-real-panel-reenable-created-rules",
+        "pass": true
+      },
+      {
+        "kernel": "xray",
+        "test": "managed-sigterm-cleaned-own-table",
+        "pass": true,
+        "exit_code": 0
+      }
+    ],
+    "host_nftables_unchanged": true,
+    "original_panel_http_status": 200,
+    "test_namespaces_removed": true,
+    "owned_processes_exited": true,
+    "relay_socket_removed": true,
+    "private_runtime_logs_read": false,
+    "fixture_installed_nat": false,
+    "control_plane": "real owned Laravel/SQLite/Redis/NodeWorker via byte-transparent Unix relay",
+    "traffic_scope": "isolated IPv4 veth; actual QUIC; no public network"
+  },
+  "guards": {
+    "result": "PASS",
+    "date": "2026-10-25",
+    "candidate": {
+      "node_sha256": "d8310fd9960e732b971e83038945434b6af775390a5582f10655e3ed92f6d5a6",
+      "client_sha256": "115aaf17049a259241fe7c0118f351f39f7d71fba2eff372b63dd06a5d24b86e",
+      "source_archive_sha256": "2dc9f92b61381ce3e95d6195ee6afdf2d6041488a6aa25b704e6ee5de219107f",
+      "candidate": "hy2-auto-candidate"
+    },
+    "kernel": "singbox",
+    "tests": [
+      {
+        "test": "foreign-udp-listener-refused-without-interception",
+        "pass": true,
+        "rejected_exit": 1,
+        "foreign_socket_preserved": true,
+        "no_node_nat_on_rejection": true,
+        "conflict_removed_control": {
+          "passed": true,
+          "client_exit": 0,
+          "client": {
+            "passed": true,
+            "expected_failure": false,
+            "stage": "traffic",
+            "server_ports": [
+              "42450:42453"
+            ],
+            "hop_interval": "5s",
+            "tls_verification": true,
+            "flows": [
+              {
+                "kind": "udp",
+                "passed": true,
+                "dial_count": 1,
+                "rounds": 20,
+                "verified_bytes": 20480,
+                "elapsed_ms": 3033,
+                "maximum_round_trip_ms": 1
+              },
+              {
+                "kind": "tcp",
+                "passed": true,
+                "dial_count": 1,
+                "rounds": 19,
+                "verified_bytes": 622592,
+                "elapsed_ms": 3046,
+                "maximum_round_trip_ms": 43
+              }
+            ]
+          }
+        }
+      },
+      {
+        "test": "foreign-nat-overlap-refused-without-overwrite",
+        "pass": true,
+        "rejected_exit": 1,
+        "foreign_rules_preserved": true,
+        "no_node_nat_on_rejection": true
+      },
+      {
+        "test": "missing-net-admin-rejected-only-when-hopping-requested",
+        "pass": true,
+        "cap_net_admin_bounding_and_effective_bits_cleared": true,
+        "range_rejected_exit": 1,
+        "no_node_nat_on_rejection": true,
+        "no_range_compatible": {
+          "passed": true,
+          "client_exit": 0,
+          "client": {
+            "passed": true,
+            "expected_failure": false,
+            "stage": "traffic",
+            "tls_verification": true,
+            "flows": [
+              {
+                "kind": "tcp",
+                "passed": true,
+                "dial_count": 1,
+                "rounds": 19,
+                "verified_bytes": 622592,
+                "elapsed_ms": 3014,
+                "maximum_round_trip_ms": 44
+              },
+              {
+                "kind": "udp",
+                "passed": true,
+                "dial_count": 1,
+                "rounds": 20,
+                "verified_bytes": 20480,
+                "elapsed_ms": 3033,
+                "maximum_round_trip_ms": 2
+              }
+            ]
+          }
+        }
+      },
+      {
+        "test": "overlapping-node-rejected-first-instance-preserved",
+        "pass": true,
+        "second_exit": 1,
+        "first_rules_preserved": true,
+        "range_control": {
+          "passed": true,
+          "client_exit": 0,
+          "client": {
+            "passed": true,
+            "expected_failure": false,
+            "stage": "traffic",
+            "server_ports": [
+              "42450:42453"
+            ],
+            "hop_interval": "5s",
+            "tls_verification": true,
+            "flows": [
+              {
+                "kind": "tcp",
+                "passed": true,
+                "dial_count": 1,
+                "rounds": 19,
+                "verified_bytes": 622592,
+                "elapsed_ms": 3011,
+                "maximum_round_trip_ms": 44
+              },
+              {
+                "kind": "udp",
+                "passed": true,
+                "dial_count": 1,
+                "rounds": 20,
+                "verified_bytes": 20480,
+                "elapsed_ms": 3032,
+                "maximum_round_trip_ms": 1
+              }
+            ]
+          }
+        },
+        "primary_control": {
+          "passed": true,
+          "client_exit": 0,
+          "client": {
+            "passed": true,
+            "expected_failure": false,
+            "stage": "traffic",
+            "tls_verification": true,
+            "flows": [
+              {
+                "kind": "udp",
+                "passed": true,
+                "dial_count": 1,
+                "rounds": 20,
+                "verified_bytes": 20480,
+                "elapsed_ms": 3035,
+                "maximum_round_trip_ms": 1
+              },
+              {
+                "kind": "tcp",
+                "passed": true,
+                "dial_count": 1,
+                "rounds": 19,
+                "verified_bytes": 622592,
+                "elapsed_ms": 3088,
+                "maximum_round_trip_ms": 44
+              }
+            ]
+          }
+        }
+      },
+      {
+        "test": "sigkill-stale-table-reclaimed-and-sigterm-cleaned",
+        "pass": true,
+        "sigkill_left_owned_stale_table": true,
+        "restarted_same_owner_table": true,
+        "restarted_range_control": {
+          "passed": true,
+          "client_exit": 0,
+          "client": {
+            "passed": true,
+            "expected_failure": false,
+            "stage": "traffic",
+            "server_ports": [
+              "42450:42453"
+            ],
+            "hop_interval": "5s",
+            "tls_verification": true,
+            "flows": [
+              {
+                "kind": "udp",
+                "passed": true,
+                "dial_count": 1,
+                "rounds": 20,
+                "verified_bytes": 20480,
+                "elapsed_ms": 3035,
+                "maximum_round_trip_ms": 1
+              },
+              {
+                "kind": "tcp",
+                "passed": true,
+                "dial_count": 1,
+                "rounds": 20,
+                "verified_bytes": 655360,
+                "elapsed_ms": 3119,
+                "maximum_round_trip_ms": 44
+              }
+            ]
+          }
+        },
+        "sigterm_cleaned_owned_table": true
+      }
+    ],
+    "harness_error_type": null,
+    "host_nftables_unchanged": true,
+    "original_panel_http_status": 200,
+    "owned_processes_exited": true,
+    "test_namespaces_removed": true,
+    "private_runtime_logs_read": false,
+    "traffic_scope": "isolated IPv4 veth; shared portforward safety guards",
+    "fixture_nat_scope": "one owned foreign conflict rule, only inside new server namespace",
+    "guard_script_sha256": "912503560a458ea1298a808c432d53661cb23ce4e3a64d13f317d7a7ece042d8"
+  },
+  "linux_race": {
+    "result": "PASS",
+    "exit_code": 0,
+    "packages": [
+      "./internal/model",
+      "./internal/panel",
+      "./internal/controlplane",
+      "./internal/portforward",
+      "./internal/service",
+      "./internal/machine"
+    ],
+    "tags": "with_quic,with_utls,with_wireguard,with_acme,with_clash_api",
+    "duration_seconds": 116.2,
+    "source_archive_sha256": "2dc9f92b61381ce3e95d6195ee6afdf2d6041488a6aa25b704e6ee5de219107f",
+    "source_files": 170,
+    "toolchain": "go version go1.26.5 linux/amd64",
+    "network": "offline local module proxy only",
+    "private_runtime_logs_read": false,
+    "panel_data_accessed": false
+  },
+  "final_inventory": {
+    "result": "PASS",
+    "test_namespaces_remaining": [],
+    "owned_test_processes": 0,
+    "host_managed_hy2_tables": 0,
+    "test_container_removed": true,
+    "loopback_17006_released": true,
+    "original_panel_http_status": 200,
+    "private_runtime_logs_read": false,
+    "private_fixture_data_retained": true
+  },
+  "backend_feature_tests": {
+    "passed": 12,
+    "command": "XBOARD_TEST_VENDOR=/path/to/vendor/autoload.php php tests/Hysteria2/port_hopping.php",
+    "database": "in-memory SQLite; real Laravel validation/controller/GET/observer"
+  },
+  "installer_tests": {
+    "passed": 25,
+    "skipped": 1,
+    "reason": "optional external distribution mirror is absent",
+    "command": "python tools/test_installer.py"
+  },
+  "experiment_source_sha256": {
+    "tests/e2e/hy2_auto/byte_relay.py": "fb03f0f3fd0921fc2955e44600d39347e05cb9b840a6f1879933bfa41f2488d6",
+    "tests/e2e/hy2_auto/final_guard.py": "58e922e0460a8f8152b0a74328b254fb5837155b442f5396046addd637fe84e5",
+    "tests/e2e/hy2_auto/guards.py": "912503560a458ea1298a808c432d53661cb23ce4e3a64d13f317d7a7ece042d8",
+    "tests/e2e/hy2_auto/linux_source_verify.py": "220fdb6b270e76e328670ae73eb6eef1cd874c7a9bae5a81a879b8ade9d6c1e2",
+    "tests/e2e/hy2_auto/managed_panel.py": "53375d5e1f1d89f311cbf4feece1d0d9c81ab516737a451542f86b185344e9e3",
+    "tests/e2e/hy2_auto/panel_fixture.py": "39635ff6803d6290344a30647a9d0448a34a2339809fe4824e1528f6a431108a",
+    "tests/e2e/hy2_auto/panel_seed.php": "6239f4877c8eee7f59382c053ccc47b935976fde45cf42c46210bdab990e7fca",
+    "tests/e2e/hy2_auto/vm_hy2_auto_fixture.py": "ca06cf5130118089f0b52d8be2485f0412c862ae83eabfed3a10bccdadc9d4ae",
+    "tests/e2e/hy2_auto/wire_helpers.py": "96dda2772946040e827e4c7ce05e76145ce842431e9b0f66d4484cf6a2a9d51d"
+  },
+  "deferred": [
+    "Public-WAN/NAT traversal",
+    "IPv6 live traffic",
+    "Commercial client runtime",
+    "Long-term stress",
+    "Node Docker image build/run",
+    "ARM64 runtime",
+    "Formal release and production deployment"
+  ]
+}
