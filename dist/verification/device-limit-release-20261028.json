@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "date": "2026-10-28",
+  "result": "PASS",
+  "plugin_version": "1.0.10",
+  "tools_version": "1.0.9",
+  "plugin_source_commit": "a600680392dc97738594f5c07f1d5cb032b433f6",
+  "node_release_source_commit": "b8b791ffb66954c78b0e7036667240b3c093a87e",
+  "node_binary_source_commit": "fd5cacf2deba18c047f4ae606bf1259220ee7592",
+  "formal_node_asset_hashes_checked": 6,
+  "tools_tests": {
+    "tests_run": 36,
+    "passed": 36,
+    "failed": 0,
+    "skipped": 0,
+    "elapsed_seconds": 13.264,
+    "execution": "Linux isolated staging, sudo; systemd transactions simulated"
+  },
+  "preliminary_unprivileged_tools_tests": {
+    "tests_run": 36,
+    "passed": 30,
+    "skipped": 6,
+    "reason": "Root-owned self-created /var/lib transaction fixtures required",
+    "superseded_by_complete_root_run": true
+  },
+  "packages": [
+    {
+      "file": "NodeEndpoint-1.0.10.zip",
+      "members": 129,
+      "sha256": "4dec80dee6ac0a117d0e70e903fa12cafa0e0517255391bb05f2f23831cc5a2f",
+      "result": "PASS"
+    },
+    {
+      "file": "node-endpoint-tools-1.0.9.zip",
+      "members": 95,
+      "sha256": "86423440487ee99a13118ac8c0e85c2722c0b146ae9c55a7c24c92ad201fea68",
+      "result": "PASS"
+    }
+  ],
+  "linkage": {
+    "result": "PASS",
+    "checks": [
+      {
+        "file": "NodeEndpoint-1.0.10.zip",
+        "node_version": "v1.13-orphan.7",
+        "result": "PASS"
+      },
+      {
+        "file": "node-endpoint-tools-1.0.9.zip",
+        "node_version": "v1.13-orphan.7",
+        "result": "PASS"
+      }
+    ]
+  },
+  "raw_plugin_source_check": {
+    "result": "PASS",
+    "checked": 25,
+    "compared_to": "Xboard-Custom-Source bundled-plugins/manifest.json",
+    "normalization": "none; raw ZIP entry streams",
+    "panel_commit": "f7e01f8fdd32c9b65060dc9cf6dcd5dc9c4086bc"
+  },
+  "previous_dist_hashes_unchanged": {
+    "node-endpoint-tools-1.0.0.zip": "42f2893938c294646c44e351a5c251cfea9f6a30156d67c345bc476307ea89e2",
+    "SHA256SUMS": "5ff86fdd6e19c46586bccfaa00cd3028421927eff275ead7eb601ca4fffe56c8",
+    "release.json": "aa7a3ff6a026cde2e80cfa5483c555d44a24739680786404a7a88b48c280603e"
+  },
+  "scope": "No production deployment, full Laravel upload suite or browser rerun"
+}

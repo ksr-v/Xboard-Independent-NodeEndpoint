@@ -1,17 +1,17 @@
 {
   "schema": 1,
   "repository": "https://github.com/ksr-v/Xboard-Node--Custom-Source",
-  "version": "v1.13-orphan.6",
-  "source_commit": "9394b235fe0665ab6e29a2281b9295a9fc5ddeaf",
-  "audited_at": "2026-10-25",
+  "version": "v1.13-orphan.7",
+  "source_commit": "b8b791ffb66954c78b0e7036667240b3c093a87e",
+  "audited_at": "2026-10-28",
   "release_is_immutable": false,
   "assets": {
-    "xboard-node-linux-amd64": "ffe4878de3fcb16b16279e4b883e0e4d845e16ec16639a265903c270165978b9",
-    "xboard-node-linux-arm64": "ffc93d22a75713528292f45c1b459c03a456275c33662d14db48fee135ec99c2",
-    "xbctl-linux-amd64": "18efe4e1cba9988dcbbdff14532986b9b352637001acf585e8d6066b8f8bb7d0",
-    "xbctl-linux-arm64": "518e2164dea5735a848f1f90edfeeb1fdc5222421ba773fce7fde49c73ea9c89",
-    "install.sh": "5824ea367a0268501d934221d0392ae14007c6f0500586cba5d6c316425ca908",
-    "SHA256SUMS": "f7cfc906911b88abf27aa99fc3ee74fa7c1592ef63bc5306575a2f09614e9a34"
+    "xboard-node-linux-amd64": "8671d3c0d4188b4c735e08896356f50a2439c771ce03d2e4493bba5cadc00b15",
+    "xboard-node-linux-arm64": "ad05c88bd5878ec1f1737ff803c05c4e760b24267caafbbd026047805f288da3",
+    "xbctl-linux-amd64": "cbafbab75572bd1873d4238f0a4eddf40d1a338071c3d5362b7ec5f58279d46d",
+    "xbctl-linux-arm64": "c3655a4a455d94cf1d9418855deb0eb2ecfcf31f0654992c3049916e0ff93ccb",
+    "install.sh": "c67d96b3144189b2caba4eaa825ace1757171470bad30e6fc9d1285db9d46eec",
+    "SHA256SUMS": "c56a83ec07e7c81dd4481f393c56d3a311b703bcab83d500ce681b0c77068f18"
   },
-  "binary_source_commit": "34c524e50977ec0bbc60ce46f4a30ad0af76a0d1"
+  "binary_source_commit": "fd5cacf2deba18c047f4ae606bf1259220ee7592"
 }

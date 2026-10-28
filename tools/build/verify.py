@@ -14,10 +14,15 @@ EXPECTED = {'NodeEndpoint-1.0.0.zip', 'node-endpoint-tools-1.0.0.zip', 'xb-node-
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--plugin-only', action='store_true', help='Verify current versioned native-plugin release')
+    parser.add_argument('--with-tools', action='store_true', help='Also verify the current supplementary tools beside the native plugin')
     args = parser.parse_args()
+    if args.with_tools and not args.plugin_only:
+        parser.error('--with-tools requires --plugin-only')
     version = json.loads((ROOT / 'plugin/NodeEndpoint/config.json').read_text('utf-8'))['version'] if args.plugin_only else '1.0.0'
     directory = ROOT / 'dist' / ('v' + version) if args.plugin_only else ROOT / 'dist'
     expected = {'NodeEndpoint-' + version + '.zip'} if args.plugin_only else EXPECTED
+    if args.with_tools:
+        expected.add('node-endpoint-tools-1.0.9.zip')
     release = json.loads((directory / 'release.json').read_text('utf-8'))
     if release.get('version') != version or {row['file'] for row in release['artifacts']} != expected:
         raise RuntimeError('Release identity differs')

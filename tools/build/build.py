@@ -47,7 +47,10 @@ def archive(name, members, output=None, version=VERSION):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--plugin-only', action='store_true', help='Build current native plugin in a versioned dist directory; preserve old releases')
+    parser.add_argument('--with-tools', action='store_true', help='Also build the current supplementary tools beside the native plugin')
     args = parser.parse_args()
+    if args.with_tools and not args.plugin_only:
+        parser.error('--with-tools requires --plugin-only')
     (ROOT / 'dist').mkdir(exist_ok=True)
     for name in DOCS:
         if not (ROOT / name).is_file():
@@ -68,9 +71,14 @@ def main():
         output = ROOT / 'dist' / ('v' + version)
         output.mkdir(exist_ok=True)
         report = archive('NodeEndpoint-' + version + '.zip', plugin, output, version)
-        (output / 'SHA256SUMS').write_text(report['sha256'] + '  ' + report['file'] + '\n', encoding='utf-8')
-        (output / 'release.json').write_text(json.dumps({'version': version, 'artifacts': [report]}, indent=2) + '\n', encoding='utf-8')
-        print(json.dumps(report, indent=2))
+        reports = [report]
+        if args.with_tools:
+            from build_tools_patch import build as build_tools
+            tool_report = build_tools(ROOT / 'dist/node-endpoint-tools-1.0.0.zip', output)
+            reports.append(dict(tool_report, version=version))
+        (output / 'SHA256SUMS').write_bytes(''.join(row['sha256'] + '  ' + row['file'] + '\n' for row in reports).encode('utf-8'))
+        (output / 'release.json').write_bytes((json.dumps({'version': version, 'artifacts': reports}, indent=2) + '\n').encode('utf-8'))
+        print(json.dumps(reports, indent=2))
         return
     if config['version'] != VERSION:
         raise RuntimeError('Legacy three-package build is fixed to 1.0.0; use --plugin-only for a newer native plugin')
