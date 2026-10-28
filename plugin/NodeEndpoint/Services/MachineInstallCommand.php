@@ -3,7 +3,7 @@ namespace Plugin\NodeEndpoint\Services;
 use InvalidArgumentException;
 final class MachineInstallCommand
 {
-    public const INSTALLER = 'https://raw.githubusercontent.com/ksr-v/Xboard-Node--Custom-Source/v1.13-orphan.6/install.sh';
+    public const INSTALLER = 'https://github.com/ksr-v/Xboard-Node--Custom-Source/releases/download/v1.13-orphan.7/install.sh';
     public static function context(array $settings): array
     {
         $settings = Endpoint::validate($settings);
@@ -38,7 +38,7 @@ final class MachineInstallCommand
     {
         if ($id < 1 || $token === '' || $panelUrl === '') { throw new InvalidArgumentException('机器身份或面板地址无效。'); }
         return ['--mode', 'machine', '--panel', $panelUrl, '--token', $token, '--machine-id', (string) $id,
-            '--version', 'v1.13-orphan.6'];
+            '--version', 'v1.13-orphan.7'];
     }
     private static function command(array $args): string
     {
