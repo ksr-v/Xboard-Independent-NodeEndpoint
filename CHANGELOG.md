@@ -1,5 +1,13 @@
 # 变更记录
 
+## 1.1.1 — 2026-10-30，Hysteria2 监听口自动放行
+
+- 新机器安装命令固定独立 Node `v1.13-orphan.8`；独立 tools `1.0.10` 同步使用该版精确资产锁。旧包与历史摘要保留。
+- 标准 Node 安装器显式启用 owned UDP INPUT 管理，覆盖单端口和跳跃 Hysteria2 的实际监听口；启动、配置变化和每 30 秒核对并恢复自己的规则。
+- 支持 iptables-nft / legacy 的 IPv4、IPv6；本地关闭优先，自定义无启用环境变量时默认关闭。额外原生 nftables INPUT 与 firewalld 需人工处理。
+- 不修改提供商持久文件、不保存全规则或改变默认策略；重载后恢复有窗口，云安全组仍需人工配置。详见[操作说明](docs/HY2_INPUT_FIREWALL.zh-CN.md)。
+- 保留 1.1.0 的登录复用与网页 Root 管理；Root installer `1.0.10` / Root tools `1.0.6` / helper `1.0.0` 不变。Node 本轮隔离验证及插件本地组件结果见[发行记录](docs/RELEASE_VALIDATION_HY2_INPUT_20261030.md)，最终资产与公开下载另行核验。
+
 ## 1.1.0 — 2026-10-29，管理员登录复用与网页 Root 任务
 
 - 同域页面复用原生面板管理员登录，处理过期、退出和账号切换，保留手动登录。

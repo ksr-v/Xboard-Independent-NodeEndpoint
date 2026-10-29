@@ -1,4 +1,14 @@
-# NodeEndpoint 1.1.0
+# NodeEndpoint 1.1.1
+
+本版将域名 / IP 新机器命令固定到独立 Node **v1.13-orphan.8**，插件 ZIP 为 `NodeEndpoint-1.1.1.zip`，独立 Node tools 为 **1.0.10**。标准 Node 安装器明确启用 Hysteria2 实际 UDP 监听口的 owned INPUT 自动放行，包含不启用跳跃的单端口节点，并在启动、配置变化和每 30 秒恢复自己的运行时规则。
+
+支持 iptables-nft / legacy 的 IPv4、IPv6；仅放行实际 UDP 监听口，不放行整个广告范围或 TCP。提供商持久规则、默认策略和其他实例规则保留，停止时只清理自己。额外原生 nftables INPUT 链与 firewalld 本次需人工处理；UFW 兼容布局和 persistent 重载后恢复存在窗口。云安全组仍需允许客户端使用的 UDP 端口范围。配置、关闭选择与支持范围见[操作说明](docs/HY2_INPUT_FIREWALL.zh-CN.md)。
+
+配套面板为 Xboard `v2026.10.30.1`、NodeEndpoint `1.1.1`。已有节点使用[固定升级命令](docs/UPGRADE.zh-CN.md)，保留身份、Token、CA 和配置；不能用新机器安装命令代替升级。Root 安装器 `v1.0.10`、Root tools `1.0.6` 和网页助手 `1.0.0` 保持不变，已有 CA 无需重建。默认 Root 面板归档升级仍处理已有有效原生入口的助手。
+
+最终摘要和本轮测试结果见[验证记录](docs/RELEASE_VALIDATION_HY2_INPUT_20261030.md)，不将旧版通过数当作本次重跑。已发布资产不覆盖。
+
+# 历史 NodeEndpoint 1.1.0
 
 同域 `/node-endpoint` 支持复用面板管理员登录；经一次 SSH 初始化后，可在网页预览、确认并执行固定 Root 任务，查看任务分阶段结果和同步公共 CA。Root 助手使用 Unix socket 和系统 UID 校验，网页不提供任意命令或私钥操作。
 

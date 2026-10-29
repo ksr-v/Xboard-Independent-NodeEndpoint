@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "result": "PASS",
+  "node_version": "v1.13-orphan.8",
+  "source_commit": "1790f29a2fe5b7798383724e537cc1356b52d66d",
+  "binary_source_commit": "313a2c78a340336ba66038d4d9b0109a78d47cc5",
+  "asset_sha256": {
+    "xbctl-linux-amd64": "1351a518ffb20993d009e8b1b9b95ceba3e7d104a037939d53d03698dd2ab32c",
+    "xbctl-linux-arm64": "14c2f8c994936c99c672500ccf79ad2f06db31fe2024e49c9aed12de1f0d153d",
+    "xboard-node-linux-amd64": "4dec79087ade152a55a98aa91bd64459f4569cab832ae39ee40e30e43389ce60",
+    "xboard-node-linux-arm64": "52c33e1088d8a9b00b112d1478d4a49738a04942a8d95102719c551826fc26c5",
+    "install.sh": "0a99408c1c2509b15ea3950223a61e4c285f32991559c371243b17a2b8b58c7f",
+    "SHA256SUMS": "103cb8d3b6592c1bd84a22767abd484d500c110eeb273980f9397481a74cfa6f"
+  },
+  "toolchain": "go1.26.8",
+  "build_time": "2026-10-30T00:00:00Z",
+  "node_source_verification": {
+    "provenance": "isolated Linux results supplied by release coordinator; packaging agent did not rerun these suites",
+    "go": {
+      "checks": 599,
+      "packages": 15
+    },
+    "race": {
+      "checks": 129,
+      "packages": 2
+    },
+    "netns_real_firewall": {
+      "checks": 9
+    },
+    "python": {
+      "passed": 94,
+      "optional_skipped": 1
+    },
+    "linux_amd64_reproduced_from_linux_and_windows_hosts": true,
+    "arm64_crossbuild_only": true
+  },
+  "plugin_packaging_agent_verification": {
+    "platform": "Windows",
+    "native_php_components": 36,
+    "synthetic_machine_commands": 4,
+    "node_migration_tool_python": 36,
+    "node_assets_local_size_and_sha256": 6,
+    "actual_native_zip_upload_checks": 6,
+    "plugin_zip_members": 139,
+    "tools_zip_members": 99
+  },
+  "public_release_download_check": {
+    "result": "PASS",
+    "checks": 6,
+    "provenance": "release coordinator public unauthenticated browser_download_url checks; packaging agent independently checked installer and checksum file",
+    "raw_tagged_installer_identical": true,
+    "assets": [
+      {
+        "asset": "xbctl-linux-amd64",
+        "bytes": 7184546,
+        "sha256": "1351a518ffb20993d009e8b1b9b95ceba3e7d104a037939d53d03698dd2ab32c",
+        "public_http_verified": true,
+        "github_digest_verified": true
+      },
+      {
+        "asset": "xbctl-linux-arm64",
+        "bytes": 6619298,
+        "sha256": "14c2f8c994936c99c672500ccf79ad2f06db31fe2024e49c9aed12de1f0d153d",
+        "public_http_verified": true,
+        "github_digest_verified": true
+      },
+      {
+        "asset": "xboard-node-linux-amd64",
+        "bytes": 67002530,
+        "sha256": "4dec79087ade152a55a98aa91bd64459f4569cab832ae39ee40e30e43389ce60",
+        "public_http_verified": true,
+        "github_digest_verified": true
+      },
+      {
+        "asset": "xboard-node-linux-arm64",
+        "bytes": 61931682,
+        "sha256": "52c33e1088d8a9b00b112d1478d4a49738a04942a8d95102719c551826fc26c5",
+        "public_http_verified": true,
+        "github_digest_verified": true
+      },
+      {
+        "asset": "install.sh",
+        "bytes": 59331,
+        "sha256": "0a99408c1c2509b15ea3950223a61e4c285f32991559c371243b17a2b8b58c7f",
+        "public_http_verified": true,
+        "github_digest_verified": true
+      },
+      {
+        "asset": "SHA256SUMS",
+        "bytes": 425,
+        "sha256": "103cb8d3b6592c1bd84a22767abd484d500c110eeb273980f9397481a74cfa6f",
+        "public_http_verified": true,
+        "github_digest_verified": true
+      }
+    ]
+  },
+  "excluded": [
+    "production deployment",
+    "commercial client acceptance",
+    "native ARM64 runtime",
+    "Docker deployment",
+    "long-term load"
+  ]
+}

@@ -22,7 +22,7 @@ def main():
     directory = ROOT / 'dist' / ('v' + version) if args.plugin_only else ROOT / 'dist'
     expected = {'NodeEndpoint-' + version + '.zip'} if args.plugin_only else EXPECTED
     if args.with_tools:
-        expected.add('node-endpoint-tools-1.0.9.zip')
+        expected.add('node-endpoint-tools-1.0.10.zip')
     release = json.loads((directory / 'release.json').read_text('utf-8'))
     if release.get('version') != version or {row['file'] for row in release['artifacts']} != expected:
         raise RuntimeError('Release identity differs')

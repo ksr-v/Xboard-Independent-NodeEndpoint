@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "result": "PASS",
+  "plugin_version": "1.1.1",
+  "node_tools_version": "1.0.10",
+  "node_version": "v1.13-orphan.8",
+  "node_source_commit": "1790f29a2fe5b7798383724e537cc1356b52d66d",
+  "node_binary_source_commit": "313a2c78a340336ba66038d4d9b0109a78d47cc5",
+  "platform": "Windows",
+  "checks": {
+    "native_php_components": 36,
+    "synthetic_release_commands": 4,
+    "node_migration_python": 36,
+    "actual_native_zip_upload_install_enable": 6,
+    "plugin_members_verified": 139,
+    "tools_members_verified": 99,
+    "node_local_asset_size_and_sha256": 6,
+    "node_public_assets_verified_by_release_coordinator": 6,
+    "deterministic_package_rebuilds": 2,
+    "old_zip_assets_unchanged": 3,
+    "packaged_node_lock_and_audited_sums_identical": true
+  },
+  "scope": {
+    "php": "real Laravel 12.69.3, Sanctum and isolated SQLite; synthetic identities",
+    "node_migration_tool": "loopback TLS and simulated systemd; no production connection",
+    "zip": "actual native uploader and PluginManager in isolated fixture",
+    "node_runtime": "separate coordinator Go/race/netns/Python results in docs/verification/node-v8-release-20261030.json"
+  },
+  "artifacts": [
+    {
+      "file": "NodeEndpoint-1.1.1.zip",
+      "bytes": 840554,
+      "sha256": "f09f014cfa8c7a59e6f1cda518c8d3770d861c515f90bea252ce80ec33b0fd7e"
+    },
+    {
+      "file": "node-endpoint-tools-1.0.10.zip",
+      "bytes": 718196,
+      "sha256": "e82265a0916b9afd55280e9d447e3bcde533aa94beec64c463a04587f9bfa031"
+    }
+  ],
+  "runtime_source_sha256": {
+    "config.json": "7af0571892691ec3bef98fed2c822f24dc3282d0b2416b8a879218f10294916a",
+    "Controllers/SettingsController.php": "abd58e9d8fe6c082a2b539ec046bc505eb76850671d6ecda17314993463b71ff",
+    "Controllers/WebManagerController.php": "33a881e3ba040bc807e010ee3ac86f61abdbf686a2f73fc8aa37aee809b6664a",
+    "database/migrations/2026_10_09_000001_create_node_endpoint_settings.php": "31294a0af01d2d7d7fe29dcd5edb4ea65c6f51f22eb9d8c4d77b60de0c836c9d",
+    "database/migrations/2026_10_18_000002_create_node_endpoint_ca_credentials.php": "f9d9b19c9918b273995e9821b9b8e37f36e07f164d82b1d6255a217d809dda46",
+    "database/migrations/2026_10_29_000003_create_node_endpoint_web_jobs.php": "dc4bf47df10e80b0b0c727f626ceed74acce395fafbcd72fe666415aeb8d3c73",
+    "Middleware/Enabled.php": "5a8d2c410b06fdd8e07bf959ef66a3f203cc7260f307bb5427db87bf0e7bae30",
+    "Middleware/NativeMachineInstall.php": "8175665b4a145e11ab7080667c675e981ecae8ff09fa51100363277b82922d28",
+    "Middleware/ScopedHandshake.php": "00ef3404f8573c3297901887d5fcb576417e219feee1eb6b5de01e4acb3c701e",
+    "Plugin.php": "cd00fedfae98d13df0ad5ea61dbf73bf3e20fda169261f098b94ea18aedfa113",
+    "resources/assets/app.js": "0bc020f73c9929c2e590a1bdea651f33a00f43c5922b8ac377931553d8943483",
+    "resources/assets/native-install.css": "b6f54d0f59c695bd532a0204ad269cb9cd6212216dda9e9fbfffe837c4d7c756",
+    "resources/assets/native-install.js": "4eeee7f957ee93e2f555ad009716694c0d2dabe7c548169df7fac93c3b63cc81",
+    "resources/assets/style.css": "7f5352b12f04e2e35313274d67ccd9d56fe83608203f8dadb30bd0286bae1d9f",
+    "resources/views/admin.blade.php": "d0a78636f39e9254159a5ca7a970eca84f703805bd6b678e4c056c726a83787f",
+    "resources/views/index.html": "555d4627606cdcc2dfee417ab6ffc4a04159418daea5df54c2f2811208fa3860",
+    "routes/api.php": "a1aca2ab985aed6df700da760c0096aae008714458d46b4361efcd68427cd9d4",
+    "routes/web.php": "81d3e619688440291e84a0994a8c432d167e787caa94346eb2717e5733e89e1a",
+    "Services/AdminIntegration.php": "ae4a77154684bc11bd8c9b0585c48f85e568c74d00c2bf6b8ad35bb01684832e",
+    "Services/CaPassphrases.php": "055596e431ccababaa536061817a972df3aa16dde96d40d90da7f3dd2fb5fa01",
+    "Services/Certificates.php": "5f49cada41f7651b9ae1074836ab5b2cec7e10e00a6350e2c78f6c6c88c6b70e",
+    "Services/CommandBuilder.php": "cbd47b54caa5cae227fac89050d2703f0ab48e506e836c664555881b2b4230db",
+    "Services/Endpoint.php": "47d7be327d3c5d7af7ba97d491dc525ead0efd2aadeacd871b7c6f760c845b0c",
+    "Services/MachineInstallCommand.php": "5ce90adad5bfbc751ca256a1ada9090d31d58b2ac0e072db33f4f9f641a559af",
+    "Services/Probe.php": "c4ef5fead410db60d6526902f65f6ee365f1010214415803d74bd50dcf3593c3",
+    "Services/RootCommandBuilder.php": "d097afbb9145b7cf7aacff93af134ac27aeedfa350a6b3b07165df4b951e1e45",
+    "Services/Settings.php": "ce722c621a6f666f764d4683302c7564d90741a060d4a484f390e92b4489d0b4",
+    "Services/WebManager.php": "d6c2699492fbec629d2085d1fd03bb2cba9eebc798865ebabcd81bf612b6fad9"
+  }
+}

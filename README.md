@@ -2,9 +2,11 @@
 
 为 Xboard 增加独立的节点通讯入口，让节点通过 **IP + 私有证书**连接面板，也保留使用原面板域名的独立部署命令。默认独立端口为 **HTTPS TCP 8443**。原网站、登录、订阅、`app_url` 和其他插件保留原有配置。
 
-当前插件为 **NodeEndpoint 1.1.0**，新机器命令固定使用独立 **xboard-node v1.13-orphan.7**。配套全插件后端为 **v2026.10.29.2**，修复在线 IP 统计、跨节点设备限制和断网后离线更新；已有面板按[更新教程](docs/UPGRADE.zh-CN.md)先升级后端，再逐台升级 Node。只上传本插件不能修复已运行的后端或 Node。Root 一键入口继续使用 **root-installer-v1.0.10 / tools 1.0.6**，其面板入口配置无需重复升级或重建 CA；本次独立 Node 迁移工具包为 **tools 1.0.9**。
+当前插件为 **NodeEndpoint 1.1.1**，新机器命令固定使用独立 **xboard-node v1.13-orphan.8**。配套全插件后端为 **v2026.10.30.1**，新增 Hysteria2 实际 UDP 监听口的 owned INPUT 自动放行，并保留在线 IP、跨节点设备限制和断网后离线更新修复；已有面板按[更新教程](docs/UPGRADE.zh-CN.md)先升级后端，再逐台升级 Node。只上传本插件不能修复已运行的后端或 Node。Root 一键入口继续使用 **root-installer-v1.0.10 / tools 1.0.6**，其面板入口配置无需重复升级或重建 CA；本次独立 Node 迁移工具包为 **tools 1.0.10**。
 
-新建 CA 的口令自动随机生成，并使用面板 `APP_KEY` 加密保存；管理员可在 HTTPS 管理页面按需查看和复制。已有配置、CA 和其他插件保留，无需卸载。全新独立 Xboard 用户使用 [内置插件版宝塔教程](https://github.com/ksr-v/Xboard-Custom-Source/blob/v2026.10.29.2/docs/installation/install-2026.10.29.2.zh-CN.md)，不必单独上传插件。
+标准 Node 安装器显式启用本实例 Hysteria2 UDP 监听口管理，含未启用跳跃的单端口节点；启动、配置变化和每 30 秒核对自己的规则。只开放实际 UDP 监听口，不开放整个跳跃范围，不改提供商持久文件或默认策略。支持 iptables-nft / legacy 的 IPv4、IPv6；额外原生 nftables INPUT 链与 firewalld 需人工处理。云安全组仍由管理员允许广告 UDP 范围。启用、关闭与重载恢复窗口见[操作说明](docs/HY2_INPUT_FIREWALL.zh-CN.md)。
+
+新建 CA 的口令自动随机生成，并使用面板 `APP_KEY` 加密保存；管理员可在 HTTPS 管理页面按需查看和复制。已有配置、CA 和其他插件保留，无需卸载。全新独立 Xboard 用户使用 [内置插件版宝塔教程](https://github.com/ksr-v/Xboard-Custom-Source/blob/v2026.10.30.1/docs/installation/install-2026.10.29.2.zh-CN.md)，不必单独上传插件。
 
 本版支持复用当前面板管理员登录，并通过一次 SSH 初始化的受限本机助手，在网页预览、确认和执行固定 Root 任务及同步公共 CA。全新面板安装将入口和助手一并初始化；已有面板升级保留设置、CA 和禁用选择。详见[网页 Root 管理说明](docs/WEB_MANAGER.zh-CN.md)。
 
@@ -14,7 +16,7 @@
 | --- | --- |
 | 空服务器，没有 Xboard | [安装独立全插件版 Xboard](#从零安装空服务器)，默认安装并启用五插件 |
 | 已有正常运行的原版 Xboard | [保留数据接入插件](#原版-xboard-面板接入保留现有数据)，不运行面板初始化或重装脚本 |
-| 已安装旧版 NodeEndpoint | 上传 [NodeEndpoint-1.1.0.zip](https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/download/v1.1.0/NodeEndpoint-1.1.0.zip) 原生升级、启用并刷新；保留设置与 CA |
+| 已安装旧版 NodeEndpoint | 上传 [NodeEndpoint-1.1.1.zip](https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/download/v1.1.1/NodeEndpoint-1.1.1.zip) 原生升级、启用并刷新；保留设置与 CA |
 | 已有面板需要限速、路由修复 | 按[配套更新教程](docs/UPGRADE.zh-CN.md)升级后端和 Node；保留机器身份及当前入口 |
 | 插件和独立 HTTPS 入口都已安装 | 防火墙问题可[只补规则](#已有入口只补防火墙或同步-ca)；IPv4“待获取”按[入口修复说明](#私有证书对接后-ipv4-待获取)处理 |
 | 为新的节点服务器安装 xboard-node | 在原生机器管理[选择域名或 IP 命令](#新机器接入域名或-ip-双选) |
@@ -24,7 +26,7 @@
 
 宝塔 / aaPanel + Docker 用户请使用[Docker 一键安装与已有面板接入说明](docs/DOCKER_INSTALL.md)，包含宿主 Root 自动配置、公共 CA 导入和容器重建后的保留信任流程。
 
-新装使用用户维护的 **Xboard v2026.10.29.2 内置全插件版**，包含 NodeEndpoint 1.1.0、SmartExpiry 1.2.0、二维码 1.2.0（审计副本）、FlowScope 2.4.0 和 SubInfoCustomizer 1.0.1，无需再单独上传插件。完整步骤见[宝塔 / aaPanel 教程](https://github.com/ksr-v/Xboard-Custom-Source/blob/v2026.10.29.2/docs/installation/install-2026.10.29.2.zh-CN.md)，本节给出主要命令。
+新装使用用户维护的 **Xboard v2026.10.30.1 内置全插件版**，包含 NodeEndpoint 1.1.1、SmartExpiry 1.2.0、二维码 1.2.0（审计副本）、FlowScope 2.4.0 和 SubInfoCustomizer 1.0.1，无需再单独上传插件。完整步骤见[宝塔 / aaPanel 教程](https://github.com/ksr-v/Xboard-Custom-Source/blob/v2026.10.30.1/docs/installation/install-2026.10.29.2.zh-CN.md)，本节给出主要命令。
 
 ### 1. 准备面板环境
 
@@ -39,7 +41,7 @@
 ```bash
 cd /www/wwwroot/panel.example.com
 
-git clone --branch v2026.10.29.2 --single-branch \
+git clone --branch v2026.10.30.1 --single-branch \
   https://github.com/ksr-v/Xboard-Custom-Source.git .
 ```
 
@@ -65,7 +67,7 @@ bash init.sh --app-user www \
 
 自动模式显示候选地址，回车接受或输入其他实际地址；检测失败时必须手工输入。手工模式不请求公网检测服务。已有真实 Root 入口或显式 `--host` 跳过该菜单。`203.0.113.10` 属于文档示例网段，不能用于实际通讯。
 
-安装器先准备文件权限，再以站点用户完成 Composer、数据库和五插件安装，最后配置独立 HTTPS 入口、受限本机助手、本机防火墙和公共 CA。按提示填写数据库、Redis、管理员信息，审阅计划并输入完整 `INSTALL <实际地址>:<端口>` 确认短语。完成后按宝塔教程配置队列与计划任务，并检查网页、插件及节点通讯。已安装的面板不要重跑 `init.sh`、删除 `.env` 或更换 `APP_KEY`；升级使用[已有面板升级说明](https://github.com/ksr-v/Xboard-Custom-Source/blob/v2026.10.29.2/docs/installation/upgrade-2026.10.29.2.zh-CN.md)。
+安装器先准备文件权限，再以站点用户完成 Composer、数据库和五插件安装，最后配置独立 HTTPS 入口、受限本机助手、本机防火墙和公共 CA。按提示填写数据库、Redis、管理员信息，审阅计划并输入完整 `INSTALL <实际地址>:<端口>` 确认短语。完成后按宝塔教程配置队列与计划任务，并检查网页、插件及节点通讯。已安装的面板不要重跑 `init.sh`、删除 `.env` 或更换 `APP_KEY`；升级使用[已有面板升级说明](https://github.com/ksr-v/Xboard-Custom-Source/blob/v2026.10.30.1/docs/installation/upgrade-2026.10.29.2.zh-CN.md)。
 
 ## 原版 Xboard 面板接入：保留现有数据
 
@@ -81,7 +83,7 @@ bash init.sh --app-user www \
 
 ## 安装或升级 NodeEndpoint 插件
 
-从 [v1.1.0 Release](https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/tag/v1.1.0) 下载 **NodeEndpoint-1.1.0.zip** 和同次 **SHA256SUMS**，核对 ZIP 摘要。GitHub 自动生成的 “Source code” 压缩包不能用于原生插件上传。
+从 [v1.1.1 Release](https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/tag/v1.1.1) 下载 **NodeEndpoint-1.1.1.zip** 和同次 **SHA256SUMS**，核对 ZIP 摘要。GitHub 自动生成的 “Source code” 压缩包不能用于原生插件上传。
 
 1. 在 Xboard 原生插件管理上传 ZIP，安装或升级，确认 NodeEndpoint 已启用。已有 1.0.0 / 1.0.1 / 1.0.2 直接升级，不先卸载；原有设置和公共 CA 保留。
 2. 打开面板域名下的 `/node-endpoint`，以 Xboard 管理员登录。
@@ -90,7 +92,7 @@ bash init.sh --app-user www \
 
 原生机器管理中的安装双选通过插件动态资源加载，不修改 Xboard 核心或编译后的 Admin bundle。常驻 Octane 环境按宿主流程 reload 应用 worker；升级后刷新浏览器页面。
 
-已是 **1.1.0** 时，无需重复上传同一个 ZIP。域名和 IP 两种新机器安装命令继续固定到独立 Node v1.13-orphan.7；Root 命令使用 v1.0.10，原有 Docker SSH 自动配置保留，网页助手仅支持原生部署。原设置、公共 CA 和托管口令保留。
+已是 **1.1.1** 时，无需重复上传同一个 ZIP。域名和 IP 两种新机器安装命令继续固定到独立 Node v1.13-orphan.8；Root 命令使用 v1.0.10，原有 Docker SSH 自动配置保留，网页助手仅支持原生部署。原设置、公共 CA 和托管口令保留。
 
 ### 修改通讯 IP 后复制 Root 命令
 
@@ -174,7 +176,7 @@ curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoi
 | **域名对接（独立部署）**（默认） | 原面板 `app_url` | 默认系统 / 公有 CA 信任，不携带 NodeEndpoint 私有 CA |
 | **新版：IP + 私有证书** | NodeEndpoint 保存的独立 IP / 端口 | 自动携带已导入的公共 CA 和指纹，安装时配置该节点服务的信任 |
 
-两种方式均使用你维护的 [独立 Node v1.13-orphan.7 固定安装源](https://github.com/ksr-v/Xboard-Node--Custom-Source/releases/download/v1.13-orphan.7/install.sh)，Node / xbctl 固定 **v1.13-orphan.7**。域名选项也使用独立部署命令。域名 / IP 的区别是对接地址和证书信任方式。
+两种方式均使用你维护的 [独立 Node v1.13-orphan.8 固定安装源](https://github.com/ksr-v/Xboard-Node--Custom-Source/releases/download/v1.13-orphan.8/install.sh)，Node / xbctl 固定 **v1.13-orphan.8**。域名选项也使用独立部署命令。域名 / IP 的区别是对接地址和证书信任方式。
 
 选择方式后点击 **复制安装命令**，在**新的节点服务器** SSH 终端执行，菜单选择 **1 安装**。机器 ID、Token 和对接地址已带入；IP 方式还带有公共 CA，无需逐机手工上传证书。
 
@@ -196,9 +198,9 @@ curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoi
 
 原生 HTTPS FPM / Octane 的 `--refresh-entry` 从安装记录读取站点、PHP、IP、端口和 WS 模式，完整确认后刷新路径规则，保留原 CA、服务器证书、托管口令及节点身份，不写插件设置或防火墙。标准 Docker 使用宿主 Root 自动流程；容器重建后会验证原 CA 再换绑，并补齐通讯设置、防火墙和公共 CA。
 
-也可先原生升级 NodeEndpoint 1.1.0，再通过网页按钮复制同版普通 Root 向导命令，对已有入口选择修改并保留原配置。必须完成入口刷新或修改；只更新插件、只运行 `--sync-ca` 或 `--configure-firewall` 不会补齐 Nginx 路径。改通讯 IP 时仍使用普通向导，并按实际地址更新服务器证书。
+也可先原生升级 NodeEndpoint 1.1.1，再通过网页按钮复制同版普通 Root 向导命令，对已有入口选择修改并保留原配置。必须完成入口刷新或修改；只更新插件、只运行 `--sync-ca` 或 `--configure-firewall` 不会补齐 Nginx 路径。改通讯 IP 时仍使用普通向导，并按实际地址更新服务器证书。
 
-确认 FlowScope 2.4.0 已启用，节点使用独立 Node v1.13-orphan.7。Node 对此前 404 有 10 分钟负缓存，修复后等待自动重试再刷新服务器详情；无需重新安装节点、更换 Token 或强制重启。地址是节点直接访问公共 IPv4 检测服务所见的出口；该服务不可达时也会暂时待获取。验证范围和诊断见 [私有入口 IPv4 测试报告](docs/FLOWSCOPE_PRIVATE_ENDPOINT_TEST_REPORT.md)。
+确认 FlowScope 2.4.0 已启用，节点使用独立 Node v1.13-orphan.8。Node 对此前 404 有 10 分钟负缓存，修复后等待自动重试再刷新服务器详情；无需重新安装节点、更换 Token 或强制重启。地址是节点直接访问公共 IPv4 检测服务所见的出口；该服务不可达时也会暂时待获取。验证范围和诊断见 [私有入口 IPv4 测试报告](docs/FLOWSCOPE_PRIVATE_ENDPOINT_TEST_REPORT.md)。
 
 ## 已有节点迁移：保留配置
 
@@ -215,13 +217,14 @@ CA 轮换时，面板导入只影响后续复制的新机器命令，不会自�
 
 ## 高级操作、卸载与验证边界
 
-需要离线下载或手工部署时，从 [v1.0.10 Release](https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/tag/v1.0.10)取得 **node-endpoint-tools-1.0.9.zip** 和同次 SHA256SUMS，校验后解压到专用受保护目录，再校验包内 `MANIFEST.sha256`。该包的 Node 下载锁为 v1.13-orphan.7；Root 面板引导仍固定其已验证的 tools 1.0.6。不要解压覆盖 Xboard 目录。直接运行 `tools/panel/node-endpoint-panel.sh install / modify` 属于底层手工流程，**不自动配置防火墙**；一键向导的防火墙处理不能套用于这些手工命令。
+需要离线下载或手工部署时，从 [v1.1.1 Release](https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/tag/v1.1.1)取得 **node-endpoint-tools-1.0.10.zip** 和同次 SHA256SUMS，校验后解压到专用受保护目录，再校验包内 `MANIFEST.sha256`。该包的 Node 下载锁为 v1.13-orphan.8；Root 面板引导仍固定其已验证的 tools 1.0.6。不要解压覆盖 Xboard 目录。直接运行 `tools/panel/node-endpoint-panel.sh install / modify` 属于底层手工流程，**不自动配置防火墙**；一键向导的防火墙处理不能套用于这些手工命令。
 
 禁用或卸载插件不会自动移除 Root HTTPS 入口；禁用会停止新入口 handshake 的地址重写，需先确认已迁移节点的 REST / WSS 行为。拆除入口前先迁移全部使用者，再按 Root 工具单独确认卸载；保留所需 PKI 和恢复备份。原生卸载保留插件自己的恢复设置及公共 CA，显式清理另见工具说明。
 
 | 文档 | 内容 |
 | --- | --- |
 | [Root 工具](docs/PANEL_TOOL.md) | 手工 FPM / Octane / Docker 参数、状态、备份、换证、离线 CA、轮换、入口卸载 |
+| [HY2 UDP INPUT](docs/HY2_INPUT_FIREWALL.zh-CN.md) | 自动监听口放行、退出清理、关闭选择及防火墙边界 |
 | [Node 工具](docs/NODE_TOOL.md) | node / machine 新建、已有实例迁移与回滚 |
 | [更新教程](docs/UPGRADE.zh-CN.md) | 后端、插件与 Node 配套更新，保留配置、身份和 CA |
 | [生产部署与恢复](PRODUCTION_DEPLOYMENT.md) | 上线核对、业务验收和失败恢复 |
@@ -239,4 +242,4 @@ Node 从 v1.13-orphan.6 起提供[完整 node 管理菜单](docs/NODE_MANAGEMENT
 
 本次设备限制修复的配套关系、测试范围与断网时间见[1.0.10 联动说明](docs/DEVICE_LIMIT_RELEASE_20261028.md)。统计以来源 IP 去重，同一公网 IP 后的多台设备共享一项；IPv4 与 IPv6 可能分别计数。
 
-开发者可运行 `python3 tools/build/build.py --plugin-only` 与 `python3 tools/build/verify.py --plugin-only` 构建和核验当前插件，输出在 `dist/v1.1.0/`。同次生成独立 tools 1.0.9 时，在两条命令后均加 `--with-tools`，再运行 `python3 tools/build/verify_linkage.py` 检查两包的 Node 资产锁一致；工具构建要求 `dist/node-endpoint-tools-1.0.0.zip` 与历史固定摘要一致。Root 工具独立发布，保留已发布的插件与历史包字节。
+开发者可运行 `python3 tools/build/build.py --plugin-only` 与 `python3 tools/build/verify.py --plugin-only` 构建和核验当前插件，输出在 `dist/v1.1.1/`。同次生成独立 tools 1.0.10 时，在两条命令后均加 `--with-tools`，再运行 `python3 tools/build/verify_linkage.py` 检查两包的 Node 资产锁一致；工具构建要求 `dist/node-endpoint-tools-1.0.0.zip` 与历史固定摘要一致。Root 工具独立发布，保留已发布的插件与历史包字节。

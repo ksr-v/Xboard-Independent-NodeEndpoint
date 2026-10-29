@@ -15,7 +15,7 @@ def main():
     lock = json.loads(lock_bytes)
     binary_assets = {'xboard-node-linux-amd64', 'xboard-node-linux-arm64',
                      'xbctl-linux-amd64', 'xbctl-linux-arm64', 'install.sh'}
-    if lock['version'] != 'v1.13-orphan.7' or lock['repository'] != 'https://github.com/ksr-v/Xboard-Node--Custom-Source':
+    if lock['version'] != 'v1.13-orphan.8' or lock['repository'] != 'https://github.com/ksr-v/Xboard-Node--Custom-Source':
         raise RuntimeError('Unexpected Node release identity')
     for key in ('source_commit', 'binary_source_commit'):
         if not re.fullmatch('[0-9a-f]{40}', lock[key]):
@@ -41,7 +41,7 @@ def main():
     directory = ROOT / 'dist' / ('v' + version)
     rows = []
     for name, prefix in [('NodeEndpoint-' + version + '.zip', 'NodeEndpoint/'),
-                         ('node-endpoint-tools-1.0.9.zip', '')]:
+                         ('node-endpoint-tools-1.0.10.zip', '')]:
         with zipfile.ZipFile(directory / name) as archive:
             if archive.read(prefix + 'tools/node/release-lock.json') != lock_bytes:
                 raise RuntimeError('Packaged release lock differs: ' + name)

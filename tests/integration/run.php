@@ -34,7 +34,7 @@ test('real Sanctum anonymous and ordinary-user tokens cannot use Admin API', fun
     eq(requestFixture('https://old.panel.example/api/v1/node-endpoint/settings', 'GET', [], $GLOBALS['userToken'])->getStatusCode(), 403);
     $r = requestFixture('https://old.panel.example/api/v1/node-endpoint/settings', 'GET', [], $GLOBALS['adminToken']);
     eq($r->getStatusCode(), 200, $r->getContent());
-    eq(jsonResponse($r)['data']['version'], '1.1.0');
+    eq(jsonResponse($r)['data']['version'], '1.1.1');
 });
 test('native generic config save cannot bypass the isolated endpoint settings API', function (): void {
     (new App\Services\Plugin\PluginConfigService())->updateConfig('node_endpoint', ['management_url' => '/attempted-change', 'enabled' => true, 'host' => 'evil.example', 'https' => false, 'http_acknowledged' => true]);
@@ -199,10 +199,10 @@ test('two independently pinned CA roots support dual trust and reject duplicate 
 function nativeInstallOptions(array $data, string $key, App\Models\ServerMachine $machine, bool $endpointReady): array
 {
     $domain = $data[$key];
-    ok(str_contains($domain, 'ksr-v/Xboard-Node--Custom-Source/releases/download/v1.13-orphan.7/install.sh'), 'Domain installer is not independently maintained.');
+    ok(str_contains($domain, 'ksr-v/Xboard-Node--Custom-Source/releases/download/v1.13-orphan.8/install.sh'), 'Domain installer is not independently maintained.');
     ok(!str_contains($domain, 'cedar2025') && !str_contains($domain, '--endpoint-ca'), 'Domain used official installer or private CA arguments.');
     foreach (['--panel'=>rtrim((string)admin_setting('app_url'),'/'), '--machine-id'=>(string)$machine->id,
-        '--token'=>$machine->token, '--version'=>'v1.13-orphan.7'] as $arg=>$value) {
+        '--token'=>$machine->token, '--version'=>'v1.13-orphan.8'] as $arg=>$value) {
         ok(str_contains($domain, escapeshellarg($arg).' '.escapeshellarg($value)), 'Domain argument differs: '.$arg);
     }
     $options = $data['install_options'];
@@ -426,13 +426,13 @@ test('independent domain and IP commands preserve shell-sensitive machine creden
     } finally {$machine->token=$previous;$machine->save();}
 });
 
-test('native plugin upgrade from 1.0.2 to 1.1.0 preserves settings, CA, machine credentials and enabled state', function (): void {
+test('native plugin upgrade from 1.0.2 to 1.1.1 preserves settings, CA, machine credentials and enabled state', function (): void {
     $before = Settings::read();
     $ca = file_get_contents(Settings::caPath());
     $token = $GLOBALS['machine']->fresh()->token;
     App\Models\Plugin::where('code', 'node_endpoint')->update(['version' => '1.0.2']);
     eq(app(PluginManager::class)->update('node_endpoint'), true);
-    eq(App\Models\Plugin::where('code', 'node_endpoint')->value('version'), '1.1.0');
+    eq(App\Models\Plugin::where('code', 'node_endpoint')->value('version'), '1.1.1');
     eq((bool) App\Models\Plugin::where('code', 'node_endpoint')->value('is_enabled'), true);
     eq(Settings::read(), $before);
     eq(file_get_contents(Settings::caPath()), $ca);
