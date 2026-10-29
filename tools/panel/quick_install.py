@@ -23,6 +23,9 @@ sys.dont_write_bytecode = True
 TOOLS_URL = 'https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/download/root-installer-v1.0.9/node-endpoint-tools-1.0.6.zip'
 TOOLS_SHA256 = 'd1dd1258b68e34e7feca111a85c97bd0d435516093b49840633166fe066e566e'
 CACHE = Path('/opt/nodeendpoint-quick') / TOOLS_SHA256
+WEB_MANAGER_VERSION = '1.0.0'
+WEB_MANAGER_SHA256 = '9afb5f8b774600ce1578bebf067a3b1d99e90ab3f7b5245523181ba29cdd0f2a'
+WEB_MANAGER_URL = 'https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/download/root-installer-v1.0.10/nodeendpoint-web-manager-1.0.0.py'
 
 
 def require(value, reason):
@@ -559,6 +562,51 @@ def configure_firewall(state='/var/lib/node-endpoint'):
         os.close(descriptor)
 
 
+def install_web_manager(helper_file=None, nginx=None, confirmed=False):
+    """Install only the pinned single-site helper; application files are data."""
+    import manager
+    from panel_ca import payload_from_state
+    plan, _ = payload_from_state('/var/lib/node-endpoint')
+    require(plan.get('deployment') in ('fpm', 'octane'),
+            '网页 Root 助手当前支持原生 PHP-FPM / Octane；Docker 保留独立 SSH 流程')
+    require(plan.get('https') is True, '网页 Root 助手要求已有的 HTTPS 独立入口')
+    if helper_file is None:
+        context = ssl.create_default_context()
+        context.minimum_version = ssl.TLSVersion.TLSv1_2
+        opener = urllib.request.build_opener(HTTPSRedirect(), urllib.request.HTTPSHandler(context=context))
+        with opener.open(urllib.request.Request(WEB_MANAGER_URL,
+                headers={'User-Agent': 'NodeEndpoint-Web-Manager-Installer/1.0'}), timeout=45) as response:
+            data = response.read(1048577)
+    else:
+        source = Path(helper_file)
+        require(not source.is_symlink() and source.is_file() and source.stat().st_size <= 1048576,
+                '网页 Root 助手资产缺失或文件异常')
+        data = source.read_bytes()
+    require(0 < len(data) <= 1048576 and hashlib.sha256(data).hexdigest() == WEB_MANAGER_SHA256,
+            '网页 Root 助手 SHA-256 不匹配；未执行助手')
+    cache = secure_path(Path('/opt/nodeendpoint-web-bootstrap') / WEB_MANAGER_SHA256)
+    cache.mkdir(mode=0o700, parents=True, exist_ok=True)
+    secure_path(cache)
+    target = secure_path(cache / 'web_manager.py')
+    if target.exists():
+        require(target.is_file() and target.stat().st_nlink == 1 and target.read_bytes() == data,
+                '网页 Root 助手缓存被修改，拒绝执行')
+    else:
+        descriptor = os.open(target, os.O_CREAT | os.O_EXCL | os.O_WRONLY | os.O_NOFOLLOW, 0o600)
+        with os.fdopen(descriptor, 'wb') as stream:
+            stream.write(data)
+    print('网页 Root 助手：仅授权该站点系统 UID，使用本机 Unix socket；仅管理已绑定入口和已批准端口。')
+    argv = [sys.executable, '-I', str(target), 'install', '--app', plan['app'],
+            '--app-user', plan['app_user'], '--php', plan['php']]
+    if nginx:
+        argv += ['--nginx', nginx]
+    if confirmed:
+        argv += ['--confirm', 'ENABLE WEB MANAGEMENT']
+    result = subprocess.run(argv, timeout=180)
+    require(result.returncode == 0, '网页 Root 助手初始化未完成；现有入口与 CA 保留，请检查本机输出后重试 --enable-web-manager')
+    return {'installed': True, 'version': WEB_MANAGER_VERSION}
+
+
 def finish_install(skip_firewall=False):
     """Keep successful entry/PKI intact and report each independent follow-up."""
     failures = []
@@ -604,6 +652,7 @@ def main():
     actions.add_argument('--configure-firewall', action='store_true', help='Allow the installed entry TCP port persistently; do not reinstall or regenerate certificates')
     actions.add_argument('--repair-address', action='store_true', help='Repair an installed custom backend endpoint using the existing CA; renew server SAN and save panel settings')
     actions.add_argument('--refresh-entry', action='store_true', help='Re-audit the owned HTTPS entry route allowlist, retaining its address, CA and panel settings')
+    actions.add_argument('--enable-web-manager', action='store_true', help='Bind the restricted local web helper to an existing native HTTPS endpoint; keep entry and CA')
     parser.add_argument('--host', help='Actual bare IP or DNS host; omit to choose IPv4 detection or manual input on first installation/repair')
     parser.add_argument('--skip-firewall', action='store_true', help='Keep local firewall unchanged during entry installation')
     args = parser.parse_args()
@@ -611,9 +660,9 @@ def main():
     require(sys.version_info >= (3, 10), '需要 Python 3.10+')
     import pwd
     os.umask(0o077)
-    require(not (args.skip_firewall and (args.detect_only or args.sync_ca or args.configure_firewall or args.refresh_entry)),
+    require(not (args.skip_firewall and (args.detect_only or args.sync_ca or args.configure_firewall or args.refresh_entry or args.enable_web_manager)),
             '--skip-firewall 仅用于入口安装或地址修复')
-    require(not (args.host and (args.detect_only or args.sync_ca or args.configure_firewall or args.refresh_entry)), '--host 仅用于安装或地址修复')
+    require(not (args.host and (args.detect_only or args.sync_ca or args.configure_firewall or args.refresh_entry or args.enable_web_manager)), '--host 仅用于安装或地址修复')
     require(args.detect_only or args.sync_ca or args.configure_firewall or sys.stdin.isatty(), '安装需要 SSH 交互终端，不要将脚本通过管道执行')
     for name in ('openssl', 'ss', 'runuser'):
         require(shutil.which(name), '缺少依赖：' + name + '，请先通过本机包管理器安装')
@@ -638,6 +687,8 @@ def main():
     selected_nginx = args.nginx
     if not selected_nginx and Path('/www/server/nginx/sbin/nginx').is_file():
         selected_nginx = '/www/server/nginx/sbin/nginx'
+    if args.enable_web_manager:
+        return install_web_manager(nginx=selected_nginx)
     if args.refresh_entry:
         return refresh_entry(selected_nginx, ca_key=args.ca_key) if args.ca_key else refresh_entry(selected_nginx)
     if args.repair_address:
@@ -693,7 +744,9 @@ def main():
     print('接下来核对站点/路由/监听并展示计划，请完整确认 INSTALL 地址:端口。新版插件的新 CA 口令自动随机生成并加密保存在面板；原有未托管 CA 仍需原口令。')
     if not args.skip_firewall:
         print('入口成功后将为该 TCP 端口添加允许所有来源的本机防火墙规则并持久保存；自管规则可用 --skip-firewall。')
+    print('本次原生初始化还会安装受限网页 Root 助手：固定本站与当前端口；网页变更仍须预览并确认计划。')
     manager.execute(manager.parser().parse_args(argv))
+    install_web_manager(nginx=selected_nginx, confirmed=True)
     print('入口安装完成。正在处理本机防火墙并通过非 Root 应用用户自动导入 CA 公共证书。')
     finish_install(args.skip_firewall)
 

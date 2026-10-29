@@ -3,10 +3,16 @@ namespace Plugin\NodeEndpoint\Services;
 use InvalidArgumentException;
 final class RootCommandBuilder
 {
-    private const INSTALLER = 'https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.9/install.sh';
+    private const INSTALLER = 'https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.10/install.sh';
+    public static function webManagerCommand(): string
+    {
+        return 'curl -fsSL ' . self::INSTALLER . ' | bash -s -- --enable-web-manager';
+    }
     private static function unavailable(string $note, ?string $target = null): array
     {
-        return ['command' => null, 'note' => $note, 'target_url' => $target];
+        return ['command' => null, 'note' => $note, 'target_url' => $target,
+            'web_manager_install_command' => self::webManagerCommand(),
+            'web_manager_install_note' => '首次通过 SSH 绑定受限本机助手后，可在本页预览和执行固定入口任务。'];
     }
     private static function quote(string $value): string { return "'" . str_replace("'", "'\"'\"'", $value) . "'"; }
     private static function exampleHost(string $host): bool
@@ -43,6 +49,8 @@ final class RootCommandBuilder
         $mode = $settings['ws_mode'] === 'rewrite' ? 'WebSocket 重写（rewrite）' : 'REST fallback（rest）';
         return ['command' => 'curl -fsSL ' . self::INSTALLER . ' | bash -s -- --host ' . self::quote($settings['host']),
             'target_url' => $target,
+            'web_manager_install_command' => self::webManagerCommand(),
+            'web_manager_install_note' => '面板原生初始化会自动安装助手；已有面板可通过 SSH 执行本命令绑定现有入口。',
             'note' => '请在面板服务器以 root 用户通过 SSH 执行；选择正确站点和 PHP，核对已保存端口 '
                 . $settings['port'] . ' 和 WS 模式 ' . $mode
                 . '，按提示确认。命令只预填已保存地址，端口和 WS 模式仍需在 SSH 向导中核对；完成后返回本页验证入口。'];

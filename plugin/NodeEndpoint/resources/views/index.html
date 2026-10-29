@@ -2,11 +2,11 @@
 <html lang="zh-CN">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>节点通讯设置 · NodeEndpoint</title><link rel="stylesheet" href="/node-endpoint/assets/style"><script defer src="/node-endpoint/assets/app"></script></head>
 <body>
-<header><div class="brand">NE<span>NodeEndpoint <small>1.0.10</small></span></div><a href="/">返回面板</a></header>
+<header><div class="brand">NE<span>NodeEndpoint <small>1.1.0</small></span></div><a href="/">返回面板</a></header>
 <main>
 <div class="intro"><p class="eyebrow">XBOARD · 节点通讯</p><h1>节点通讯设置</h1><p>统一管理独立的 REST 与 WebSocket 地址。网站、订阅和登录地址保持原有设置。</p></div>
 <div id="notice" role="status" aria-live="polite"></div>
-<section id="login-panel"><h2>管理员验证</h2><p>使用 Xboard 管理员凭据登录。会话仅保存在本页内存中，刷新后需要重新验证。</p>
+<section id="login-panel"><h2>管理员验证</h2><p>同一浏览器、同一面板地址下可复用当前后台登录。凭据仅在本页内存中使用，管理员权限由服务器核验。</p><button id="use-admin-session" type="button" class="secondary">使用当前后台登录</button><p id="session-status" class="muted" aria-live="polite">也可以使用下方管理员凭据验证。</p>
 <form id="login-form"><label>邮箱<input id="email" type="email" autocomplete="username" required></label><label>密码<input id="password" type="password" autocomplete="current-password" required></label><button type="submit">验证管理员</button></form>
 <details><summary>使用已有管理员 Bearer Token</summary><p>适用于启用了验证码的面板。请从可信的本地管理员会话获取凭据。</p><form id="token-form"><label>Bearer Token<input id="admin-token" type="password" autocomplete="off" required></label><button>验证 Token</button></form></details></section>
 <div id="workspace" hidden>
@@ -18,9 +18,15 @@
 <div id="http-risk" class="warning" hidden><p>HTTP 会明文传输长期 Token 和通讯内容。HTTPS 失败时不会自动降级。</p><label class="switch"><input id="http-ack" type="checkbox">我明确接受明文传输风险，启用 HTTP。</label></div>
 <label>WebSocket 模式<select id="ws-mode"><option value="rewrite">仅新入口重写 WS/WSS 地址</option><option value="rest">新入口仅使用 REST fallback</option></select></label>
 <div class="urlbox"><span>REST</span><code id="url">—</code><span>WS / WSS</span><code id="ws-url">—</code></div>
-<p class="muted">此处保存配置后，需通过 SSH 执行 Root 管理工具部署监听及证书。Web 进程不执行 Shell。</p>
+<p class="muted">保存后，在下方预览并确认 Root 助手操作，部署监听及证书。首次安装助手需在服务器通过 SSH 执行。</p>
 <div class="actions"><button>保存设置</button><button id="detect-ip" type="button" class="secondary">检测面板公网 IP</button><button id="probe" type="button" class="secondary">验证已保存入口</button></div><p id="detected-ip" class="muted"></p></form>
 <div id="root-tool-panel" hidden><h3>SSH 配置入口</h3><p>保存设置 → 复制命令 → 在面板服务器以 Root 执行 → 返回此页验证入口。</p><p>已保存入口：<code id="root-tool-target">—</code></p><pre id="root-tool-command" tabindex="0">请先保存有效的 HTTPS 通讯设置。</pre><button id="copy-root-tool" type="button" class="secondary" disabled>一键复制 Root 工具命令</button><p id="root-tool-note" class="muted" aria-live="polite"></p></div></section>
+<section id="root-manager"><div class="section-heading"><h2>Root 助手</h2><button id="refresh-root-status" type="button" class="secondary">刷新助手状态</button></div><p id="root-helper-state" role="status" aria-live="polite">正在读取助手状态。</p><p id="root-helper-policy" class="muted"></p>
+<div id="root-helper-unavailable" class="warning" hidden><p>尚未安装助手或当前不可用。新版面板 Root 安装或升级流程会自动初始化助手；现有面板可通过 SSH，以 Root 执行下方固定版本的首次初始化命令，再刷新状态。</p><pre id="root-helper-install-command">请先完成管理员验证。</pre><button id="copy-helper-install" type="button" class="secondary" disabled>复制首次初始化命令</button><p id="root-helper-install-note" class="muted"></p></div>
+<div id="root-helper-controls" hidden><div class="grid"><label>操作<select id="root-action"><option value="configure">配置已保存的 HTTPS 入口</option><option value="refresh">刷新入口配置与证书状态</option><option value="renew">续签服务器证书，保留根 CA</option><option value="firewall">配置已保存端口的防火墙规则</option></select></label><div class="root-plan-action"><button id="root-plan" type="button">生成操作预览</button><p id="root-plan-hint" class="muted">每次执行前均需核对预览并输入确认文字。</p></div></div>
+<div id="root-plan-panel" class="root-preview" hidden><h3>执行预览</h3><dl id="root-plan-summary" class="summary-list"></dl><ol id="root-plan-stages" class="stage-list"></ol><p id="root-plan-expiry" class="muted" aria-live="polite"></p><form id="root-execute-form"><label>请输入 <code id="root-confirmation-text"></code> 以确认本次操作<input id="root-confirmation" autocomplete="off" spellcheck="false" required></label><button id="root-execute" type="submit" disabled>确认执行此预览</button></form></div>
+<div class="actions"><button id="sync-root-ca" type="button" class="secondary">校验并同步公共 CA 与状态</button></div><p class="muted">同步只导入 Root 助手提供的公共 CA 和状态。根 CA 轮换、私钥导出继续通过 SSH 操作。</p></div>
+<div id="root-job-panel" class="root-preview" hidden><h3>操作进度</h3><p id="root-job-state" role="status" aria-live="polite"></p><p id="root-job-backup" class="muted"></p><ol id="root-job-stages" class="stage-list"></ol><p id="root-job-error" class="error-text" role="alert"></p><button id="refresh-root-job" type="button" class="secondary">刷新任务状态</button></div></section>
 <div class="grid cards"><section><h2>证书与信任</h2><p>根 CA 和服务器证书采用双 10 年策略。根私钥在 Root 工具中加密导出并离线保管，请勿上传私钥。</p><pre id="cert-status">尚未导入根 CA。</pre>
 <form id="ca-form"><label>CA 公共证书 PEM 文件<input id="ca-file" type="file" accept=".pem,.crt" required></label><label>独立可信 SHA-256 指纹（双 CA 按 PEM 顺序，用逗号分隔）<input id="fingerprints" placeholder="从 SSH / 可信离线渠道获取" required autocomplete="off"></label><button>核对并导入 CA</button></form><button id="download-ca" class="secondary">下载已导入 CA 公共证书</button>
 <h3>CA 加密口令</h3><p class="muted">新建 CA 可自动生成并加密保存口令。请同时保留面板配置与数据库备份；旧 CA 继续使用原有手动口令。</p><p id="ca-passphrase-status" class="muted" aria-live="polite">导入当前根 CA 后可查看自动保存状态。</p>
