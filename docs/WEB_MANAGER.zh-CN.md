@@ -14,7 +14,7 @@ curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoi
 
 此命令只为已安装入口启用网页管理，不重跑 MODIFY、不重建 CA。完整 SSH 向导仍可用于首次创建入口。本版助手不支持 Docker 容器部署，相关部署继续使用 SSH 工具。
 
-固定版本为 `root-installer-v1.0.10`、已校验的 `tools 1.0.6` 和 `web-manager 1.0.0`。旧 tag 和资产保持原样。更新已有面板保留设置、CA、应用密钥和管理员禁用插件的选择；更新不会自动给旧面板增加 Root 授权。
+固定版本为 `root-installer-v1.0.10`、已校验的 `tools 1.0.6` 和 `web-manager 1.0.0`。旧 tag 和资产保持原样。更新已有面板保留设置、CA、应用密钥和管理员禁用插件的选择。以 Root 执行面板原生归档升级且不加 `--skip-endpoint` 时，会为已有有效入口安装或更新助手，按上述范围授予本站系统 UID 固定任务权限；只上传插件、手动更新 Web 源码或显式跳过入口时，再单独执行上述助手初始化命令。
 
 ## 网页操作
 
