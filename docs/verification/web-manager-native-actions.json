@@ -1,0 +1,963 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-10-29T14:17:51.762832+00:00",
+  "fixture": "/opt/xb-web-manager-e2e-20261029",
+  "origin": "https://web-manager.test:18444",
+  "cases": [
+    {
+      "name": "five_bundled_plugins_enabled",
+      "passed": true,
+      "evidence": [
+        {
+          "code": "node_endpoint",
+          "version": "1.1.0",
+          "is_enabled": true
+        },
+        {
+          "code": "smart_expiry",
+          "version": "1.2.0",
+          "is_enabled": true
+        },
+        {
+          "code": "qrcodeextend",
+          "version": "1.2.0",
+          "is_enabled": true
+        },
+        {
+          "code": "flowscope",
+          "version": "2.4.0",
+          "is_enabled": true
+        },
+        {
+          "code": "subinfo_customizer",
+          "version": "1.0.1",
+          "is_enabled": true
+        }
+      ]
+    },
+    {
+      "name": "root_helper_available",
+      "passed": true,
+      "evidence": {
+        "available": true,
+        "version": "1.0.0",
+        "policy": {
+          "allowed_ports": [
+            18443
+          ],
+          "app": "/opt/xb-web-manager-e2e-20261029/app",
+          "app_user": "www"
+        }
+      }
+    },
+    {
+      "name": "pending_saved_target_detected",
+      "passed": true,
+      "evidence": {
+        "root": {
+          "host": "127.0.0.1",
+          "port": 18443,
+          "https": true
+        },
+        "desired": {
+          "enabled": true,
+          "host": "127.0.0.2",
+          "port": 18443,
+          "https": true,
+          "http_acknowledged": false,
+          "ws_mode": "rest"
+        }
+      }
+    },
+    {
+      "name": "configure_entry",
+      "passed": true,
+      "evidence": {
+        "state": "succeeded",
+        "stages": {
+          "entry": "succeeded",
+          "ca_sync": "succeeded",
+          "firewall": "succeeded"
+        }
+      }
+    },
+    {
+      "name": "configure_ca_preserved",
+      "passed": true
+    },
+    {
+      "name": "configure_ca_pin_unchanged",
+      "passed": true,
+      "evidence": {
+        "fingerprints": [
+          "9b31f648ddde674289fa08ffe65b525d9634def3d7972e36509c9120c69690d0"
+        ]
+      }
+    },
+    {
+      "name": "public_ca_sync_after_configure",
+      "passed": true,
+      "evidence": {
+        "certificates": [
+          {
+            "fingerprint_sha256": "9b31f648ddde674289fa08ffe65b525d9634def3d7972e36509c9120c69690d0",
+            "not_before": "2026-10-29T14:05:54+00:00",
+            "not_after": "2036-10-29T14:10:54+00:00",
+            "remaining_days": 3652,
+            "san": "",
+            "issuer": {
+              "CN": "NodeEndpoint Root c0c2720617181bb0"
+            },
+            "status": "valid",
+            "expiry_alert": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "configured_target_and_san",
+      "passed": true,
+      "evidence": {
+        "endpoint": {
+          "host": "127.0.0.2",
+          "port": 18443,
+          "https": true
+        },
+        "server": {
+          "issuer": "CN = NodeEndpoint Root c0c2720617181bb0",
+          "not_after": "2036-10-29T14:10:54+00:00",
+          "not_before": "2026-10-29T14:13:07+00:00",
+          "remaining_days": 3652,
+          "reminder_days": null,
+          "san": "IP Address:127.0.0.2",
+          "serial": "EDB71E81E0114B3B9F3DE8091F0EED24",
+          "sha256": "c463d401d1a38fa3b289b749bd837f237c344930f2f71138241f6f2810bcde56",
+          "status": "valid",
+          "subject": "CN = 127.0.0.2"
+        }
+      }
+    },
+    {
+      "name": "duplicate_execute_same_job_and_leaf",
+      "passed": true,
+      "evidence": {
+        "job_id": "ab814fe3a1a8d6ca8cbfa2a3e3f00717"
+      }
+    },
+    {
+      "name": "other_admin_cannot_execute_plan",
+      "passed": true,
+      "evidence": {
+        "status": 404,
+        "duration_seconds": 0.4345,
+        "cache_control": "no-store, private",
+        "code": "not_found"
+      }
+    },
+    {
+      "name": "other_admin_cannot_read_job",
+      "passed": true,
+      "evidence": {
+        "status": 404,
+        "duration_seconds": 0.4108,
+        "cache_control": "no-store, private",
+        "code": "not_found"
+      }
+    },
+    {
+      "name": "refresh_entry",
+      "passed": true,
+      "evidence": {
+        "state": "succeeded",
+        "stages": {
+          "entry": "succeeded",
+          "ca_sync": "succeeded",
+          "firewall": "succeeded"
+        }
+      }
+    },
+    {
+      "name": "refresh_ca_preserved",
+      "passed": true
+    },
+    {
+      "name": "refresh_ca_pin_unchanged",
+      "passed": true,
+      "evidence": {
+        "fingerprints": [
+          "9b31f648ddde674289fa08ffe65b525d9634def3d7972e36509c9120c69690d0"
+        ]
+      }
+    },
+    {
+      "name": "refresh_preserves_leaf",
+      "passed": true
+    },
+    {
+      "name": "renew_entry",
+      "passed": true,
+      "evidence": {
+        "state": "succeeded",
+        "stages": {
+          "entry": "succeeded",
+          "ca_sync": "succeeded",
+          "firewall": "succeeded"
+        }
+      }
+    },
+    {
+      "name": "renew_ca_preserved",
+      "passed": true
+    },
+    {
+      "name": "renew_ca_pin_unchanged",
+      "passed": true,
+      "evidence": {
+        "fingerprints": [
+          "9b31f648ddde674289fa08ffe65b525d9634def3d7972e36509c9120c69690d0"
+        ]
+      }
+    },
+    {
+      "name": "renew_replaces_leaf_preserving_san",
+      "passed": true,
+      "evidence": {
+        "issuer": "CN = NodeEndpoint Root c0c2720617181bb0",
+        "not_after": "2036-10-29T14:10:54+00:00",
+        "not_before": "2026-10-29T14:13:38+00:00",
+        "remaining_days": 3652,
+        "reminder_days": null,
+        "san": "IP Address:127.0.0.2",
+        "serial": "1CDD5B8248B712C50507532A7D6675E0",
+        "sha256": "49c57e06861ed1eef7e475d6d72f534c36edc2464f6b32a0eeb0d3b2eec3e89d",
+        "status": "valid",
+        "subject": "CN = 127.0.0.2"
+      }
+    },
+    {
+      "name": "firewall_only_fixed_fixture_port",
+      "passed": true,
+      "evidence": {
+        "state": "succeeded",
+        "result": {
+          "status": "ensured",
+          "port": 18443
+        }
+      }
+    },
+    {
+      "name": "changed_saved_settings_reject_stale_plan",
+      "passed": true,
+      "evidence": {
+        "status": 409,
+        "duration_seconds": 0.3971,
+        "cache_control": "no-store, private",
+        "code": "settings_changed"
+      }
+    },
+    {
+      "name": "typed_confirmation_required",
+      "passed": true,
+      "evidence": {
+        "status": 422,
+        "duration_seconds": 0.3954,
+        "cache_control": "no-store, private",
+        "code": "confirmation_mismatch"
+      }
+    },
+    {
+      "name": "anonymous_forbidden",
+      "passed": true,
+      "evidence": {
+        "status": 403,
+        "duration_seconds": 0.37,
+        "cache_control": "no-cache, private",
+        "code": null
+      }
+    },
+    {
+      "name": "invalid_bearer_forbidden",
+      "passed": true,
+      "evidence": {
+        "status": 403,
+        "duration_seconds": 0.3827,
+        "cache_control": "no-cache, private",
+        "code": null
+      }
+    },
+    {
+      "name": "non_admin_forbidden",
+      "passed": true,
+      "evidence": {
+        "status": 403,
+        "duration_seconds": 0.3787,
+        "cache_control": "no-cache, private",
+        "code": null
+      }
+    },
+    {
+      "name": "missing_origin_forbidden",
+      "passed": true,
+      "evidence": {
+        "status": 403,
+        "duration_seconds": 0.3977,
+        "cache_control": "no-store, private",
+        "code": "secure_origin_required"
+      }
+    },
+    {
+      "name": "foreign_origin_forbidden",
+      "passed": true,
+      "evidence": {
+        "status": 403,
+        "duration_seconds": 0.3808,
+        "cache_control": "no-store, private",
+        "code": "secure_origin_required"
+      }
+    },
+    {
+      "name": "foreign_host_forbidden",
+      "passed": true,
+      "evidence": {
+        "status": 403,
+        "duration_seconds": 0.3764,
+        "cache_control": "no-store, private",
+        "code": "secure_origin_required"
+      }
+    },
+    {
+      "name": "plain_http_forbidden",
+      "passed": true,
+      "evidence": {
+        "status": 403,
+        "duration_seconds": 0.3762,
+        "cache_control": "no-store, private",
+        "code": "secure_origin_required"
+      }
+    },
+    {
+      "name": "host_syntax_rejected_29",
+      "passed": true,
+      "evidence": {
+        "status": 422,
+        "duration_seconds": 0.3815,
+        "cache_control": "no-cache, private",
+        "code": null
+      }
+    },
+    {
+      "name": "host_syntax_rejected_30",
+      "passed": true,
+      "evidence": {
+        "status": 422,
+        "duration_seconds": 0.381,
+        "cache_control": "no-cache, private",
+        "code": null
+      }
+    },
+    {
+      "name": "host_syntax_rejected_31",
+      "passed": true,
+      "evidence": {
+        "status": 422,
+        "duration_seconds": 0.3829,
+        "cache_control": "no-cache, private",
+        "code": null
+      }
+    },
+    {
+      "name": "unapproved_port_rejected",
+      "passed": true,
+      "evidence": {
+        "status": 422,
+        "duration_seconds": 0.9894,
+        "cache_control": "no-store, private",
+        "code": "policy_denied"
+      }
+    },
+    {
+      "name": "root_rpc_whitelist_33",
+      "passed": true
+    },
+    {
+      "name": "root_rpc_whitelist_34",
+      "passed": true
+    },
+    {
+      "name": "root_rpc_whitelist_35",
+      "passed": true
+    },
+    {
+      "name": "endpoint_path_closed_36",
+      "passed": true,
+      "evidence": {
+        "path": "/",
+        "status": 404
+      }
+    },
+    {
+      "name": "endpoint_path_closed_37",
+      "passed": true,
+      "evidence": {
+        "path": "/admin",
+        "status": 404
+      }
+    },
+    {
+      "name": "endpoint_path_closed_38",
+      "passed": true,
+      "evidence": {
+        "path": "/api/v1/node-endpoint/settings",
+        "status": 404
+      }
+    },
+    {
+      "name": "endpoint_path_closed_39",
+      "passed": true,
+      "evidence": {
+        "path": "/api/v1/passport/auth/login",
+        "status": 404
+      }
+    },
+    {
+      "name": "endpoint_path_closed_40",
+      "passed": true,
+      "evidence": {
+        "path": "/api/v2/server/handshake/extra",
+        "status": 404
+      }
+    },
+    {
+      "name": "endpoint_method_closed",
+      "passed": true,
+      "evidence": {
+        "status": 405
+      }
+    },
+    {
+      "name": "unknown_machine_401",
+      "passed": true,
+      "evidence": {
+        "status": 401
+      }
+    },
+    {
+      "name": "disabled_machine_403",
+      "passed": true,
+      "evidence": {
+        "status": 403
+      }
+    },
+    {
+      "name": "old_address_san_rejected",
+      "passed": true
+    }
+  ],
+  "jobs": [
+    {
+      "id": "ab814fe3a1a8d6ca8cbfa2a3e3f00717",
+      "action": "configure",
+      "state": "succeeded",
+      "stages": [
+        {
+          "name": "entry",
+          "state": "succeeded"
+        },
+        {
+          "name": "ca_sync",
+          "state": "succeeded"
+        },
+        {
+          "name": "firewall",
+          "state": "succeeded"
+        }
+      ],
+      "result": {
+        "root_status": {
+          "ca": {
+            "issuer": "CN = NodeEndpoint Root c0c2720617181bb0",
+            "not_after": "2036-10-29T14:10:54+00:00",
+            "not_before": "2026-10-29T14:05:54+00:00",
+            "remaining_days": 3652,
+            "reminder_days": null,
+            "san": "",
+            "serial": "36C80F2C670F57EC8FD0AC1980D721E5",
+            "sha256": "9b31f648ddde674289fa08ffe65b525d9634def3d7972e36509c9120c69690d0",
+            "status": "valid",
+            "subject": "CN = NodeEndpoint Root c0c2720617181bb0"
+          },
+          "ca_key_online": true,
+          "checks": {
+            "nginx": "loaded",
+            "rest_authenticated": "NOT TESTED",
+            "rest_unauthenticated": "reachable_authentication_required",
+            "tls": "verified",
+            "websocket_authenticated": "NOT TESTED"
+          },
+          "endpoint": {
+            "host": "127.0.0.2",
+            "port": 18443,
+            "https": true
+          },
+          "generated_at": "2026-10-29T14:18:13.232112+00:00",
+          "installed": true,
+          "revocation_enforced": false,
+          "rotation": null,
+          "schema_version": 1,
+          "server": {
+            "issuer": "CN = NodeEndpoint Root c0c2720617181bb0",
+            "not_after": "2036-10-29T14:10:54+00:00",
+            "not_before": "2026-10-29T14:13:07+00:00",
+            "remaining_days": 3652,
+            "reminder_days": null,
+            "san": "IP Address:127.0.0.2",
+            "serial": "EDB71E81E0114B3B9F3DE8091F0EED24",
+            "sha256": "c463d401d1a38fa3b289b749bd837f237c344930f2f71138241f6f2810bcde56",
+            "status": "valid",
+            "subject": "CN = 127.0.0.2"
+          },
+          "trust": [
+            {
+              "issuer": "CN = NodeEndpoint Root c0c2720617181bb0",
+              "not_after": "2036-10-29T14:10:54+00:00",
+              "not_before": "2026-10-29T14:05:54+00:00",
+              "remaining_days": 3652,
+              "reminder_days": null,
+              "san": "",
+              "serial": "36C80F2C670F57EC8FD0AC1980D721E5",
+              "sha256": "9b31f648ddde674289fa08ffe65b525d9634def3d7972e36509c9120c69690d0",
+              "status": "valid",
+              "subject": "CN = NodeEndpoint Root c0c2720617181bb0"
+            }
+          ],
+          "version": "1.0.0"
+        },
+        "endpoint": {
+          "host": "127.0.0.2",
+          "port": 18443,
+          "https": true,
+          "ws_mode": "rest"
+        },
+        "backup_id": "20261029T141806-47f02b39",
+        "ca_preserved": true,
+        "firewall_result": {
+          "status": "ensured",
+          "port": 18443
+        },
+        "ca_sync": {
+          "status": "unchanged",
+          "certificates": 1,
+          "fingerprints": [
+            "9b31f648ddde674289fa08ffe65b525d9634def3d7972e36509c9120c69690d0"
+          ]
+        }
+      }
+    },
+    {
+      "id": "02fb3617ea97ada2b6e471bb0f041180",
+      "action": "refresh",
+      "state": "succeeded",
+      "stages": [
+        {
+          "name": "entry",
+          "state": "succeeded"
+        },
+        {
+          "name": "ca_sync",
+          "state": "succeeded"
+        },
+        {
+          "name": "firewall",
+          "state": "succeeded"
+        }
+      ],
+      "result": {
+        "root_status": {
+          "ca": {
+            "issuer": "CN = NodeEndpoint Root c0c2720617181bb0",
+            "not_after": "2036-10-29T14:10:54+00:00",
+            "not_before": "2026-10-29T14:05:54+00:00",
+            "remaining_days": 3652,
+            "reminder_days": null,
+            "san": "",
+            "serial": "36C80F2C670F57EC8FD0AC1980D721E5",
+            "sha256": "9b31f648ddde674289fa08ffe65b525d9634def3d7972e36509c9120c69690d0",
+            "status": "valid",
+            "subject": "CN = NodeEndpoint Root c0c2720617181bb0"
+          },
+          "ca_key_online": true,
+          "checks": {
+            "nginx": "loaded",
+            "rest_authenticated": "NOT TESTED",
+            "rest_unauthenticated": "reachable_authentication_required",
+            "tls": "verified",
+            "websocket_authenticated": "NOT TESTED"
+          },
+          "endpoint": {
+            "host": "127.0.0.2",
+            "port": 18443,
+            "https": true
+          },
+          "generated_at": "2026-10-29T14:18:30.145102+00:00",
+          "installed": true,
+          "revocation_enforced": false,
+          "rotation": null,
+          "schema_version": 1,
+          "server": {
+            "issuer": "CN = NodeEndpoint Root c0c2720617181bb0",
+            "not_after": "2036-10-29T14:10:54+00:00",
+            "not_before": "2026-10-29T14:13:07+00:00",
+            "remaining_days": 3652,
+            "reminder_days": null,
+            "san": "IP Address:127.0.0.2",
+            "serial": "EDB71E81E0114B3B9F3DE8091F0EED24",
+            "sha256": "c463d401d1a38fa3b289b749bd837f237c344930f2f71138241f6f2810bcde56",
+            "status": "valid",
+            "subject": "CN = 127.0.0.2"
+          },
+          "trust": [
+            {
+              "issuer": "CN = NodeEndpoint Root c0c2720617181bb0",
+              "not_after": "2036-10-29T14:10:54+00:00",
+              "not_before": "2026-10-29T14:05:54+00:00",
+              "remaining_days": 3652,
+              "reminder_days": null,
+              "san": "",
+              "serial": "36C80F2C670F57EC8FD0AC1980D721E5",
+              "sha256": "9b31f648ddde674289fa08ffe65b525d9634def3d7972e36509c9120c69690d0",
+              "status": "valid",
+              "subject": "CN = NodeEndpoint Root c0c2720617181bb0"
+            }
+          ],
+          "version": "1.0.0"
+        },
+        "endpoint": {
+          "host": "127.0.0.2",
+          "port": 18443,
+          "https": true,
+          "ws_mode": "rest"
+        },
+        "backup_id": "20261029T141825-335b2b6a",
+        "ca_preserved": true,
+        "firewall_result": {
+          "status": "ensured",
+          "port": 18443
+        },
+        "ca_sync": {
+          "status": "unchanged",
+          "certificates": 1,
+          "fingerprints": [
+            "9b31f648ddde674289fa08ffe65b525d9634def3d7972e36509c9120c69690d0"
+          ]
+        }
+      }
+    },
+    {
+      "id": "489a06d6a45530cc39839c3393f3d970",
+      "action": "renew",
+      "state": "succeeded",
+      "stages": [
+        {
+          "name": "entry",
+          "state": "succeeded"
+        },
+        {
+          "name": "ca_sync",
+          "state": "succeeded"
+        },
+        {
+          "name": "firewall",
+          "state": "succeeded"
+        }
+      ],
+      "result": {
+        "root_status": {
+          "ca": {
+            "issuer": "CN = NodeEndpoint Root c0c2720617181bb0",
+            "not_after": "2036-10-29T14:10:54+00:00",
+            "not_before": "2026-10-29T14:05:54+00:00",
+            "remaining_days": 3652,
+            "reminder_days": null,
+            "san": "",
+            "serial": "36C80F2C670F57EC8FD0AC1980D721E5",
+            "sha256": "9b31f648ddde674289fa08ffe65b525d9634def3d7972e36509c9120c69690d0",
+            "status": "valid",
+            "subject": "CN = NodeEndpoint Root c0c2720617181bb0"
+          },
+          "ca_key_online": true,
+          "checks": {
+            "nginx": "loaded",
+            "rest_authenticated": "NOT TESTED",
+            "rest_unauthenticated": "reachable_authentication_required",
+            "tls": "verified",
+            "websocket_authenticated": "NOT TESTED"
+          },
+          "endpoint": {
+            "host": "127.0.0.2",
+            "port": 18443,
+            "https": true
+          },
+          "generated_at": "2026-10-29T14:18:45.077728+00:00",
+          "installed": true,
+          "revocation_enforced": false,
+          "rotation": null,
+          "schema_version": 1,
+          "server": {
+            "issuer": "CN = NodeEndpoint Root c0c2720617181bb0",
+            "not_after": "2036-10-29T14:10:54+00:00",
+            "not_before": "2026-10-29T14:13:38+00:00",
+            "remaining_days": 3652,
+            "reminder_days": null,
+            "san": "IP Address:127.0.0.2",
+            "serial": "1CDD5B8248B712C50507532A7D6675E0",
+            "sha256": "49c57e06861ed1eef7e475d6d72f534c36edc2464f6b32a0eeb0d3b2eec3e89d",
+            "status": "valid",
+            "subject": "CN = 127.0.0.2"
+          },
+          "trust": [
+            {
+              "issuer": "CN = NodeEndpoint Root c0c2720617181bb0",
+              "not_after": "2036-10-29T14:10:54+00:00",
+              "not_before": "2026-10-29T14:05:54+00:00",
+              "remaining_days": 3652,
+              "reminder_days": null,
+              "san": "",
+              "serial": "36C80F2C670F57EC8FD0AC1980D721E5",
+              "sha256": "9b31f648ddde674289fa08ffe65b525d9634def3d7972e36509c9120c69690d0",
+              "status": "valid",
+              "subject": "CN = NodeEndpoint Root c0c2720617181bb0"
+            }
+          ],
+          "version": "1.0.0"
+        },
+        "endpoint": {
+          "host": "127.0.0.2",
+          "port": 18443,
+          "https": true,
+          "ws_mode": "rest"
+        },
+        "backup_id": "20261029T141838-600e1a15",
+        "ca_preserved": true,
+        "firewall_result": {
+          "status": "ensured",
+          "port": 18443
+        },
+        "ca_sync": {
+          "status": "unchanged",
+          "certificates": 1,
+          "fingerprints": [
+            "9b31f648ddde674289fa08ffe65b525d9634def3d7972e36509c9120c69690d0"
+          ]
+        }
+      }
+    },
+    {
+      "id": "b4b0376d6d8db9fab65825c54671b68f",
+      "action": "firewall",
+      "state": "succeeded",
+      "stages": [
+        {
+          "name": "firewall",
+          "state": "succeeded"
+        }
+      ],
+      "result": {
+        "root_status": {
+          "ca": {
+            "issuer": "CN = NodeEndpoint Root c0c2720617181bb0",
+            "not_after": "2036-10-29T14:10:54+00:00",
+            "not_before": "2026-10-29T14:05:54+00:00",
+            "remaining_days": 3652,
+            "reminder_days": null,
+            "san": "",
+            "serial": "36C80F2C670F57EC8FD0AC1980D721E5",
+            "sha256": "9b31f648ddde674289fa08ffe65b525d9634def3d7972e36509c9120c69690d0",
+            "status": "valid",
+            "subject": "CN = NodeEndpoint Root c0c2720617181bb0"
+          },
+          "ca_key_online": true,
+          "checks": {
+            "nginx": "loaded",
+            "rest_authenticated": "NOT TESTED",
+            "rest_unauthenticated": "reachable_authentication_required",
+            "tls": "verified",
+            "websocket_authenticated": "NOT TESTED"
+          },
+          "endpoint": {
+            "host": "127.0.0.2",
+            "port": 18443,
+            "https": true
+          },
+          "generated_at": "2026-10-29T14:18:50.952773+00:00",
+          "installed": true,
+          "revocation_enforced": false,
+          "rotation": null,
+          "schema_version": 1,
+          "server": {
+            "issuer": "CN = NodeEndpoint Root c0c2720617181bb0",
+            "not_after": "2036-10-29T14:10:54+00:00",
+            "not_before": "2026-10-29T14:13:38+00:00",
+            "remaining_days": 3652,
+            "reminder_days": null,
+            "san": "IP Address:127.0.0.2",
+            "serial": "1CDD5B8248B712C50507532A7D6675E0",
+            "sha256": "49c57e06861ed1eef7e475d6d72f534c36edc2464f6b32a0eeb0d3b2eec3e89d",
+            "status": "valid",
+            "subject": "CN = 127.0.0.2"
+          },
+          "trust": [
+            {
+              "issuer": "CN = NodeEndpoint Root c0c2720617181bb0",
+              "not_after": "2036-10-29T14:10:54+00:00",
+              "not_before": "2026-10-29T14:05:54+00:00",
+              "remaining_days": 3652,
+              "reminder_days": null,
+              "san": "",
+              "serial": "36C80F2C670F57EC8FD0AC1980D721E5",
+              "sha256": "9b31f648ddde674289fa08ffe65b525d9634def3d7972e36509c9120c69690d0",
+              "status": "valid",
+              "subject": "CN = NodeEndpoint Root c0c2720617181bb0"
+            }
+          ],
+          "version": "1.0.0"
+        },
+        "endpoint": {
+          "host": "127.0.0.2",
+          "port": 18443,
+          "https": true,
+          "ws_mode": "rest"
+        },
+        "ca_preserved": true,
+        "firewall_result": {
+          "status": "ensured",
+          "port": 18443
+        }
+      }
+    }
+  ],
+  "credentials_exported": false,
+  "initial_root_status": {
+    "ca": {
+      "issuer": "CN = NodeEndpoint Root c0c2720617181bb0",
+      "not_after": "2036-10-29T14:10:54+00:00",
+      "not_before": "2026-10-29T14:05:54+00:00",
+      "remaining_days": 3652,
+      "reminder_days": null,
+      "san": "",
+      "serial": "36C80F2C670F57EC8FD0AC1980D721E5",
+      "sha256": "9b31f648ddde674289fa08ffe65b525d9634def3d7972e36509c9120c69690d0",
+      "status": "valid",
+      "subject": "CN = NodeEndpoint Root c0c2720617181bb0"
+    },
+    "ca_key_online": true,
+    "checks": {
+      "nginx": "loaded",
+      "rest_authenticated": "NOT TESTED",
+      "rest_unauthenticated": "reachable_authentication_required",
+      "tls": "verified",
+      "websocket_authenticated": "NOT TESTED"
+    },
+    "endpoint": {
+      "host": "127.0.0.1",
+      "port": 18443,
+      "https": true
+    },
+    "generated_at": "2026-10-29T14:17:54.385337+00:00",
+    "installed": true,
+    "revocation_enforced": false,
+    "rotation": null,
+    "schema_version": 1,
+    "server": {
+      "issuer": "CN = NodeEndpoint Root c0c2720617181bb0",
+      "not_after": "2036-10-29T14:10:54+00:00",
+      "not_before": "2026-10-29T14:05:54+00:00",
+      "remaining_days": 3652,
+      "reminder_days": null,
+      "san": "IP Address:127.0.0.1",
+      "serial": "58735072B0186FFC00BDB08020684CD5",
+      "sha256": "3bf70a44359e04433990b8457beb2704d3307878785e0de3f6e260dcf9a23d9d",
+      "status": "valid",
+      "subject": "CN = 127.0.0.1"
+    },
+    "trust": [
+      {
+        "issuer": "CN = NodeEndpoint Root c0c2720617181bb0",
+        "not_after": "2036-10-29T14:10:54+00:00",
+        "not_before": "2026-10-29T14:05:54+00:00",
+        "remaining_days": 3652,
+        "reminder_days": null,
+        "san": "",
+        "serial": "36C80F2C670F57EC8FD0AC1980D721E5",
+        "sha256": "9b31f648ddde674289fa08ffe65b525d9634def3d7972e36509c9120c69690d0",
+        "status": "valid",
+        "subject": "CN = NodeEndpoint Root c0c2720617181bb0"
+      }
+    ],
+    "version": "1.0.0"
+  },
+  "initial_ca_fingerprints": [
+    "9b31f648ddde674289fa08ffe65b525d9634def3d7972e36509c9120c69690d0"
+  ],
+  "final_root_status": {
+    "ca": {
+      "issuer": "CN = NodeEndpoint Root c0c2720617181bb0",
+      "not_after": "2036-10-29T14:10:54+00:00",
+      "not_before": "2026-10-29T14:05:54+00:00",
+      "remaining_days": 3652,
+      "reminder_days": null,
+      "san": "",
+      "serial": "36C80F2C670F57EC8FD0AC1980D721E5",
+      "sha256": "9b31f648ddde674289fa08ffe65b525d9634def3d7972e36509c9120c69690d0",
+      "status": "valid",
+      "subject": "CN = NodeEndpoint Root c0c2720617181bb0"
+    },
+    "ca_key_online": true,
+    "checks": {
+      "nginx": "loaded",
+      "rest_authenticated": "NOT TESTED",
+      "rest_unauthenticated": "reachable_authentication_required",
+      "tls": "verified",
+      "websocket_authenticated": "NOT TESTED"
+    },
+    "endpoint": {
+      "host": "127.0.0.2",
+      "port": 18443,
+      "https": true
+    },
+    "generated_at": "2026-10-29T14:19:04.428504+00:00",
+    "installed": true,
+    "revocation_enforced": false,
+    "rotation": null,
+    "schema_version": 1,
+    "server": {
+      "issuer": "CN = NodeEndpoint Root c0c2720617181bb0",
+      "not_after": "2036-10-29T14:10:54+00:00",
+      "not_before": "2026-10-29T14:13:38+00:00",
+      "remaining_days": 3652,
+      "reminder_days": null,
+      "san": "IP Address:127.0.0.2",
+      "serial": "1CDD5B8248B712C50507532A7D6675E0",
+      "sha256": "49c57e06861ed1eef7e475d6d72f534c36edc2464f6b32a0eeb0d3b2eec3e89d",
+      "status": "valid",
+      "subject": "CN = 127.0.0.2"
+    },
+    "trust": [
+      {
+        "issuer": "CN = NodeEndpoint Root c0c2720617181bb0",
+        "not_after": "2036-10-29T14:10:54+00:00",
+        "not_before": "2026-10-29T14:05:54+00:00",
+        "remaining_days": 3652,
+        "reminder_days": null,
+        "san": "",
+        "serial": "36C80F2C670F57EC8FD0AC1980D721E5",
+        "sha256": "9b31f648ddde674289fa08ffe65b525d9634def3d7972e36509c9120c69690d0",
+        "status": "valid",
+        "subject": "CN = NodeEndpoint Root c0c2720617181bb0"
+      }
+    ],
+    "version": "1.0.0"
+  },
+  "phase": "actions",
+  "success": true,
+  "completed_at": "2026-10-29T14:19:04.439265+00:00"
+}
