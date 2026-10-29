@@ -36,7 +36,7 @@ rootCommandCheck('saving returns a pinned command for the normalized saved host 
     eq($response->getStatusCode(), 200, $response->getContent());
     $data = jsonResponse($response)['data'];
     $tool = $data['root_tool'];
-    eq($tool['command'], 'curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.9/install.sh | bash -s -- --host \'1.1.1.1\'');
+    eq($tool['command'], 'curl -fsSL https://raw.githubusercontent.com/ksr-v/Xboard-Independent-NodeEndpoint/root-installer-v1.0.10/install.sh | bash -s -- --host \'1.1.1.1\'');
     eq($tool['target_url'], 'https://1.1.1.1:9443');
     foreach (['root', 'SSH', 'PHP', '9443', 'rest', '站点', '确认', '验证入口'] as $detail) {
         ok(str_contains($tool['note'], $detail), 'Missing SSH wizard detail: ' . $detail);
@@ -68,7 +68,7 @@ rootCommandCheck('anonymous and ordinary users cannot fetch commands or alter sa
         foreach (['GET', 'POST'] as $method) {
             $response = requestFixture($GLOBALS['settingsUrl'], $method, rootCommandSettings(['host' => '8.8.8.8']), $token);
             eq($response->getStatusCode(), 403);
-            ok(!str_contains($response->getContent(), 'root-installer-v1.0.9'), 'Unauthorized response exposed the command.');
+            ok(!str_contains($response->getContent(), 'root-installer-v1.0.10'), 'Unauthorized response exposed the command.');
             eq(Settings::read(), $before);
         }
     }

@@ -163,14 +163,19 @@ final class WebManagerController extends Controller
             $owner = $this->owner($request, true);
             $input = $request->all(); $this->exact($input, ['action']);
             if (!in_array($input['action'], ['configure', 'refresh', 'renew', 'firewall'], true)) { throw WebManager::failure('invalid_request'); }
-            return DB::transaction(function () use ($owner, $input): array {
+            [$saved, $revision] = DB::transaction(function (): array {
                 DB::table('node_endpoint_settings')->where('id', 1)->lockForUpdate()->first();
-                $saved = $this->saved(); $revision = $this->revision();
-                $parameters = ['action' => $input['action']];
-                if ($input['action'] === 'configure') {
-                    $parameters += array_intersect_key($saved, array_flip(['host', 'port', 'ws_mode']));
-                }
-                $raw = $this->manager->request('plan', $parameters);
+                return [$this->saved(), $this->revision()];
+            });
+            $parameters = ['action' => $input['action']];
+            if ($input['action'] === 'configure') {
+                $parameters += array_intersect_key($saved, array_flip(['host', 'port', 'ws_mode']));
+            }
+            // Root's fixed CLI bridge locks this same row. No application transaction may cross the RPC.
+            $raw = $this->manager->request('plan', $parameters);
+            return DB::transaction(function () use ($owner, $input, $saved, $revision, $raw): array {
+                DB::table('node_endpoint_settings')->where('id', 1)->lockForUpdate()->first();
+                if (!hash_equals($revision, $this->revision())) { throw WebManager::failure('settings_changed', 409); }
                 $target = WebManager::target($raw['target'] ?? null, true);
                 if (!$this->matches($target, $saved, true)) { throw WebManager::failure('target_mismatch', 409); }
                 $expires = $raw['expires_at'] ?? null;
@@ -189,6 +194,7 @@ final class WebManagerController extends Controller
                 $plan = ['id' => $raw['id'], 'digest' => $raw['digest'], 'action' => $raw['action'], 'expires_at' => $expires,
                     'confirmation' => $raw['confirmation'], 'target' => $target, 'stages' => WebManager::stages($raw['stages'] ?? null),
                     'current' => isset($raw['current']) ? WebManager::publicStatus($raw['current']) : null];
+                if (($plan['current']['installed'] ?? false) === true) { $plan['ca_preserved'] = true; }
                 if (!Cache::put($this->key('plan', $owner, $plan['id']), ['plan' => $plan, 'revision' => $revision,
                     'expires' => min($date->getTimestamp(), time() + self::TTL), 'job' => null], self::TTL)) {
                     throw WebManager::failure('owner_storage_failed', 503);
@@ -227,8 +233,8 @@ final class WebManagerController extends Controller
                 return $record;
             });
             if (is_array($record['job'])) { return $record['job']; }
-            return DB::transaction(function () use ($owner, $input, $key, $record): array {
-                // Recheck after prebinding commits, and hold the lock through Root submission.
+            $existing = DB::transaction(function () use ($key, $record): ?array {
+                // Recheck after prebinding commits, then release the row before Root's own CLI reads it.
                 DB::table('node_endpoint_settings')->where('id', 1)->lockForUpdate()->first();
                 $plan = $record['plan'];
                 $latest = Cache::get($key);
@@ -237,7 +243,13 @@ final class WebManagerController extends Controller
                 if (!hash_equals($record['revision'], $this->revision()) || !$this->matches($plan['target'], $this->saved(), true)) {
                     throw WebManager::failure('settings_changed', 409);
                 }
-                $raw = $this->manager->request('execute', $input);
+                return null;
+            });
+            if ($existing !== null) { return $existing; }
+            // Root revalidates the reviewed settings and state digest in its worker before any mutation.
+            $raw = $this->manager->request('execute', $input);
+            return DB::transaction(function () use ($owner, $key, $record, $raw): array {
+                $plan = $record['plan'];
                 if (($raw['id'] ?? null) !== $plan['id']
                     || !in_array($raw['state'] ?? null, ['queued', 'running', 'succeeded', 'partial', 'failed', 'interrupted'], true)) {
                     throw WebManager::failure('helper_protocol', 502);
@@ -307,10 +319,12 @@ final class WebManagerController extends Controller
     {
         return $this->respond(function () use ($request): array {
             $this->owner($request, true); $this->exact($request->all(), []);
+            // Root may be waiting for the application's CLI bridge, so never hold a database lock here.
+            $data = $this->statusData();
             $directory = dirname(Settings::caPath()); $previous = null; $replaced = false;
-            try { return DB::transaction(function () use ($directory, &$previous, &$replaced): array {
+            try { return DB::transaction(function () use ($data, $directory, &$previous, &$replaced): array {
                 DB::table('node_endpoint_settings')->where('id', 1)->lockForUpdate()->first();
-                $saved = $this->saved(); $data = $this->statusData();
+                $saved = $this->saved();
                 if (!is_array($data['root_status']) || !isset($data['root_status']['endpoint'])
                     || !$this->matches($data['root_status']['endpoint'], $saved)) { throw WebManager::failure('target_mismatch', 409); }
                 if (!is_array($data['ca'])) { throw WebManager::failure('ca_unavailable'); }

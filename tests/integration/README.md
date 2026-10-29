@@ -1,5 +1,19 @@
 # Native component integration
 
+NodeEndpoint 1.1.0 adds same-origin administrator-session reuse and the restricted Root web manager. Plugin installation, enablement and boot do not require a running Root helper; without it the authenticated page offers the fixed SSH initialization command and existing manual CA/status imports. Root initialization and effects require their separate Linux tests.
+
+For the standalone browser checks, install the locked `tests/ui` dependencies and use an installed Chrome:
+
+```powershell
+node tests/ui/session-root.cjs
+node tests/ui/root-command.cjs
+node tests/ui/ca-passphrase.cjs
+```
+
+The current run passes 11 session/Root workflow groups, 9 SSH command groups and 7 CA-passphrase groups. These load the real plugin HTML, JavaScript and CSS over a synthetic HTTPS origin with mocked administrator and Root APIs. They exercise account replacement/deletion, stored-session expiry and 403 cleanup, page-only logout, exact confirmation, stale/expired plans, uncertain execute-response retry of the same plan, task stages and recovery after a synthetic owner-cache clear, missing-history 404 and nested-job 503 handling, safe error display, explicit public CA synchronization and mobile layout. They do not execute a Root process, install a helper or establish a production deployment result. Synthetic screenshots remain under `tests/ui/work/`.
+
+The real Laravel/Admin/Sanctum bridge suite is `tests/integration/web_manager.php`; its Root transport is synthetic and its output must retain that scope. Actual helper filesystem permissions, UID authorization, service setup and fixed Root tasks are covered separately by the Linux helper suite.
+
 NodeEndpoint 1.0.3: Windows and Linux each pass 36 component checks, including independent domain-source generation, original URL/fallback, and shell-sensitive credentials; the 14 Chrome choice checks now verify both domain and IP commands use the independent installer. See [NATIVE_DOMAIN_TEST_REPORT.md](../../NATIVE_DOMAIN_TEST_REPORT.md). The 1.0.2 baseline below remains historical.
 
 2026-10-17, NodeEndpoint 1.0.2: Windows and Linux each pass 34 native component checks and 6 dynamic Admin view/resource checks. The actual audited Admin build passes 14 Chrome checks for domain/IP choices, clipboard accuracy, native query cache, creation, mobile layouts, authentication and disabling. See [NATIVE_INSTALL_CHOICES_TEST_REPORT.md](../../NATIVE_INSTALL_CHOICES_TEST_REPORT.md) for mocks and scope.

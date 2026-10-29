@@ -1,4 +1,12 @@
-# NodeEndpoint 1.0.10
+# NodeEndpoint 1.1.0
+
+同域 `/node-endpoint` 支持复用面板管理员登录；经一次 SSH 初始化后，可在网页预览、确认并执行固定 Root 任务，查看任务分阶段结果和同步公共 CA。Root 助手使用 Unix socket 和系统 UID 校验，网页不提供任意命令或私钥操作。
+
+全新安装 Xboard v2026.10.29.2 会同时安装并启用五个内置插件，初始化原生 HTTPS 入口和助手。已有面板升级保留设置、CA、APP_KEY 和禁用选择；旧入口可使用固定 `--enable-web-manager` 命令单独安装助手。详见[网页管理说明](docs/WEB_MANAGER.zh-CN.md)。
+
+插件 ZIP 为 `NodeEndpoint-1.1.0.zip`；Root 引导为 `root-installer-v1.0.10`、`tools 1.0.6`、`web-manager 1.0.0`。已发布旧资产不覆盖。Node 的安装版本继续固定 v1.13-orphan.7。
+
+## 历史 1.0.10
 
 本版使机器管理中的域名和 IP 新装命令都固定使用独立 Node **v1.13-orphan.7** 的正式 Release 安装器。原生 ZIP 与独立迁移工具 **tools 1.0.9** 同步携带新发行锁和逐资产 SHA-256。
 
