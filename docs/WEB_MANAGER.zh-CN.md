@@ -1,10 +1,10 @@
 # 管理员登录与网页 Root 管理
 
-NodeEndpoint 1.1.1 在同域 `/node-endpoint` 复用面板管理员登录。页面读取面板现有的登录记录，经原生管理员 API 验证后使用；退出登录、登录过期或切换账号会清理当前页面的认证和敏感内容。页面不把凭据放入 URL，也不另存一份 Token。仍支持手动登录。
+NodeEndpoint 1.1.2 在同域 `/node-endpoint` 复用面板管理员登录。页面读取面板现有的登录记录，经原生管理员 API 验证后使用；退出登录、登录过期或切换账号会清理当前页面的认证和敏感内容。页面不把凭据放入 URL，也不另存一份 Token。仍支持手动登录。
 
 ## 安装
 
-全新安装 [Xboard v2026.10.30.1](https://github.com/ksr-v/Xboard-Custom-Source/releases/tag/v2026.10.30.1) 的原生 PHP-FPM 路线时，面板初始化会一并安装并启用五个内置插件，创建独立 HTTPS 入口，安装受限 Root 助手，并同步公共 CA。核对真实通讯地址、端口和权限说明后按安装器提示确认。`--skip-endpoint` 会延期入口和助手初始化。
+全新安装 [Xboard v2026.10.30.2](https://github.com/ksr-v/Xboard-Custom-Source/releases/tag/v2026.10.30.2) 的原生 PHP-FPM 路线时，面板初始化会一并安装并启用五个内置插件，创建独立 HTTPS 入口，安装受限 Root 助手，并同步公共 CA。核对真实通讯地址、端口和权限说明后按安装器提示确认。`--skip-endpoint` 会延期入口和助手初始化。
 
 已有面板使用默认 Root 归档升级时，会为有效原生 HTTPS 入口安装或更新助手，无需另行运行下方命令。只有仅上传插件、手动升级源码或显式 `--skip-endpoint` 后助手仍未安装时，才在同一台面板服务器以 Root 单独执行一次：
 

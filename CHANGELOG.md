@@ -1,5 +1,12 @@
 # 变更记录
 
+## 1.1.2 — 2026-10-30，Node v9 配套修复
+
+- 新机器安装命令固定 Node `v1.13-orphan.9`，独立 tools 为 `1.0.11`；已核验六项本地资产并填入精确来源与摘要锁，保留旧版资产。
+- ACME 修复针对混合大小写域名的 Order / CSR literal 不一致，在 ACME 入口与配置指纹使用相同规范化；不更改 TLS 校验或 self / file / content 模式，不删除现有证书缓存。
+- 已确认旧 nft 0.9.0 的成功 null 输出且独立空表检查成立；v9 按此限定兼容，并改用 ip / ip6 NAT 与规则所有权标记。其他未知输出仍拒绝，旧 v8 inet 表仅在核验后迁移。真实 4.19 内核尚未启动验收。
+- 保留 v8 的 owned UDP INPUT、关闭选择与兼容边界。Root installer `1.0.10` / Root tools `1.0.6` / helper `1.0.0` 不变。见[验证记录](docs/RELEASE_VALIDATION_NODE_V9_20261030.md)。
+
 ## 1.1.1 — 2026-10-30，Hysteria2 监听口自动放行
 
 - 新机器安装命令固定独立 Node `v1.13-orphan.8`；独立 tools `1.0.10` 同步使用该版精确资产锁。旧包与历史摘要保留。

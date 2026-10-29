@@ -1,4 +1,12 @@
-# NodeEndpoint 1.1.1
+# NodeEndpoint 1.1.2
+
+目标配套为 Xboard `v2026.10.30.2`、独立 Node `v1.13-orphan.9` 和 Node tools `1.0.11`。新机器命令及版本断言固定 v9；六项最终本地资产已核对并填入下载锁，Node 运行回归、插件 ZIP 验收及公开六资产下载核验通过。
+
+本轮已确认的 ACME 问题为混合大小写 DNS 域名导致 Order / CSR literal 不一致。v9 在 ACME 入口和配置指纹统一处理名称，不削弱 TLS 验证、不清空证书缓存，也不改 self / file / content 模式。现场已确认 nftables `0.9.0`、内核 `4.19.0-21`：JSON 查询退出码为 0、返回 `nftables: null`，独立纯文本 `list tables` 也成功且为空。v9 只在该独立空表检查成立时兼容 null，其他异常、未知结构和非空结果仍拒绝。转发计划改用 `ip` / `ip6` 家族 NAT、数值优先级与未挂钩的完整所有权标记规则，避免依赖旧环境不支持的 inet NAT / table comment；仅对校验通过的旧 v8 inet 资源作受控迁移，不清空外部规则。
+
+保留 v8 的 INPUT、NAT、关闭选择和外部规则保全边界。Root 安装器 `v1.0.10`、Root tools `1.0.6`、助手 `1.0.0` 保持不变。已有节点使用保留绑定的 `upgrade`，不执行新装 `REPLACE`。实际结果见[本轮验证记录](docs/RELEASE_VALIDATION_NODE_V9_20261030.md)，旧版通过数保留历史归属。
+
+# 历史 NodeEndpoint 1.1.1
 
 本版将域名 / IP 新机器命令固定到独立 Node **v1.13-orphan.8**，插件 ZIP 为 `NodeEndpoint-1.1.1.zip`，独立 Node tools 为 **1.0.10**。标准 Node 安装器明确启用 Hysteria2 实际 UDP 监听口的 owned INPUT 自动放行，包含不启用跳跃的单端口节点，并在启动、配置变化和每 30 秒恢复自己的运行时规则。
 

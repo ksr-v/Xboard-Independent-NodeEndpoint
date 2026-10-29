@@ -15,10 +15,10 @@ function requireTrue(bool $condition, string $message): void {
     if (!$condition) throw new RuntimeException($message);
 }
 
-releaseCheck('domain command fixes the v8 Release installer and matching version', function (): void {
+releaseCheck('domain command fixes the v9 Release installer and matching version', function (): void {
     $command = MachineInstallCommand::buildDomain('https://panel.example.test', 17, 'synthetic-token');
-    requireTrue(MachineInstallCommand::INSTALLER === 'https://github.com/ksr-v/Xboard-Node--Custom-Source/releases/download/v1.13-orphan.8/install.sh', 'Installer pin differs.');
-    foreach (['--mode'=>'machine', '--panel'=>'https://panel.example.test', '--token'=>'synthetic-token', '--machine-id'=>'17', '--version'=>'v1.13-orphan.8'] as $key=>$value) {
+    requireTrue(MachineInstallCommand::INSTALLER === 'https://github.com/ksr-v/Xboard-Node--Custom-Source/releases/download/v1.13-orphan.9/install.sh', 'Installer pin differs.');
+    foreach (['--mode'=>'machine', '--panel'=>'https://panel.example.test', '--token'=>'synthetic-token', '--machine-id'=>'17', '--version'=>'v1.13-orphan.9'] as $key=>$value) {
         requireTrue(str_contains($command, escapeshellarg($key) . ' ' . escapeshellarg($value)), 'Argument differs: ' . $key);
     }
     requireTrue(str_starts_with($command, 'curl -fsSL ' . escapeshellarg(MachineInstallCommand::INSTALLER) . ' | sudo bash -s -- '), 'Pipeline differs.');
@@ -33,11 +33,11 @@ releaseCheck('synthetic shell-sensitive machine identity stays one escaped argum
     requireTrue(str_contains($command, escapeshellarg('--panel') . ' ' . escapeshellarg($url)), 'URL escaping differs.');
 });
 
-releaseCheck('IP command retains CA bundle and both pins with the same v8 installer', function (): void {
+releaseCheck('IP command retains CA bundle and both pins with the same v9 installer', function (): void {
     $pem = "-----BEGIN CERTIFICATE-----\nSYNTHETIC-PUBLIC-FIXTURE\n-----END CERTIFICATE-----\n";
     $pins = [str_repeat('a', 64), str_repeat('b', 64)];
     $command = MachineInstallCommand::build(['url'=>'https://192.0.2.18:8443', 'pem'=>$pem, 'fingerprints'=>$pins], 19, 'synthetic-token');
-    foreach (['--endpoint-ca-base64'=>base64_encode($pem), '--endpoint-ca-fingerprint'=>implode(',', $pins), '--version'=>'v1.13-orphan.8'] as $key=>$value) {
+    foreach (['--endpoint-ca-base64'=>base64_encode($pem), '--endpoint-ca-fingerprint'=>implode(',', $pins), '--version'=>'v1.13-orphan.9'] as $key=>$value) {
         requireTrue(str_contains($command, escapeshellarg($key) . ' ' . escapeshellarg($value)), 'IP argument differs: ' . $key);
     }
     requireTrue(str_contains($command, escapeshellarg(MachineInstallCommand::INSTALLER)), 'IP installer differs.');

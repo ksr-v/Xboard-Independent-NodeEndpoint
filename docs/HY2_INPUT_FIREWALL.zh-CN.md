@@ -1,6 +1,6 @@
 # Hysteria2 UDP 监听口自动放行
 
-配套版本为独立 Node `v1.13-orphan.8`、NodeEndpoint `1.1.1` 和 Xboard `v2026.10.30.1`。本次修复的是节点主机 INPUT 防火墙仍阻断实际监听口的问题。已有跳跃 NAT 正确，并不代表 INPUT 已允许数据包通过；关闭跳跃后单端口也不能连接时，应先检查实际监听口。
+当前配套为独立 Node `v1.13-orphan.9`、NodeEndpoint `1.1.2` 和 Xboard `v2026.10.30.2`。以下 INPUT 能力始于 v8，v9 保留其行为；本轮 ACME 与 nftables 输出兼容修复的实际范围另见[本轮记录](RELEASE_VALIDATION_NODE_V9_20261030.md)。已有跳跃 NAT 正确，并不代表 INPUT 已允许数据包通过；关闭跳跃后单端口也不能连接时，应先检查实际监听口。
 
 ## 自动管理的范围
 
@@ -9,6 +9,8 @@
 例如连接端口为 `17443-19443`、实际监听端口为 `17443`：跳跃范围仍由 Node 的 NAT 规则转发至 `17443`，INPUT 只放行实际的 `17443/udp`，不会将整个范围或 TCP 一并放行。若配置指定监听 IP，规则受相应地址与 IP 版本约束；未指定地址时沿用内核的通配监听语义。放行允许所有来源访问这个监听口，节点管理员应在启用前确认符合本机策略。
 
 支持范围为 Linux 主机的 iptables-nft 和 iptables-legacy，分别处理 IPv4 与 IPv6。存在额外原生 nftables INPUT basechain 或 firewalld 管理时，本次不自动修改这些规则，需按实际防火墙人工放行；不能用另一条 nft `accept` 覆盖其他链的 `drop`。Docker 还需核对容器网络命名空间、权限与宿主端口发布，不将宿主环境结论直接套用于容器。
+
+旧 nftables `0.9.0` 的自动 INPUT 仅支持显式 legacy 工具；已有 nft compat INPUT 或额外原生 INPUT 链时会拒绝自动管理，不切换系统 alternatives。NAT 的旧 CLI 验收使用现代隔离内核，实际 4.19 内核未启动验收。
 
 自动 INPUT 管理使用进程级独占租约，同一网络环境只允许一个启用该能力的 Node 进程；该进程内可以有多个节点实例。多个独立 Node 服务不同时争抢规则，应由管理员手动管理其他服务的 INPUT。
 
@@ -37,7 +39,7 @@ firewall:
 
 ## 升级与最小诊断
 
-已有节点按[升级教程](UPGRADE.zh-CN.md)使用固定 v8 安装器的 `upgrade`，保留身份、Token、CA、配置与数据目录。面板复制的新机器安装命令不能代替升级；只上传 NodeEndpoint 插件也不会更新已运行的 Node。
+已有节点按[升级教程](UPGRADE.zh-CN.md)使用固定 v9 安装器的 `upgrade`，保留身份、Token、CA、配置与数据目录。面板复制的新机器安装命令不能代替升级；只上传 NodeEndpoint 插件也不会更新已运行的 Node。
 
 只读检查版本、实际服务与 UDP 监听：
 
@@ -49,4 +51,4 @@ ss -lun '( sport = :17443 )'
 
 将端口和服务名替换为实际值。先确认单监听端口能够连接，再验证客户端导入后的端口范围和持续跳跃。提供问题信息时仅提供版本、端口、监听状态及脱敏错误，不公开订阅 URL、Token、密码、私钥或完整防火墙 / 原始日志。
 
-本版验收结果另见[验证范围](RELEASE_VALIDATION_HY2_INPUT_20261030.md)。本文描述实现合同，不将历史 NAT 或其他版本的测试记录计为 v8 已通过。
+本版验收结果另见[v9 验证范围](RELEASE_VALIDATION_NODE_V9_20261030.md)。[v8 历史记录](RELEASE_VALIDATION_HY2_INPUT_20261030.md)保留原有归属，不作为当前 v9 的重跑结果。

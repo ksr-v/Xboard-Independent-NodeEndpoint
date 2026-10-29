@@ -125,7 +125,7 @@ class LayoutTests(unittest.TestCase):
 
     def test_release_is_exactly_pinned(self):
         lock = json.loads(ne.LOCK_PATH.read_text())
-        self.assertEqual(lock["version"], "v1.13-orphan.8")
+        self.assertEqual(lock["version"], "v1.13-orphan.9")
         self.assertFalse(lock["release_is_immutable"])
         self.assertEqual(len(lock["assets"]["xboard-node-linux-arm64"]), 64)
 

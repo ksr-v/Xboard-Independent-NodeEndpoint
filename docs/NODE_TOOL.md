@@ -1,14 +1,16 @@
 # Node 对接与安全迁移工具
 
-工具 CLI 版本：1.0.0，当前随独立 tools 1.0.10 发行。入口：`tools/node/node_endpoint.py`，Python 3.9+ 标准库；CA 验证另需 `openssl`。工具不运行上游安装器、不自动升级已有二进制，不改变面板绑定、流量历史或 FlowScope 采集器。
+工具 CLI 版本：1.0.0，当前随独立 tools 1.0.11 发行。入口：`tools/node/node_endpoint.py`，Python 3.9+ 标准库；CA 验证另需 `openssl`。工具不运行上游安装器、不自动升级已有二进制，不改变面板绑定、流量历史或 FlowScope 采集器。
 
 ## 当前发行锁（2026-10-30）
 
-NodeEndpoint 1.1.1 随附的独立 tools 1.0.10 将 Node 下载版本更新为 **v1.13-orphan.8**。以包内 `tools/node/release-lock.json` 的 source commit 与逐资产 SHA-256 为当前依据，`audited-SHA256SUMS` 同步记录发行清单。工具的保守迁移实现与 CLI 版本 1.0.0 保持，未改成自动替换已有二进制。
+v9 最终本地资产已逐一核对大小与摘要，active 锁已填入其正式源码与实际编译来源。Node 运行回归、插件 ZIP 验收及公开六资产核验通过，见[本轮记录](RELEASE_VALIDATION_NODE_V9_20261030.md)；公开无凭据下载的大小、SHA-256 和 GitHub digest 均与固定锁一致。
+
+NodeEndpoint 1.1.2 随附的独立 tools 1.0.11 将 Node 下载版本更新为 **v1.13-orphan.9**。以包内 `tools/node/release-lock.json` 的 source commit 与逐资产 SHA-256 为当前依据，`audited-SHA256SUMS` 同步记录发行清单。工具的保守迁移实现与 CLI 版本 1.0.0 保持，未改成自动替换已有二进制。
 
 发行源码 commit 以当前 `release-lock.json` 的 `source_commit` 为准，二进制构建来源另记为 `binary_source_commit`。发行提交补齐安装器固定资产摘要和文档，Go 业务源码与构建来源一致；安装器自身的摘要不等同于二进制编译来源。
 
-已有节点升级到本次 UDP INPUT 修复版本使用[配套更新教程](UPGRADE.zh-CN.md)中的明确 `upgrade`，不使用 `prepare / install-new` 或面板新装命令。下方 v1.13-orphan.4 的审计摘要与联测结果是历史证据，不能视为 v1.13-orphan.8 的实机验收。本次验证范围另见[发行记录](RELEASE_VALIDATION_HY2_INPUT_20261030.md)。
+已有节点升级到本次 v9 修复版本使用[配套更新教程](UPGRADE.zh-CN.md)中的明确 `upgrade`，不使用 `prepare / install-new` 或面板新装命令。下方 v1.13-orphan.4 的审计摘要与联测结果是历史证据，不能视为 v1.13-orphan.9 的实机验收。本次验证范围另见[发行记录](RELEASE_VALIDATION_NODE_V9_20261030.md)。
 
 Root 面板入口继续固定 root-installer-v1.0.10 / tools 1.0.6，它不负责 Node 二进制升级。不要把两个工具包版本差异当成需要重建面板 CA 的信号。
 
