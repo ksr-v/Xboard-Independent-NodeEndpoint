@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "source": "Exact extracted published-candidate ZIP and pinned bootstrap/helper bytes",
+  "platform": "win32",
+  "python": "3.12.0",
+  "tools_sha256": "23e692481127802040696a1a500d9890a98c98c9c7da3925494a1fc0d8c5a904",
+  "modules": [
+    "test_optional_api",
+    "test_nginx_syntax",
+    "test_panel.NginxUnitTests",
+    "test_panel.TransactionUnitTests",
+    "test_docker_manager",
+    "test_refresh_entry",
+    "test_quick_install",
+    "test_web_bootstrap",
+    "test_web_manager",
+    "test_transaction_diagnostics",
+    "test_panel_passphrase",
+    "test_docker_passphrase",
+    "test_upgrade_entry",
+    "test_web_upgrade",
+    "test_existing_entry_refresh"
+  ],
+  "tests_run": 159,
+  "failures": [],
+  "errors": [],
+  "skipped": [
+    {
+      "test": "test_actual_unix_peer_credentials_and_one_line_protocol (test_web_manager.LinuxPermissionTests.test_actual_unix_peer_credentials_and_one_line_protocol)",
+      "reason": "Linux Root permission/socket checks"
+    },
+    {
+      "test": "test_group_writable_ancestor_and_hardlink_rejected (test_web_manager.LinuxPermissionTests.test_group_writable_ancestor_and_hardlink_rejected)",
+      "reason": "Linux Root permission/socket checks"
+    },
+    {
+      "test": "test_history_removal_fsyncs_directory_before_returning (test_web_manager.LinuxPermissionTests.test_history_removal_fsyncs_directory_before_returning)",
+      "reason": "Linux Root permission/socket checks"
+    },
+    {
+      "test": "test_malicious_stdout_stderr_and_hanging_descendants_are_bounded (test_web_manager.LinuxPermissionTests.test_malicious_stdout_stderr_and_hanging_descendants_are_bounded)",
+      "reason": "Linux Root permission/socket checks"
+    },
+    {
+      "test": "test_private_diagnostics_contain_frames_but_no_exception_text (test_web_manager.LinuxPermissionTests.test_private_diagnostics_contain_frames_but_no_exception_text)",
+      "reason": "Linux Root permission/socket checks"
+    },
+    {
+      "test": "test_private_store_durable_permissions_and_symlink_rejection (test_web_manager.LinuxPermissionTests.test_private_store_durable_permissions_and_symlink_rejection)",
+      "reason": "Linux Root permission/socket checks"
+    },
+    {
+      "test": "test_raw_bounded_command_preserves_nonzero_status_and_json_bridge_requires_success (test_web_manager.LinuxPermissionTests.test_raw_bounded_command_preserves_nonzero_status_and_json_bridge_requires_success)",
+      "reason": "Linux Root permission/socket checks"
+    },
+    {
+      "test": "test_symlink_sidecar_is_rejected_without_following_or_modifying_it (test_existing_entry_refresh.ExistingEntryRefreshTests.test_symlink_sidecar_is_rejected_without_following_or_modifying_it)",
+      "reason": "Host does not permit creating symlinks"
+    }
+  ],
+  "passed": true,
+  "scope": "Unit and boundary tests; no production services or real-account proxy traffic"
+}

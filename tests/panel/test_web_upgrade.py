@@ -14,13 +14,14 @@ sys.path.insert(0, str(ROOT / 'tools/panel'))
 import web_manager as web
 
 
-def previous_policy():
+def previous_policy(version='1.0.0'):
     binding = {'app': '/srv/xboard', 'app_user': 'www', 'php': '/usr/bin/php', 'deployment': 'fpm',
                'backend': 'unix:/run/php.sock', 'source_site': '/etc/nginx/site.conf',
                'site_name': 'panel.example', 'include_dir': '/etc/nginx/conf.d',
                'config_path': '/etc/nginx/conf.d/node.conf', 'main_config': '/etc/nginx/nginx.conf',
                'ownership': 'a' * 32}
-    return {'schema': 1, 'version': '1.0.0', 'tools_sha256': web.LEGACY_TOOLS_SHA256,
+    return {'schema': 1, 'version': version,
+            'tools_sha256': web.PREVIOUS_TOOLS_SHA256 if version == '1.0.1' else web.LEGACY_TOOLS_SHA256,
             'manifest_sha256': 'b' * 64, 'app': binding['app'], 'app_user': 'www', 'php': binding['php'],
             'app_uid': 1001, 'app_gid': 1001, 'nginx': '/usr/sbin/nginx', 'state': '/var/lib/node-endpoint',
             'binding': binding, 'ws_backend': None, 'allowed_ports': [8443, 9443]}
@@ -34,10 +35,15 @@ class UpgradePolicyTests(unittest.TestCase):
         self.assertEqual(web.upgrade_policy(old, 'c' * 64), expected)
         self.assertEqual(web.upgrade_policy(expected, 'c' * 64), expected)
         self.assertEqual(old['version'], '1.0.0')
+        previous = previous_policy('1.0.1')
+        self.assertEqual(web.upgrade_policy(previous, 'c' * 64), expected)
+        self.assertEqual(previous['version'], '1.0.1')
 
     def test_unknown_version_pin_or_invalid_legacy_scope_is_rejected(self):
         for change in ({'version': '1.0.9'}, {'tools_sha256': 'f' * 64},
                        {'version': web.VERSION, 'tools_sha256': web.LEGACY_TOOLS_SHA256},
+                       {'version': '1.0.1', 'tools_sha256': web.LEGACY_TOOLS_SHA256},
+                       {'version': '1.0.0', 'tools_sha256': web.PREVIOUS_TOOLS_SHA256},
                        {'app_uid': 0}, {'allowed_ports': [80]}, {'allowed_ports': [8443, 8443]},
                        {'manifest_sha256': 'invalid'}, {'unknown': 'field'}):
             with self.subTest(change=change), self.assertRaises(web.RpcError):
@@ -45,8 +51,8 @@ class UpgradePolicyTests(unittest.TestCase):
 
 
 class UpgradeInstallTests(unittest.TestCase):
-    def context(self, stack, active=True, uid=1001, change=None):
-        old = previous_policy()
+    def context(self, stack, active=True, uid=1001, change=None, version='1.0.0'):
+        old = previous_policy(version)
         plan = {**old['binding'], 'port': 8443, 'host': 'node.example', 'https': True,
                 'ws_backend': old['ws_backend'], **(change or {})}
         env = SimpleNamespace(main=plan['main_config'], binary=old['nginx'],
@@ -69,7 +75,7 @@ class UpgradeInstallTests(unittest.TestCase):
         stack.enter_context(patch.object(web, 'SERVICE', unit))
         stack.enter_context(patch.object(web, 'PRIVATE', folder / 'private'))
         stack.enter_context(patch.object(web, 'CONFIG', folder / 'policy'))
-        code = folder / '1.0.1/helper.py'
+        code = folder / web.VERSION / 'helper.py'
         stack.enter_context(patch.object(web, 'CODE', code))
         source = SimpleNamespace(resolve=lambda: source,
             stat=lambda: SimpleNamespace(st_mode=0o100600, st_uid=0, st_nlink=1, st_size=10),
@@ -98,6 +104,16 @@ class UpgradeInstallTests(unittest.TestCase):
             _, _, service, _ = self.context(stack, active=False)
             web.install(SimpleNamespace(command='upgrade', state='/var/lib/node-endpoint'))
             self.assertEqual([call.args[0] for call in service.call_args_list], ['stop', 'daemon-reload'])
+
+    def test_previously_upgraded_helper_can_upgrade_again_after_entry_rollback(self):
+        with ExitStack() as stack:
+            old, writes, service, lifecycle = self.context(stack, version='1.0.1')
+            result = web.install(SimpleNamespace(command='upgrade', state='/var/lib/node-endpoint'))
+            lifecycle.assert_called_once_with(old)
+            self.assertEqual(result['policy']['allowed_ports'], old['allowed_ports'])
+            self.assertEqual(json.loads(writes.call_args_list[1].args[1]), web.upgrade_policy(old, 'c' * 64))
+            self.assertEqual([call.args[0] for call in service.call_args_list],
+                             ['stop', 'daemon-reload', 'start', 'is-active'])
 
     def test_different_state_uid_or_binding_is_rejected_before_any_service_change(self):
         for uid, change, state in ((1002, None, '/var/lib/node-endpoint'),
@@ -129,10 +145,11 @@ class UpgradeInstallTests(unittest.TestCase):
 
 
 class ServiceStateTests(unittest.TestCase):
-    def context(self, stack, enabled='enabled', active='active', dropins=''):
+    def context(self, stack, enabled='enabled', active='active', dropins='', version='1.0.0'):
         data = b'legacy helper fixture'
-        stack.enter_context(patch.object(web, 'LEGACY_HELPER_SHA256', hashlib.sha256(data).hexdigest()))
-        old_code = Path('/opt/nodeendpoint-web-manager/1.0.0/web_manager.py')
+        fingerprint = 'PREVIOUS_HELPER_SHA256' if version == '1.0.1' else 'LEGACY_HELPER_SHA256'
+        stack.enter_context(patch.object(web, fingerprint, hashlib.sha256(data).hexdigest()))
+        old_code = Path('/opt/nodeendpoint-web-manager') / version / 'web_manager.py'
         temporary = tempfile.TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
         unit = Path(temporary.name) / 'unit'
@@ -169,6 +186,11 @@ class ServiceStateTests(unittest.TestCase):
                 self.context(stack, enabled, active, dropins)
                 with self.assertRaises(web.RpcError):
                     web.service_state(previous_policy())
+
+    def test_previous_published_helper_code_is_verified_with_its_own_pin(self):
+        with ExitStack() as stack:
+            self.context(stack, version='1.0.1')
+            self.assertEqual(web.service_state(previous_policy('1.0.1')), {'enabled': True, 'active': True})
 
 
 if __name__ == '__main__':

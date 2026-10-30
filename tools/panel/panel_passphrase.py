@@ -279,6 +279,42 @@ def existing_password(pki, plan=None, ca_id=None, ca_key=None):
     return ManagedPassphrases(pki.state, plan).password(pki, ca_id, ca_key)
 
 
+def validate_existing_metadata(pki, plan=None):
+    """Read Root bindings for an unchanged entry without retrieving any secret."""
+    target = pki.root / FILENAME
+    if not target.exists() and not target.is_symlink():
+        return None  # Legacy manual CA: retain the existing no-sidecar workflow.
+    # Reuse the complete private-file/schema/context checks, but never construct
+    # an application bridge. No password, pending recovery or metadata save is
+    # needed when the existing server certificate is kept.
+    vault = ManagedPassphrases(pki.state, plan, bridge=object())
+    _require(vault.data['pending'] is None,
+             '存在未完成的 CA 凭据操作；请先单独恢复，未取密或修改元数据')
+    meta = pki.meta
+    _require(isinstance(meta, dict) and isinstance(meta.get('active_ca'), str)
+             and CA_ID.fullmatch(meta['active_ca']), '当前 CA 身份记录无效，拒绝仅刷新入口')
+    rotation = meta.get('rotation')
+    if rotation is not None:
+        _require(isinstance(rotation, dict)
+                 and rotation.get('phase') in ('distribute_dual_trust', 'new_ca_active_dual_trust')
+                 and all(isinstance(rotation.get(key), str) and CA_ID.fullmatch(rotation[key])
+                         for key in ('old_ca', 'new_ca'))
+                 and rotation['old_ca'] != rotation['new_ca'],
+                 'CA 轮换记录不完整；请先单独核对，未取密或修改元数据')
+        expected = rotation['old_ca'] if rotation['phase'] == 'distribute_dual_trust' else rotation['new_ca']
+        _require(meta['active_ca'] == expected,
+                 'CA 轮换与当前身份不一致；请先单独核对，未取密或修改元数据')
+    record = vault.data['cas'].get(meta['active_ca'])
+    if record is None:
+        return None  # An existing legacy CA can coexist with managed rotation records.
+    try:
+        fingerprint = pki.openssl.info(pki.ca_dir(meta['active_ca']) / 'ca.pem')['sha256']
+    except Exception:
+        raise SafetyError('当前 CA 公开证书不可校验；未取密或修改元数据') from None
+    _require(fingerprint == record['fingerprint'], '当前 CA 公开指纹与凭据记录不符，拒绝仅刷新入口')
+    return True
+
+
 def rebind_docker_context(pki, plan, ca_key=None):
     """Called only inside a reviewed Root transaction; no new CA or password."""
     target = pki.root / FILENAME

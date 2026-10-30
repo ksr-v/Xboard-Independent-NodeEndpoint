@@ -20,12 +20,12 @@ import urllib.request
 import zipfile
 sys.dont_write_bytecode = True
 
-TOOLS_URL = 'https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/download/root-installer-v1.0.11/node-endpoint-tools-1.0.12.zip'
-TOOLS_SHA256 = '96d2010d842d07a12fe1ef220cfb98acfca6d0678ce6ec1f3e3b164805d03c6c'
+TOOLS_URL = 'https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/download/root-installer-v1.0.12/node-endpoint-tools-1.0.13.zip'
+TOOLS_SHA256 = '23e692481127802040696a1a500d9890a98c98c9c7da3925494a1fc0d8c5a904'
 CACHE = Path('/opt/nodeendpoint-quick') / TOOLS_SHA256
-WEB_MANAGER_VERSION = '1.0.1'
-WEB_MANAGER_SHA256 = '790182149633ba12683db9a5680a7dec89b35a4c94e60468b18dd72eafa6adad'
-WEB_MANAGER_URL = 'https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/download/root-installer-v1.0.11/nodeendpoint-web-manager-1.0.1.py'
+WEB_MANAGER_VERSION = '1.0.2'
+WEB_MANAGER_SHA256 = 'd37261ad6418166e5d2f7e4785fd4dc7ef81a435f41af44122f3d2e26643fbb0'
+WEB_MANAGER_URL = 'https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/download/root-installer-v1.0.12/nodeendpoint-web-manager-1.0.2.py'
 
 
 def require(value, reason):
@@ -691,7 +691,7 @@ def main():
     require(args.detect_only or args.sync_ca or args.configure_firewall or sys.stdin.isatty(), '安装需要 SSH 交互终端，不要将脚本通过管道执行')
     for name in ('openssl', 'ss', 'runuser'):
         require(shutil.which(name), '缺少依赖：' + name + '，请先通过本机包管理器安装')
-    print('校验固定 tools v1.0.12（设备准入路由修复 + 原生入口保留配置升级）；不更新 Xboard、Node 或系统软件。')
+    print('校验固定 tools v1.0.13（设备准入路由修复 + 同地址刷新不取 CA 口令）；不更新 Xboard、Node 或系统软件。')
     data = Path(args.package_file).read_bytes() if args.package_file else download()
     directory = install_cache(verified_members(data))
     sys.dont_write_bytecode = True

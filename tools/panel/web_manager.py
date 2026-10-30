@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Local, fixed-policy NodeEndpoint web bridge. No network listener or shell RPC.
 
-This asset is released separately from the immutable tools 1.0.12 archive. Install
+This asset is released separately from the immutable tools 1.0.13 archive. Install
 once as Root after the SSH wizard has created a native FPM/Octane HTTPS entry.
 Application code is always executed by its existing non-Root account. The RPC
 grants that account only the operations described by the Root-installed policy.
@@ -34,13 +34,15 @@ import time
 import traceback
 
 sys.dont_write_bytecode = True
-VERSION = '1.0.1'
-TOOLS_SHA256 = '96d2010d842d07a12fe1ef220cfb98acfca6d0678ce6ec1f3e3b164805d03c6c'
+VERSION = '1.0.2'
+TOOLS_SHA256 = '23e692481127802040696a1a500d9890a98c98c9c7da3925494a1fc0d8c5a904'
 LEGACY_TOOLS_SHA256 = 'd1dd1258b68e34e7feca111a85c97bd0d435516093b49840633166fe066e566e'
 LEGACY_HELPER_SHA256 = '9afb5f8b774600ce1578bebf067a3b1d99e90ab3f7b5245523181ba29cdd0f2a'
+PREVIOUS_TOOLS_SHA256 = '96d2010d842d07a12fe1ef220cfb98acfca6d0678ce6ec1f3e3b164805d03c6c'
+PREVIOUS_HELPER_SHA256 = '790182149633ba12683db9a5680a7dec89b35a4c94e60468b18dd72eafa6adad'
 TOOLS_ROOT = Path('/opt/nodeendpoint-quick') / TOOLS_SHA256
 CONFIG = Path('/etc/nodeendpoint-web-manager.json')
-CODE = Path('/opt/nodeendpoint-web-manager/1.0.1/web_manager.py')
+CODE = Path('/opt/nodeendpoint-web-manager/1.0.2/web_manager.py')
 STATE = Path('/var/lib/node-endpoint')
 PRIVATE = Path('/var/lib/nodeendpoint-web-manager')
 RUNTIME = Path('/run/nodeendpoint-web-manager')
@@ -946,7 +948,7 @@ def upgrade_policy(previous, manifest):
     """Validate only the two published policy identities, retaining their scope."""
     require(isinstance(previous, dict)
             and (previous.get('version'), previous.get('tools_sha256')) in (
-                ('1.0.0', LEGACY_TOOLS_SHA256), (VERSION, TOOLS_SHA256))
+                ('1.0.0', LEGACY_TOOLS_SHA256), ('1.0.1', PREVIOUS_TOOLS_SHA256), (VERSION, TOOLS_SHA256))
             and isinstance(previous.get('manifest_sha256'), str)
             and SHA.fullmatch(previous['manifest_sha256']), 'policy_changed')
     normalized = {**previous, 'version': VERSION, 'tools_sha256': TOOLS_SHA256,
@@ -958,8 +960,12 @@ def service_state(previous):
     """Only the generated, local systemd unit is supported for in-place upgrades."""
     secure(SERVICE, 0o644)
     code = Path('/opt/nodeendpoint-web-manager') / previous['version'] / 'web_manager.py'
-    expected = LEGACY_HELPER_SHA256 if previous['version'] == '1.0.0' else hashlib.sha256(
-        secure(Path(__file__).resolve(), 0o600).read_bytes()).hexdigest()
+    if previous['version'] == '1.0.0':
+        expected = LEGACY_HELPER_SHA256
+    elif previous['version'] == '1.0.1':
+        expected = PREVIOUS_HELPER_SHA256
+    else:
+        expected = hashlib.sha256(secure(Path(__file__).resolve(), 0o600).read_bytes()).hexdigest()
     require(hashlib.sha256(secure(code, 0o600).read_bytes()).hexdigest() == expected
             and SERVICE.read_text() == service_text(previous, code), 'manual_required')
     binary = str(secure(shutil.which('systemctl', path='/usr/bin:/bin') or '/usr/bin/systemctl'))

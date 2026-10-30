@@ -121,7 +121,7 @@ class DockerManagerTests(unittest.TestCase):
         stack.enter_context(patch.object(manager, 'Manager', return_value=controller))
         confirm = stack.enter_context(patch.object(manager, 'confirmation', side_effect=confirmation_error or (lambda *args: events.append('confirm'))))
         rebind = stack.enter_context(patch('panel_passphrase.rebind_docker_context', side_effect=lambda *args: events.append('rebind')))
-        existing = stack.enter_context(patch('panel_passphrase.existing_password', side_effect=lambda *args, **kwargs: events.append('password')))
+        existing = stack.enter_context(patch('panel_passphrase.validate_existing_metadata', side_effect=lambda *args, **kwargs: events.append('metadata')))
         stack.enter_context(patch('builtins.print'))
         return events, controller, confirm, rebind, existing, initialized, isolation
 
@@ -129,7 +129,7 @@ class DockerManagerTests(unittest.TestCase):
         with ExitStack() as stack:
             events, controller, confirm, rebind, existing, _, _ = self.execute_context(stack, lambda plan: {**plan, 'ownership': 'c' * 32})
             manager.execute(self.args)
-        self.assertEqual(events, ['confirm', 'backup', 'rebind', 'password'])
+        self.assertEqual(events, ['confirm', 'backup', 'rebind', 'metadata'])
         controller.transaction.assert_called_once()
 
     def test_changed_review_or_cancel_does_not_rebind_or_retrieve_credentials(self):

@@ -37,7 +37,9 @@ def command(args, timeout=45, allow_failure=False):
         raise SafetyError('Required command failed: ' + str(args[0])) from exc
     if result.returncode and not allow_failure:
         # Configuration may contain secrets: do not echo full stderr/stdout.
-        raise SafetyError(f'{Path(str(args[0])).name} exited {result.returncode}; inspect it locally')
+        error = SafetyError(f'{Path(str(args[0])).name} exited {result.returncode}; inspect it locally')
+        error.returncode = result.returncode
+        raise error
     return result.stdout.decode(errors='replace'), result.stderr.decode(errors='replace'), result.returncode
 
 
@@ -497,6 +499,56 @@ def probe_after_reload(plan, pki):
     raise SafetyError('Post-reload probe failed; expected certificate/routing was not served') from last
 
 
+def exception_diagnostic(error):
+    """Bounded metadata only: never inspect messages, args, commands or output."""
+    types, codes, seen = [], [], set()
+    cycle = truncated = False
+    current = error
+    while current is not None:
+        if id(current) in seen:
+            cycle = True
+            break
+        if len(types) >= 8:
+            truncated = True
+            break
+        seen.add(id(current))
+        name = type(current).__name__
+        types.append(name if re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]{0,79}', name) else 'Exception')
+        numeric = {'index': len(types) - 1}
+        for key in ('errno', 'returncode'):
+            value = getattr(current, key, None)
+            if type(value) is int and -(2 ** 31) <= value <= 2 ** 32 - 1:
+                numeric[key] = value
+        if len(numeric) > 1:
+            codes.append(numeric)
+        cause = current.__cause__
+        current = cause if cause is not None else (
+            None if current.__suppress_context__ else current.__context__)
+    return {'exception_types': types, 'exception_codes': codes,
+            'exception_chain_cycle': cycle, 'exception_chain_truncated': truncated}
+
+
+def record_failure(backup, operation, stage, error, rollback_failed=None,
+                   rollback_stage=None, rollback_error=None):
+    """Diagnostics must never interrupt restoration or replace its outcome."""
+    try:
+        report = {'schema': 1, 'operation': operation, 'failed_stage': stage,
+                  **exception_diagnostic(error), 'rollback_failed': rollback_failed}
+        if rollback_stage is not None:
+            report['rollback_stage'] = rollback_stage
+        if rollback_error is not None:
+            report['rollback_exception'] = exception_diagnostic(rollback_error)
+        write_json(Path(backup) / 'FAILURE.json', report, 0o600)
+        return True
+    except Exception:
+        return False
+
+
+def failure_location(backup, recorded):
+    path = str(Path(backup) / 'FAILURE.json')
+    return path if recorded else path + ' (diagnostic file could not be written)'
+
+
 class Manager:
     SNAPSHOT = {'installation': 'installation.json', 'pki_state': 'pki/state.json',
                 'trust_bundle': 'pki/trust-bundle.pem', 'public_status': 'public-status.json',
@@ -607,53 +659,81 @@ class Manager:
         target = Path(plan['config_path'])
         self.env.nginx(['-t'])
         backup = self.backup(target)
+        stage = 'protected_app_registry'
         try:
             if plan.get('app'):
                 apps = read_json(self.state / 'protected-apps.json', [])
                 if not isinstance(apps, list) or any(not isinstance(x, str) or not Path(x).is_absolute() for x in apps):
                     raise SafetyError('Invalid protected application registry')
                 write_json(self.state / 'protected-apps.json', sorted(set([*apps, plan['app']])))
+            stage = 'action'
             action()
             checks = {}
             if reload:
                 if remove:
+                    stage = 'remove_config'
                     target.unlink()
                     if (self.state / 'installation.json').exists():
                         (self.state / 'installation.json').unlink()
                 else:
                     if plan['https']:
+                        stage = 'cert_verify'
                         self.pki.openssl.verify(self.pki.leaf_dir() / 'server.pem', self.pki.ca_dir() / 'ca.pem', plan['host'])
+                    stage = 'render_config'
                     text = render(plan, self.pki.leaf_dir() / 'server.pem' if plan['https'] else None,
                                   self.pki.leaf_dir() / 'server.key.pem' if plan['https'] else None)
+                    stage = 'compare_existing_config'
                     if existing and plan == existing['plan'] and target.read_text() == text and self.pki.meta == read_json(backup / 'pki_state', {}):
+                        stage = 'public_status'
                         return {'changed': False, 'backup': str(backup), 'status': self.public_status()}
+                    stage = 'write_config'
                     atomic_write(target, text, 0o644)
+                    stage = 'write_installation'
                     write_json(self.state / 'installation.json', {'version': VERSION, 'ownership': plan['ownership'],
                                'config_path': str(target), 'config_sha256': sha256(text), 'plan': plan})
+                stage = 'nginx_test'
                 self.env.nginx(['-t'])
+                stage = 'refresh_loaded_config'
                 self.env.refresh()
                 if not remove and str(target) not in self.env.files:
                     raise SafetyError('Generated independent configuration is not loaded')
+                stage = 'nginx_reload'
                 self.env.nginx(['-s', 'reload'])
                 if not remove:
+                    stage = 'post_reload_probe'
                     checks = probe_after_reload(plan, self.pki)
+            stage = 'public_status'
             result = {'changed': True, 'backup': str(backup), 'status': self.public_status(checks)}
             # Only a committed change advances the rollback pointer. Read-only
             # manual backups, idempotent runs and failed changes preserve it.
+            stage = 'commit_backup_pointer'
             atomic_write(self.state / 'last-backup', backup.name + '\n')
             return result
         except Exception as original:
+            record_failure(backup, 'transaction', stage, original)
+            rollback_stage = 'rollback_restore'
             try:
                 self.restore(backup)
+                rollback_stage = 'rollback_nginx_test'
                 self.env.nginx(['-t'])
                 if reload:
+                    rollback_stage = 'rollback_nginx_reload'
                     self.env.nginx(['-s', 'reload'])
+                rollback_stage = 'rollback_refresh_loaded_config'
                 self.env.refresh()
             except Exception as restore_error:
-                write_json(backup / 'RECOVERY_REQUIRED.json', {'error': type(original).__name__,
-                           'restore_error': type(restore_error).__name__, 'config_path': str(target)})
-                raise SafetyError('Automatic rollback failed; recovery evidence preserved in ' + str(backup)) from original
-            raise SafetyError('Change failed; previous configuration restored. Evidence: ' + str(backup)) from original
+                recorded = record_failure(backup, 'transaction', stage, original, True, rollback_stage, restore_error)
+                try:
+                    write_json(backup / 'RECOVERY_REQUIRED.json', {'error': type(original).__name__,
+                               'restore_error': type(restore_error).__name__, 'config_path': str(target)})
+                except Exception:
+                    pass
+                raise SafetyError('Automatic rollback failed at ' + rollback_stage + '; original failure at ' + stage
+                                  + '. Recovery evidence: ' + str(backup) + '. Diagnostics: '
+                                  + failure_location(backup, recorded)) from original
+            recorded = record_failure(backup, 'transaction', stage, original, False)
+            raise SafetyError('Change failed at ' + stage + '; previous configuration restored. Diagnostics: '
+                              + failure_location(backup, recorded)) from original
 
     def rollback(self):
         current = self.assert_owned() if self.installed else None
@@ -672,28 +752,48 @@ class Manager:
         if manifest.get('config_path') != current['config_path']:
             raise SafetyError('Backup configuration path differs from owned entry')
         rescue = self.backup(current['config_path'])
+        stage = 'rollback_restore'
         try:
             self.restore(previous)
+            stage = 'nginx_test'
             self.env.nginx(['-t'])
+            stage = 'refresh_loaded_config'
             self.env.refresh()
+            stage = 'nginx_reload'
             self.env.nginx(['-s', 'reload'])
             if self.installed:
+                stage = 'post_reload_probe'
                 probe_after_reload(self.installed['plan'], self.pki)
+            stage = 'public_status'
             result = {'restored': str(previous), 'rescue': str(rescue), 'status': self.public_status()}
+            stage = 'commit_backup_pointer'
             atomic_write(self.state / 'last-backup', rescue.name + '\n')
             return result
         except Exception as exc:
+            record_failure(rescue, 'rollback', stage, exc)
+            recovery_stage = 'rescue_restore'
             try:
                 self.restore(rescue)
+                recovery_stage = 'rescue_nginx_test'
                 self.env.nginx(['-t'])
+                recovery_stage = 'rescue_nginx_reload'
                 self.env.nginx(['-s', 'reload'])
                 if self.installed:
+                    recovery_stage = 'rescue_post_reload_probe'
                     probe_after_reload(self.installed['plan'], self.pki)
             except Exception as restore_error:
-                write_json(rescue / 'RECOVERY_REQUIRED.json', {'error': type(exc).__name__,
-                           'restore_error': type(restore_error).__name__, 'config_path': current['config_path']})
-                raise SafetyError('Rollback and rescue failed; recovery evidence preserved in ' + str(rescue)) from exc
-            raise SafetyError('Rollback failed; current entry restored. Evidence: ' + str(rescue)) from exc
+                recorded = record_failure(rescue, 'rollback', stage, exc, True, recovery_stage, restore_error)
+                try:
+                    write_json(rescue / 'RECOVERY_REQUIRED.json', {'error': type(exc).__name__,
+                               'restore_error': type(restore_error).__name__, 'config_path': current['config_path']})
+                except Exception:
+                    pass
+                raise SafetyError('Rollback and rescue failed at ' + recovery_stage + '; original failure at ' + stage
+                                  + '. Recovery evidence: ' + str(rescue) + '. Diagnostics: '
+                                  + failure_location(rescue, recorded)) from exc
+            recorded = record_failure(rescue, 'rollback', stage, exc, False)
+            raise SafetyError('Rollback failed at ' + stage + '; current entry restored. Diagnostics: '
+                              + failure_location(rescue, recorded)) from exc
 
 
 def confirmation(expected, provided=None):
@@ -940,8 +1040,8 @@ def execute(args):
                             with_password(pki, lambda password: pki.renew(plan['host'], password, args.ca_key),
                                           passphrase, plan=plan, ca_key=args.ca_key, manual=args.manual_ca_passphrase)
                         else:
-                            from panel_passphrase import existing_password
-                            existing_password(pki, plan, ca_key=args.ca_key)
+                            from panel_passphrase import validate_existing_metadata
+                            validate_existing_metadata(pki, plan)
                 output = manager.transaction(apply, plan)
             elif args.action == 'backup':
                 manager.assert_owned()

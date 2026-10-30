@@ -1,5 +1,7 @@
 # 设备限额账号连接失败：独立入口修复
 
+后续修正：沿用已有证书刷新时的 CA 口令读取依赖已在 [root-installer-v1.0.12 更新说明](ENTRY_REFRESH_CA_FIX_20261030.md)修复。已有站点请使用该页的最新一键升级命令；以下保留首次路由修复背景和验证范围。
+
 本次发布为 **root-installer-v1.0.11 / tools 1.0.12 / web-manager 1.0.1**，用于已安装 NodeEndpoint 独立 HTTPS 入口的面板服务器。修复不需要替换 Node 二进制或更改用户 UUID。
 
 ## 问题与修复

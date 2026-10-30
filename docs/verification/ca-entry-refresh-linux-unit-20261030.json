@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "source": "Exact extracted published-candidate ZIP and pinned bootstrap/helper bytes",
+  "platform": "linux",
+  "python": "3.12.3",
+  "tools_sha256": "23e692481127802040696a1a500d9890a98c98c9c7da3925494a1fc0d8c5a904",
+  "modules": [
+    "test_optional_api",
+    "test_nginx_syntax",
+    "test_panel.NginxUnitTests",
+    "test_panel.TransactionUnitTests",
+    "test_docker_manager",
+    "test_refresh_entry",
+    "test_quick_install",
+    "test_web_bootstrap",
+    "test_web_manager",
+    "test_transaction_diagnostics",
+    "test_panel_passphrase",
+    "test_docker_passphrase",
+    "test_upgrade_entry",
+    "test_web_upgrade",
+    "test_existing_entry_refresh"
+  ],
+  "tests_run": 159,
+  "failures": [],
+  "errors": [],
+  "skipped": [],
+  "passed": true,
+  "scope": "Unit and boundary tests; no production services or real-account proxy traffic",
+  "remote_execution": {
+    "asset_sha256": {
+      "node-endpoint-tools-1.0.13.zip": "23e692481127802040696a1a500d9890a98c98c9c7da3925494a1fc0d8c5a904",
+      "quick_install.py": "876dd5f6b87d212f51b15a7f0e7ec3c46032a41b68be97d436fb3e6081b5359e",
+      "nodeendpoint-web-manager-1.0.2.py": "d37261ad6418166e5d2f7e4785fd4dc7ef81a435f41af44122f3d2e26643fbb0",
+      "install.sh": "f102d2cb2dc7491821f7f88e474b2db73176c9a279114ade2a7a5ce97312d0e4"
+    },
+    "uploaded_test_files": 21,
+    "test_source_sha256": {
+      "test_address_repair.py": "ab9563d45e437b01e382e90214ab79c4705dfb99cd31547a781df6cbc2c32a60",
+      "test_docker_context.py": "6565c5b1a2b15cc1d888e88544983ff9ebfccea10203387fc93561c2230ffb69",
+      "test_docker_manager.py": "b9c03a91919bc0285ca0bd45b4c33834ea8f37ae1695b6809eddd11c7a76ed14",
+      "test_docker_panel_ca.py": "261fdea2e2a3c3b4b1c960ee0e6a94e7a20f949ac4ce0bc0e8747d4d0556f2bb",
+      "test_docker_passphrase.py": "571cfefcbc48ee3fe747975e073689e3ae0dc03faad37be842a5906ec3b9d025",
+      "test_docker_quick.py": "1114190c5a9d55e3aae53aea321cef722d2abf3cfcfebe5c248cfae3e4e406c3",
+      "test_existing_entry_refresh.py": "47850a7eb2fdc7a21ac33baf75f2218ff4c4a6ca3ede21b691f8dc74b6955fb0",
+      "test_firewall.py": "42556c7f2beccfadcffebcb05538c5908f2a18a170f4f1adedada093a41fb2d7",
+      "test_nginx_syntax.py": "c496c085f731718a1fa876a03fa726faabb72f1af33f411fbb20d8c1b0e82add",
+      "test_optional_api.py": "a0c3878c77f35a8d11dfdf39b6b9a04e8a9df56b89846883b3a97f7120186b91",
+      "test_panel.py": "93f3e55434b64df1c8910164482691bff045f443c2e2dd5397d843f6e041d22d",
+      "test_panel_ca.py": "c1b5778d9a274f4d1d65a46e0c359d60a80a4d4e8bc2ea86ca100c024fd2beb1",
+      "test_panel_passphrase.py": "e21d65eae786d39053d7165c7b6a4082f01fd80b2ce17e5ebd9ca1ae867c54ed",
+      "test_public_ip.py": "37f1dae31cf95841e4fd59d7ad6845b7ada8fae1440c81e98fcdd11e986c64a0",
+      "test_quick_install.py": "1355f5e221bc3e12d81b39519026627395d29df9d8e856ca054059ea4361fea6",
+      "test_refresh_entry.py": "1584a095656b63c069a90089b5191bce116726fc9d9a0f9287fb74811da8583f",
+      "test_transaction_diagnostics.py": "dd610e77a689c0255692908404926dcb2323c73a20c23acc3c9ce907369bf79b",
+      "test_upgrade_entry.py": "f2742ea3b37b70d46b57d0dda28f2e85d929e44bbf88cf601b06d7700737d5f2",
+      "test_web_bootstrap.py": "9ad4d95b525e616002a5e90fa327aa46f53f234fd4bc5646c5fc81a1ef3b6752",
+      "test_web_manager.py": "bf96cb6ad07b7fa7ec143d62f437722f3a841a61184cdb578bfcd739c1796e1f",
+      "test_web_upgrade.py": "fd1e9876987d6b10be012eff22af61a9666f8c20049fa709fdefcc88392aa827"
+    },
+    "runner_sha256": "b83707295f4ad7b9f4305339af024ca133c7904edad721afcf87881d828ea694",
+    "runtime_guard": {
+      "python_subprocesses": 6,
+      "openssl_subprocesses": 686,
+      "unexpected_process_attempts": 0,
+      "network_connect_attempts": 0
+    },
+    "existing_service_processes_checked": 19,
+    "existing_service_processes_preserved": true,
+    "runner_exit_code": 0,
+    "fixture_scope": "Fresh private /opt fixture paths inside mount/network/PID namespaces; exact-asset unit/boundary tests and real local OpenSSL only. Application/Nginx adapters are mocked by tests; no service commands, network requests or real-account traffic."
+  }
+}
