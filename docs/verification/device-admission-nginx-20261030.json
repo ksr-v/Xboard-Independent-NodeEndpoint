@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "date": "2026-10-30",
+  "result": "PASS",
+  "scope": "Real isolated Nginx with synthetic HTTP and FastCGI stubs. This is not a Laravel, Redis, real-account or Node proxy end-to-end test.",
+  "transport": "HTTP on fixture-only IPv4 loopback listeners",
+  "render_adjustment": "Only generated listener addresses were narrowed from wildcard to IPv4 loopback for isolation.",
+  "render_branches": [
+    "HTTP proxy",
+    "FPM FastCGI"
+  ],
+  "route_audit_input": "Synthetic route table containing the exact audited native actions and resolved authentication middleware.",
+  "assertions": {
+    "old_plan_device_get_and_post_status": 404,
+    "new_plan_device_get_and_put_status": 405,
+    "new_plan_device_post_status_from_synthetic_backend": 401,
+    "unknown_device_path_get_and_post_status": 404,
+    "only_expected_post_requests_reached_stubs": true
+  },
+  "checks_passed": 33,
+  "checks": [
+    "octane/old/control-get-405",
+    "octane/old/acquire/get",
+    "octane/old/acquire/post-404",
+    "octane/old/release/get",
+    "octane/old/release/post-404",
+    "octane/old/unknown-GET-404",
+    "octane/old/unknown-POST-404",
+    "octane/new/control-get-405",
+    "octane/new/acquire/get",
+    "octane/new/acquire/post-forwarded-401",
+    "octane/new/acquire/put-405",
+    "octane/new/release/get",
+    "octane/new/release/post-forwarded-401",
+    "octane/new/release/put-405",
+    "octane/new/unknown-GET-404",
+    "octane/new/unknown-POST-404",
+    "fpm/old/control-get-405",
+    "fpm/old/acquire/get",
+    "fpm/old/acquire/post-404",
+    "fpm/old/release/get",
+    "fpm/old/release/post-404",
+    "fpm/old/unknown-GET-404",
+    "fpm/old/unknown-POST-404",
+    "fpm/new/control-get-405",
+    "fpm/new/acquire/get",
+    "fpm/new/acquire/post-forwarded-401",
+    "fpm/new/acquire/put-405",
+    "fpm/new/release/get",
+    "fpm/new/release/post-forwarded-401",
+    "fpm/new/release/put-405",
+    "fpm/new/unknown-GET-404",
+    "fpm/new/unknown-POST-404",
+    "only-four-posts-reached-backends"
+  ],
+  "existing_nginx_processes_preserved": true,
+  "fixture_nginx_stopped": true,
+  "release_package_verification": {
+    "schema": 1,
+    "result": "PASS",
+    "archive": "node-endpoint-tools-1.0.12.zip",
+    "archive_sha256": "96d2010d842d07a12fe1ef220cfb98acfca6d0678ce6ec1f3e3b164805d03c6c",
+    "zip_members": 102,
+    "manifest_verified_files": 101,
+    "manifest_covers_every_non_manifest_file": true,
+    "all_manifest_member_sha256_verified": true,
+    "live_tested_sources": {
+      "tools/panel/nginx.py": {
+        "sha256": "9bbdd59ab5c8222290fb68bbf32eec11dc9ea60dec532a940ea16d1eb1dd630d",
+        "matches_live_test_exact_bytes": true
+      },
+      "tools/panel/pki.py": {
+        "sha256": "006aadb8a413fa2c04dac75040ee318ea248aab1a082b181458e03afd5c3c5c2",
+        "matches_live_test_exact_bytes": true
+      }
+    },
+    "line_ending_normalization_used": false,
+    "http_test_rerun_required": false,
+    "archive_bytes": 726408
+  },
+  "not_tested": [
+    "TLS transport",
+    "Laravel authentication and Redis leases",
+    "Real-account admission or Node proxy traffic",
+    "Production deployment"
+  ]
+}

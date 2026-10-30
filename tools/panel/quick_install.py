@@ -20,12 +20,12 @@ import urllib.request
 import zipfile
 sys.dont_write_bytecode = True
 
-TOOLS_URL = 'https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/download/root-installer-v1.0.9/node-endpoint-tools-1.0.6.zip'
-TOOLS_SHA256 = 'd1dd1258b68e34e7feca111a85c97bd0d435516093b49840633166fe066e566e'
+TOOLS_URL = 'https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/download/root-installer-v1.0.11/node-endpoint-tools-1.0.12.zip'
+TOOLS_SHA256 = '96d2010d842d07a12fe1ef220cfb98acfca6d0678ce6ec1f3e3b164805d03c6c'
 CACHE = Path('/opt/nodeendpoint-quick') / TOOLS_SHA256
-WEB_MANAGER_VERSION = '1.0.0'
-WEB_MANAGER_SHA256 = '9afb5f8b774600ce1578bebf067a3b1d99e90ab3f7b5245523181ba29cdd0f2a'
-WEB_MANAGER_URL = 'https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/download/root-installer-v1.0.10/nodeendpoint-web-manager-1.0.0.py'
+WEB_MANAGER_VERSION = '1.0.1'
+WEB_MANAGER_SHA256 = '790182149633ba12683db9a5680a7dec89b35a4c94e60468b18dd72eafa6adad'
+WEB_MANAGER_URL = 'https://github.com/ksr-v/Xboard-Independent-NodeEndpoint/releases/download/root-installer-v1.0.11/nodeendpoint-web-manager-1.0.1.py'
 
 
 def require(value, reason):
@@ -495,6 +495,26 @@ def refresh_entry(nginx=None, ca_key=None):
     print('若节点已检测到公网 IPv4，旧的 404 退避最多 10 分钟后会重试上报，随后可刷新服务器管理页面。')
 
 
+def upgrade_entry(nginx=None):
+    """Update an existing helper first; never create a new web authorization."""
+    from panel_ca import payload_from_state
+    plan, _ = payload_from_state('/var/lib/node-endpoint')
+    require(plan.get('https') is True and plan.get('deployment') in ('fpm', 'octane'),
+            '一键路由升级仅支持已有的原生 HTTPS FPM/Octane 独立入口')
+    policy = Path('/etc/nodeendpoint-web-manager.json')
+    if policy.exists() or policy.is_symlink():
+        secure_path(policy)
+        install_web_manager(nginx=nginx, upgrade=True)
+    else:
+        for name in ('/etc/systemd/system/nodeendpoint-web-manager.service',
+                     '/opt/nodeendpoint-web-manager', '/var/lib/nodeendpoint-web-manager',
+                     '/run/nodeendpoint-web-manager/control.sock'):
+            residue = Path(name)
+            require(not (residue.exists() or residue.is_symlink()),
+                    '网页 Root 助手安装状态不完整，入口路由尚未修改；请先通过 SSH 核对现有助手')
+    return refresh_entry(nginx)
+
+
 def php_candidates():
     paths = set()
     for process in Path('/proc').iterdir():
@@ -562,7 +582,7 @@ def configure_firewall(state='/var/lib/node-endpoint'):
         os.close(descriptor)
 
 
-def install_web_manager(helper_file=None, nginx=None, confirmed=False):
+def install_web_manager(helper_file=None, nginx=None, confirmed=False, upgrade=False):
     """Install only the pinned single-site helper; application files are data."""
     import manager
     from panel_ca import payload_from_state
@@ -596,14 +616,18 @@ def install_web_manager(helper_file=None, nginx=None, confirmed=False):
         with os.fdopen(descriptor, 'wb') as stream:
             stream.write(data)
     print('网页 Root 助手：仅授权该站点系统 UID，使用本机 Unix socket；仅管理已绑定入口和已批准端口。')
-    argv = [sys.executable, '-I', str(target), 'install', '--app', plan['app'],
-            '--app-user', plan['app_user'], '--php', plan['php']]
-    if nginx:
-        argv += ['--nginx', nginx]
-    if confirmed:
-        argv += ['--confirm', 'ENABLE WEB MANAGEMENT']
-    result = subprocess.run(argv, timeout=180)
-    require(result.returncode == 0, '网页 Root 助手初始化未完成；现有入口与 CA 保留，请检查本机输出后重试 --enable-web-manager')
+    argv = [sys.executable, '-I', str(target), 'upgrade' if upgrade else 'install']
+    if upgrade:
+        argv += ['--state', '/var/lib/node-endpoint']
+    else:
+        argv += ['--app', plan['app'], '--app-user', plan['app_user'], '--php', plan['php']]
+        if nginx:
+            argv += ['--nginx', nginx]
+        if confirmed:
+            argv += ['--confirm', 'ENABLE WEB MANAGEMENT']
+    result = subprocess.run(argv, timeout=300 if upgrade else 180)
+    require(result.returncode == 0, '网页 Root 助手更新未完成；入口路由尚未刷新，请检查输出后重试 --upgrade-entry'
+            if upgrade else '网页 Root 助手初始化未完成；现有入口与 CA 保留，请检查本机输出后重试 --enable-web-manager')
     return {'installed': True, 'version': WEB_MANAGER_VERSION}
 
 
@@ -652,6 +676,7 @@ def main():
     actions.add_argument('--configure-firewall', action='store_true', help='Allow the installed entry TCP port persistently; do not reinstall or regenerate certificates')
     actions.add_argument('--repair-address', action='store_true', help='Repair an installed custom backend endpoint using the existing CA; renew server SAN and save panel settings')
     actions.add_argument('--refresh-entry', action='store_true', help='Re-audit the owned HTTPS entry route allowlist, retaining its address, CA and panel settings')
+    actions.add_argument('--upgrade-entry', action='store_true', help='Upgrade an existing same-scope web helper, then refresh the owned entry routes')
     actions.add_argument('--enable-web-manager', action='store_true', help='Bind the restricted local web helper to an existing native HTTPS endpoint; keep entry and CA')
     parser.add_argument('--host', help='Actual bare IP or DNS host; omit to choose IPv4 detection or manual input on first installation/repair')
     parser.add_argument('--skip-firewall', action='store_true', help='Keep local firewall unchanged during entry installation')
@@ -660,13 +685,13 @@ def main():
     require(sys.version_info >= (3, 10), '需要 Python 3.10+')
     import pwd
     os.umask(0o077)
-    require(not (args.skip_firewall and (args.detect_only or args.sync_ca or args.configure_firewall or args.refresh_entry or args.enable_web_manager)),
+    require(not (args.skip_firewall and (args.detect_only or args.sync_ca or args.configure_firewall or args.refresh_entry or args.upgrade_entry or args.enable_web_manager)),
             '--skip-firewall 仅用于入口安装或地址修复')
-    require(not (args.host and (args.detect_only or args.sync_ca or args.configure_firewall or args.refresh_entry or args.enable_web_manager)), '--host 仅用于安装或地址修复')
+    require(not (args.host and (args.detect_only or args.sync_ca or args.configure_firewall or args.refresh_entry or args.upgrade_entry or args.enable_web_manager)), '--host 仅用于安装或地址修复')
     require(args.detect_only or args.sync_ca or args.configure_firewall or sys.stdin.isatty(), '安装需要 SSH 交互终端，不要将脚本通过管道执行')
     for name in ('openssl', 'ss', 'runuser'):
         require(shutil.which(name), '缺少依赖：' + name + '，请先通过本机包管理器安装')
-    print('校验固定 tools v1.0.6（Docker 宿主机自动配置 + 随机 CA 口令托管 + TCP 端口放行 + CA 导入）；不更新 Xboard、Node 或系统软件。')
+    print('校验固定 tools v1.0.12（设备准入路由修复 + 原生入口保留配置升级）；不更新 Xboard、Node 或系统软件。')
     data = Path(args.package_file).read_bytes() if args.package_file else download()
     directory = install_cache(verified_members(data))
     sys.dont_write_bytecode = True
@@ -689,6 +714,8 @@ def main():
         selected_nginx = '/www/server/nginx/sbin/nginx'
     if args.enable_web_manager:
         return install_web_manager(nginx=selected_nginx)
+    if args.upgrade_entry:
+        return upgrade_entry(selected_nginx)
     if args.refresh_entry:
         return refresh_entry(selected_nginx, ca_key=args.ca_key) if args.ca_key else refresh_entry(selected_nginx)
     if args.repair_address:

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Local, fixed-policy NodeEndpoint web bridge. No network listener or shell RPC.
 
-This asset is released separately from the immutable tools 1.0.6 archive. Install
+This asset is released separately from the immutable tools 1.0.12 archive. Install
 once as Root after the SSH wizard has created a native FPM/Octane HTTPS entry.
 Application code is always executed by its existing non-Root account. The RPC
 grants that account only the operations described by the Root-installed policy.
@@ -34,11 +34,13 @@ import time
 import traceback
 
 sys.dont_write_bytecode = True
-VERSION = '1.0.0'
-TOOLS_SHA256 = 'd1dd1258b68e34e7feca111a85c97bd0d435516093b49840633166fe066e566e'
+VERSION = '1.0.1'
+TOOLS_SHA256 = '96d2010d842d07a12fe1ef220cfb98acfca6d0678ce6ec1f3e3b164805d03c6c'
+LEGACY_TOOLS_SHA256 = 'd1dd1258b68e34e7feca111a85c97bd0d435516093b49840633166fe066e566e'
+LEGACY_HELPER_SHA256 = '9afb5f8b774600ce1578bebf067a3b1d99e90ab3f7b5245523181ba29cdd0f2a'
 TOOLS_ROOT = Path('/opt/nodeendpoint-quick') / TOOLS_SHA256
 CONFIG = Path('/etc/nodeendpoint-web-manager.json')
-CODE = Path('/opt/nodeendpoint-web-manager/1.0.0/web_manager.py')
+CODE = Path('/opt/nodeendpoint-web-manager/1.0.1/web_manager.py')
 STATE = Path('/var/lib/node-endpoint')
 PRIVATE = Path('/var/lib/nodeendpoint-web-manager')
 RUNTIME = Path('/run/nodeendpoint-web-manager')
@@ -926,27 +928,68 @@ def systemctl(*arguments, timeout=45):
     require(result.returncode == 0, 'unavailable')
 
 
-def service_text(policy):
+def service_text(policy, code=None):
     # No application path is interpolated into ExecStart or shell syntax.
     python = str(secure(Path(sys.executable).resolve(strict=True)))
     require(re.fullmatch(r'/[A-Za-z0-9_./+-]+', python), 'unsafe_path')
     return ('[Unit]\nDescription=NodeEndpoint restricted local web manager\nAfter=network.target\n\n'
         '[Service]\nType=simple\nUser=root\nGroup=root\nUMask=0077\n'
         'Environment=PATH=/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/sbin:/usr/local/bin\n'
-        f'ExecStart={python} -I -B {CODE} serve\n'
+        f'ExecStart={python} -I -B {code or CODE} serve\n'
         'Restart=on-failure\nRestartSec=3\nTimeoutStopSec=150\nKillMode=mixed\n'
         'PrivateTmp=false\nProtectHome=true\nProtectKernelTunables=true\nProtectKernelModules=true\n'
         'ProtectControlGroups=true\nRestrictAddressFamilies=AF_UNIX AF_INET AF_INET6 AF_NETLINK\n'
         'LockPersonality=true\nLimitNOFILE=256\nTasksMax=64\n\n[Install]\nWantedBy=multi-user.target\n')
 
 
+def upgrade_policy(previous, manifest):
+    """Validate only the two published policy identities, retaining their scope."""
+    require(isinstance(previous, dict)
+            and (previous.get('version'), previous.get('tools_sha256')) in (
+                ('1.0.0', LEGACY_TOOLS_SHA256), (VERSION, TOOLS_SHA256))
+            and isinstance(previous.get('manifest_sha256'), str)
+            and SHA.fullmatch(previous['manifest_sha256']), 'policy_changed')
+    normalized = {**previous, 'version': VERSION, 'tools_sha256': TOOLS_SHA256,
+                  'manifest_sha256': manifest}
+    return validate_policy(normalized)
+
+
+def service_state(previous):
+    """Only the generated, local systemd unit is supported for in-place upgrades."""
+    secure(SERVICE, 0o644)
+    code = Path('/opt/nodeendpoint-web-manager') / previous['version'] / 'web_manager.py'
+    expected = LEGACY_HELPER_SHA256 if previous['version'] == '1.0.0' else hashlib.sha256(
+        secure(Path(__file__).resolve(), 0o600).read_bytes()).hexdigest()
+    require(hashlib.sha256(secure(code, 0o600).read_bytes()).hexdigest() == expected
+            and SERVICE.read_text() == service_text(previous, code), 'manual_required')
+    binary = str(secure(shutil.which('systemctl', path='/usr/bin:/bin') or '/usr/bin/systemctl'))
+    def query(*arguments, codes=(0,)):
+        result = subprocess.run([binary, *arguments, 'nodeendpoint-web-manager.service'],
+            stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            timeout=15, shell=False, env={'PATH': '/usr/sbin:/usr/bin:/sbin:/bin', 'LANG': 'C', 'LC_ALL': 'C'})
+        require(result.returncode in codes and len(result.stdout) <= 8192, 'manual_required')
+        return result.stdout.decode('utf-8').strip()
+    require(query('show', '--property=FragmentPath', '--value') == str(SERVICE)
+            and query('show', '--property=DropInPaths', '--value') == '', 'manual_required')
+    enabled = query('is-enabled', codes=(0, 1))
+    active = query('is-active', codes=(0, 3))
+    require(enabled in ('enabled', 'disabled') and active in ('active', 'inactive'), 'manual_required')
+    return {'enabled': enabled == 'enabled', 'active': active == 'active'}
+
+
 def install(arguments):
     root_only()
-    require(arguments.confirm == 'ENABLE WEB MANAGEMENT' or (arguments.confirm is None and sys.stdin.isatty()
-            and input('输入 ENABLE WEB MANAGEMENT 授权本机应用管理既有入口：').strip() == 'ENABLE WEB MANAGEMENT'), 'confirmation_mismatch')
+    upgrading = getattr(arguments, 'command', None) == 'upgrade'
+    if not upgrading:
+        require(arguments.confirm == 'ENABLE WEB MANAGEMENT' or (arguments.confirm is None and sys.stdin.isatty()
+                and input('输入 ENABLE WEB MANAGEMENT 授权本机应用管理既有入口：').strip() == 'ENABLE WEB MANAGEMENT'), 'confirmation_mismatch')
     tools = PinnedTools()
     manager = tools.manager
-    state = manager.safe_state(arguments.state)
+    previous = read_private(CONFIG) if upgrading else None
+    preserved = upgrade_policy(previous, tools.manifest_sha256) if upgrading else None
+    if upgrading:
+        require(preserved['state'] == arguments.state, 'policy_changed')
+    state = manager.safe_state(preserved['state'] if upgrading else arguments.state)
     plan, _ = tools.panel_ca.payload_from_state(state)
     require(plan.get('deployment') in ('fpm', 'octane') and plan.get('https') is True
             and all(isinstance(plan.get(key), str) and plan[key] for key in BOUND_FIELDS), 'manual_required')
@@ -956,19 +999,24 @@ def install(arguments):
     import pwd
     owner = pwd.getpwnam(plan['app_user'])
     require(owner.pw_uid > 0 and owner.pw_gid > 0, 'manual_required')
-    env = manager.Environment(arguments.nginx)
+    env = manager.Environment(preserved['nginx'] if upgrading else arguments.nginx)
     require(env.main == plan['main_config'] and plan['config_path'] in env.files, 'policy_changed')
     manager.trusted_file(plan['php'], True)
-    ports = sorted(set([plan['port'], *(arguments.allow_port or [])]))
+    ports = list(preserved['allowed_ports']) if upgrading else sorted(set([plan['port'], *(arguments.allow_port or [])]))
     policy = validate_policy({'schema': 1, 'version': VERSION, 'tools_sha256': TOOLS_SHA256,
         'manifest_sha256': tools.manifest_sha256, 'app': plan['app'], 'app_user': plan['app_user'],
         'app_uid': owner.pw_uid, 'app_gid': owner.pw_gid, 'php': plan['php'], 'nginx': env.binary, 'state': str(state),
         'binding': {key: plan[key] for key in BOUND_FIELDS}, 'ws_backend': plan.get('ws_backend'), 'allowed_ports': ports})
+    if upgrading:
+        require(policy == preserved and plan['port'] in ports, 'policy_changed')
+        lifecycle = service_state(previous)
     if PRIVATE.exists() or PRIVATE.is_symlink():
         previous_jobs = Store().load_all('job')
         require(all(job.get('state') in TERMINAL for job in previous_jobs.values()), 'busy')
     if SERVICE.exists() or SERVICE.is_symlink():
         secure(SERVICE, 0o644)
+        if upgrading:
+            require(read_private(CONFIG) == previous, 'policy_changed')
         # Stop accepting RPC before replacement. The old process drains an
         # operation that raced the idle check; never restart over its writes.
         systemctl('stop', 'nodeendpoint-web-manager.service', timeout=170)
@@ -985,9 +1033,11 @@ def install(arguments):
     atomic(CONFIG, canonical(policy))
     atomic(SERVICE, service_text(policy).encode('utf-8'), 0o644)
     systemctl('daemon-reload')
-    systemctl('enable', 'nodeendpoint-web-manager.service')
-    systemctl('start', 'nodeendpoint-web-manager.service')
-    systemctl('is-active', '--quiet', 'nodeendpoint-web-manager.service')
+    if not upgrading:
+        systemctl('enable', 'nodeendpoint-web-manager.service')
+    if not upgrading or lifecycle['active']:
+        systemctl('start', 'nodeendpoint-web-manager.service')
+        systemctl('is-active', '--quiet', 'nodeendpoint-web-manager.service')
     return {'installed': True, 'version': VERSION,
             'policy': {key: policy[key] for key in ('app', 'app_user', 'allowed_ports')}}
 
@@ -1051,6 +1101,8 @@ def main(argv=None):
     installer.add_argument('--allow-port', type=int, action='append')
     installer.add_argument('--state', default=str(STATE), help='Root-only existing entry state; never accepted by RPC')
     installer.add_argument('--confirm', choices=('ENABLE WEB MANAGEMENT',))
+    upgrader = commands.add_parser('upgrade', help='Update an existing same-scope helper, preserving its service state')
+    upgrader.add_argument('--state', default=str(STATE), help='Expected existing entry state; never changes its binding')
     commands.add_parser('serve')
     commands.add_parser('status-policy')
     arguments = parser.parse_args(argv)
@@ -1061,7 +1113,7 @@ def main(argv=None):
         os.environ.clear()
         os.environ.update({'PATH': '/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/sbin:/usr/local/bin',
                            'HOME': '/root', 'LANG': 'C.UTF-8', 'LC_ALL': 'C.UTF-8'})
-        if arguments.command == 'install':
+        if arguments.command in ('install', 'upgrade'):
             result = install(arguments)
         elif arguments.command == 'serve':
             serve()

@@ -37,6 +37,7 @@ class BootstrapBoundary(unittest.TestCase):
     def test_verified_bytes_are_copied_before_root_install_and_confirm_is_explicit(self):
         with patch.object(panel_ca,'payload_from_state',return_value=(self.plan,{})), \
              patch.object(quick,'WEB_MANAGER_SHA256',self.digest), \
+             patch.object(quick.os,'O_NOFOLLOW',getattr(quick.os,'O_NOFOLLOW',0),create=True), \
              patch.object(quick,'secure_path',side_effect=lambda p:Path(p)), \
              patch.object(quick,'Path',side_effect=self.paths), \
              patch.object(quick.subprocess,'run',return_value=SimpleNamespace(returncode=0)) as execute:
@@ -45,7 +46,20 @@ class BootstrapBoundary(unittest.TestCase):
             self.assertEqual(Path(argv[2]).read_bytes(),self.data)
             self.assertNotEqual(Path(argv[2]),self.source)
             self.assertEqual(argv[-2:],['--confirm','ENABLE WEB MANAGEMENT'])
-            self.assertEqual(result,{'installed':True,'version':'1.0.0'})
+            self.assertEqual(result,{'installed':True,'version':quick.WEB_MANAGER_VERSION})
+
+    def test_upgrade_invokes_only_existing_scope_command_without_new_authorization(self):
+        with patch.object(panel_ca,'payload_from_state',return_value=(self.plan,{})), \
+             patch.object(quick,'WEB_MANAGER_SHA256',self.digest), \
+             patch.object(quick.os,'O_NOFOLLOW',getattr(quick.os,'O_NOFOLLOW',0),create=True), \
+             patch.object(quick,'secure_path',side_effect=lambda p:Path(p)), \
+             patch.object(quick,'Path',side_effect=self.paths), \
+             patch.object(quick.subprocess,'run',return_value=SimpleNamespace(returncode=0)) as execute:
+            quick.install_web_manager(helper_file=self.source,nginx='/fixture/nginx',confirmed=True,upgrade=True)
+            argv=execute.call_args.args[0]
+            self.assertEqual(argv[3:],['upgrade','--state','/var/lib/node-endpoint'])
+            self.assertEqual(Path(argv[2]).read_bytes(),self.data)
+            self.assertEqual(execute.call_args.kwargs['timeout'],300)
 
     def test_foreign_cached_bytes_are_not_overwritten_or_executed(self):
         target=self.base/'cache'/self.digest/'web_manager.py';target.parent.mkdir(parents=True)

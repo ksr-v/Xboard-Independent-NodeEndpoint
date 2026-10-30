@@ -1,5 +1,7 @@
 # 已有面板与节点更新教程
 
+2026-10-30 补充：[设备限额账号连接失败的入口修复](DEVICE_ADMISSION_ENTRY_FIX_20261030.md)已独立发布为 `root-installer-v1.0.11 / tools 1.0.12 / web-manager 1.0.1`。已安装独立入口的原生面板使用其中的 `--upgrade-entry` 命令，补齐设备准入路由并升级已安装助手；不需要重复升级 Node 或重建 CA。下文的 v9 配套版本与历史升级流程保留原发布信息。
+
 本次配套版本为独立 Xboard **v2026.10.30.2**、NodeEndpoint **1.1.2**、独立 xboard-node **v1.13-orphan.9**。本版目标为 ACME 域名大小写一致性与已确认的旧 nft null 空表 / NAT 能力兼容修复，实际验证范围以本轮报告为准。保留 v8 INPUT、在线 IP 与设备限制行为，需要更新实际运行的 Node。插件 1.1.2 负责让以后复制的域名 / IP 安装命令使用新 Node，不能替已运行的节点更新二进制。
 
 已有 NodeEndpoint 入口、IP、端口、CA、托管口令、机器 Token 与用户 UUID 均沿用当前配置。无需卸载其他插件，也无需重建证书。Root 面板入口继续使用 `root-installer-v1.0.10 / tools 1.0.6`；以 Root 执行面板归档升级且不加 `--skip-endpoint` 时，会为已有有效原生入口安装或更新受限助手，授权范围与全新初始化相同。只有仅上传插件、手动源码升级或显式跳过而助手仍未安装时，才需单独执行固定 Root 安装器的 `--enable-web-manager`。独立下载的 Node 迁移工具包更新为 tools 1.0.11，固定下载 Node v1.13-orphan.9。

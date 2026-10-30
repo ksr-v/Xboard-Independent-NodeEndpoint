@@ -20,13 +20,29 @@ API_METHODS = {
     '/api/v2/server/machine/status': ['POST'],
 }
 
-# This authenticated metadata report is supplied by the optional FlowScope
-# plugin, not native ServerRoute. Never expose other FlowScope routes here.
-OPTIONAL_API_METHODS = {'/api/v2/flowscope/node-address': ['POST']}
+# Device admission is absent on older panels. Audit both guarded native routes
+# together before exposing them; never infer support from a saved plan or prefix.
+DEVICE_ADMISSION_API_METHODS = {
+    '/api/v2/server/device/acquire': ['POST'],
+    '/api/v2/server/device/release': ['POST'],
+}
+# The authenticated metadata report is supplied by the optional FlowScope
+# plugin. No other FlowScope routes belong on the private entry.
+OPTIONAL_API_METHODS = {
+    '/api/v2/flowscope/node-address': ['POST'],
+    **DEVICE_ADMISSION_API_METHODS,
+}
 OPTIONAL_API_ACTIONS = {
+    '/api/v2/server/device/acquire': 'App\\Http\\Controllers\\V2\\Server\\ServerController@acquireDevice',
+    '/api/v2/server/device/release': 'App\\Http\\Controllers\\V2\\Server\\ServerController@releaseDevice',
     '/api/v2/flowscope/node-address': 'Plugin\\Flowscope\\Controllers\\AddressController@store',
 }
 OPTIONAL_API_MIDDLEWARE = 'Plugin\\Flowscope\\Middleware\\EnsureEnabled'
+
+OPTIONAL_API_GUARDS = {
+    '/api/v2/flowscope/node-address': OPTIONAL_API_MIDDLEWARE,
+    **{path: 'App\\Http\\Middleware\\ServerV2' for path in DEVICE_ADMISSION_API_METHODS},
+}
 
 # Exact source snapshot audited in .audit/Xboard. Unknown middleware is never
 # patched or implicitly trusted; add new profiles only after a source audit.
@@ -293,17 +309,27 @@ def verify_routes(routes):
     if any(path not in observed or len(observed[path]) != 1 or
            not set(methods).issubset(observed[path][0]) for path, methods in API_METHODS.items()):
         raise SafetyError('Actual Laravel route table differs from audited Node API profile')
+    verify_device_admission_pair(optional)
     for path, items in optional.items():
         if len(items) != 1:
-            raise SafetyError('Optional Node address route must have exactly one audited action')
+            raise SafetyError('Optional Node API route must have exactly one audited action')
         item = items[0]
-        methods = set(item.get('method', '').split('|')) - {'HEAD'}
+        method = item.get('method')
+        if not isinstance(method, str):
+            raise SafetyError('Optional Node API route has an invalid method')
+        methods = set(method.split('|')) - {'HEAD'}
         middleware = item.get('middleware')
         if (methods != set(OPTIONAL_API_METHODS[path]) or
                 item.get('action') != OPTIONAL_API_ACTIONS[path] or
-                not isinstance(middleware, list) or OPTIONAL_API_MIDDLEWARE not in middleware):
-            raise SafetyError('Optional Node address route differs from its audited method, action or state guard')
+                not isinstance(middleware, list) or OPTIONAL_API_GUARDS[path] not in middleware):
+            raise SafetyError('Optional Node API route differs from its audited method, action or state guard')
     return list(optional)
+
+
+def verify_device_admission_pair(paths):
+    selected = set(paths).intersection(DEVICE_ADMISSION_API_METHODS)
+    if selected and selected != set(DEVICE_ADMISSION_API_METHODS):
+        raise SafetyError('Device admission requires both audited acquire and release routes')
 
 
 def optional_api_methods(plan):
@@ -312,6 +338,7 @@ def optional_api_methods(plan):
     if (not isinstance(paths, list) or any(not isinstance(path, str) or path not in OPTIONAL_API_METHODS for path in paths) or
             len(set(paths)) != len(paths)):
         raise SafetyError('Invalid optional Node API path selection')
+    verify_device_admission_pair(paths)
     return {path: OPTIONAL_API_METHODS[path] for path in paths}
 
 
