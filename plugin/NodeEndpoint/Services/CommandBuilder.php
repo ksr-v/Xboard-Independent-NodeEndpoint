@@ -45,12 +45,12 @@ final class CommandBuilder
         }
         if ($settings['https']) { array_push($args, '--ca-file', '/root/node-endpoint-ca.pem', '--ca-fingerprint', implode(',', $fingerprints)); }
         else { $args[] = '--allow-http'; }
-        array_push($args, '--confirm-new-identity', 'UNUSED', '--download');
+        array_push($args, '--confirm-new-identity', 'UNUSED', '--download', '--release', 'latest');
         return ['prepare' => implode(' ', array_map([self::class, 'quote'], $args)),
             'install' => "python3 tools/node/node_endpoint.py install-new --prepared-dir " . self::quote("/etc/node-endpoint-node/{$id}") . " --confirm-install NEW",
-            'notes' => ['在已校验版本和 SHA-256 的工具包目录执行；先通过可信渠道复制并核对 CA。',
+            'notes' => ['在已校验 SHA-256 的当前插件 ZIP 的 NodeEndpoint/ 目录执行，保留完整 tools/；先通过可信渠道复制并核对 CA。',
                 'Token 将交互输入，命令不含 Token。仅创建新实例；迁移已有实例使用 inspect/migrate。',
-                '二进制下载版本和摘要由工具内锁定；不运行上游重装脚本。',
+                '准备时解析独立 Node 最新正式 Release，校验官方摘要并固定该次版本；安装前复核同一版本，不运行上游重装脚本。',
                 '仅用于尚未运行的新身份。认证 WSS 会注册连接和清理设备状态；已有实例必须走停服迁移。',
                 'prepare 会分别预检 REST 和 WSS；请查看工具报告和生产验收限制。']];
     }

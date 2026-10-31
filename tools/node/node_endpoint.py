@@ -34,6 +34,9 @@ from strict_yaml import parse, LayoutError
 
 VERSION = "1.0.0"
 LOCK_PATH = Path(__file__).with_name("release-lock.json")
+NODE_REPOSITORY = "https://github.com/ksr-v/Xboard-Node--Custom-Source"
+NODE_RELEASE_API = "https://api.github.com/repos/ksr-v/Xboard-Node--Custom-Source/releases/"
+RELEASE_TAG = r"v[0-9]+\.[0-9]+(?:\.[0-9]+)?(?:-orphan\.[0-9]+)?"
 
 
 class SafetyError(ValueError):
@@ -478,18 +481,106 @@ def auth_bindings(row, env):
             for item in value["nodes"]]
 
 
-def download_binary(architecture, directory):
-    lock = json.loads(LOCK_PATH.read_text("utf-8"))
+def release_download(url, limit, api=False):
+    request = urllib.request.Request(url, headers={"User-Agent": "NodeEndpoint", "Accept": "application/vnd.github+json" if api else "application/octet-stream"})
+    try:
+        with urllib.request.urlopen(request, timeout=30) as response:
+            final = urlsplit(response.geturl())
+            hosts = ("api.github.com",) if api else ("github.com", "release-assets.githubusercontent.com", "objects.githubusercontent.com")
+            require(final.scheme == "https" and final.hostname in hosts and final.port in (None, 443) and
+                    not final.username and not final.password, "release download redirected outside trusted HTTPS hosts")
+            payload = response.read(limit + 1)
+        require(payload and len(payload) <= limit, "release response is empty or oversized")
+        return payload
+    except (OSError, ValueError) as exc:
+        if isinstance(exc, SafetyError):
+            raise
+        raise SafetyError("official release download failed; no older release fallback is allowed") from exc
+
+
+def resolve_release_lock(release, architecture):
     require(architecture in ("amd64", "arm64"), "unsupported architecture")
+    require(isinstance(release, str) and (release == "latest" or re.fullmatch(RELEASE_TAG, release)), "invalid stable release tag")
+    endpoint = "latest" if release == "latest" else "tags/" + release
+    try:
+        metadata = json.loads(release_download(NODE_RELEASE_API + endpoint, 1024 * 1024, api=True))
+    except (TypeError, ValueError) as exc:
+        if isinstance(exc, SafetyError):
+            raise
+        raise SafetyError("invalid official release metadata") from exc
+    require(isinstance(metadata, dict), "invalid official release metadata")
+    tag = metadata.get("tag_name")
+    require(isinstance(tag, str) and re.fullmatch(RELEASE_TAG, tag) and metadata.get("draft") is False and
+            metadata.get("prerelease") is False and (release == "latest" or tag == release), "release must be the selected published stable tag")
+    base = NODE_REPOSITORY + "/releases/download/" + tag + "/"
+    assets = metadata.get("assets")
+    require(isinstance(assets, list), "release assets are missing")
+    selected = {}
+    name = "xboard-node-linux-" + architecture
+    for asset_name in (name, "SHA256SUMS"):
+        matches = [item for item in assets if isinstance(item, dict) and item.get("name") == asset_name]
+        require(len(matches) == 1 and matches[0].get("state") == "uploaded" and
+                matches[0].get("browser_download_url") == base + asset_name, "release asset is missing, duplicated or foreign")
+        asset_digest = matches[0].get("digest")
+        require(asset_digest is None or isinstance(asset_digest, str) and re.fullmatch(r"sha256:[a-f0-9]{64}", asset_digest), "invalid release asset digest")
+        selected[asset_name] = matches[0]
+    sums = release_download(base + "SHA256SUMS", 256 * 1024)
+    require(selected["SHA256SUMS"].get("digest") in (None, "sha256:" + digest(sums)), "release checksums API digest mismatch")
+    try:
+        rows = [match[1].lower() for line in sums.decode("ascii").splitlines()
+                if (match := re.fullmatch(r"([a-fA-F0-9]{64}) [ *](.+)", line)) and match[2] == name]
+    except UnicodeError as exc:
+        raise SafetyError("invalid release checksum file") from exc
+    require(len(rows) == 1, "release binary checksum is missing or duplicated")
+    require(selected[name].get("digest") in (None, "sha256:" + rows[0]), "binary checksum disagrees with official API digest")
+    return {"schema": 1, "repository": NODE_REPOSITORY, "version": tag,
+            "assets": {name: rows[0], "SHA256SUMS": digest(sums)}}
+
+
+def verify_elf(payload, architecture):
+    require(payload[:6] == b"\x7fELF\x02\x01" and len(payload) >= 20 and
+            struct.unpack("<H", payload[18:20])[0] == (62 if architecture == "amd64" else 183), "binary ELF architecture mismatch")
+
+
+def prepared_release_lock(directory, prepared, architecture):
+    if prepared.get("release_selection", "pinned") == "pinned":
+        return json.loads(LOCK_PATH.read_text("utf-8"))
+    require(prepared.get("release_selection") == "latest", "unsupported prepared release selection")
+    selected = json.loads(safe_path(directory / "selected-release-lock.json", private=True).read_text("utf-8"))
+    require(isinstance(selected, dict) and selected.get("version") == prepared.get("upstream_version"), "prepared release tag changed")
+    # Resolve the exact prepared tag again, never latest: a newer publication
+    # between prepare and install must not replace the already checked binary.
+    official = resolve_release_lock(prepared["upstream_version"], architecture)
+    require(selected == official, "prepared release checksums changed; prepare again in a new directory")
+    return official
+
+
+def verify_prepared_binary(directory, prepared, architecture):
+    lock = prepared_release_lock(directory, prepared, architecture)
+    binary = safe_path(directory / "xboard-node", private=True)
+    payload = binary.read_bytes()
+    require(digest(payload) == lock["assets"]["xboard-node-linux-" + architecture], "prepared binary no longer matches release lock")
+    if prepared.get("release_selection") == "latest":
+        verify_elf(payload, architecture)
+        version = run([str(binary), "-v"])
+        require(re.match(r"^xboard-node\s+" + re.escape(lock["version"]) + r"(?:\s|$)", version), "prepared binary version does not match the selected official tag")
+
+
+def download_binary(architecture, directory, release="pinned"):
+    require(architecture in ("amd64", "arm64"), "unsupported architecture")
+    require(release in ("pinned", "latest"), "unsupported release selection")
+    lock = resolve_release_lock("latest", architecture) if release == "latest" else json.loads(LOCK_PATH.read_text("utf-8"))
     name = "xboard-node-linux-" + architecture
     url = lock["repository"] + "/releases/download/" + lock["version"] + "/" + name
     try:
-        with urllib.request.urlopen(url, timeout=30) as response:
-            require(response.geturl().startswith("https://"), "download redirected outside HTTPS")
-            payload = response.read(100 * 1024 * 1024 + 1)
+        if release == "latest":
+            payload = release_download(url, 100 * 1024 * 1024)
+        else:
+            with urllib.request.urlopen(url, timeout=30) as response:
+                require(response.geturl().startswith("https://"), "download redirected outside HTTPS")
+                payload = response.read(100 * 1024 * 1024 + 1)
         require(len(payload) <= 100 * 1024 * 1024 and digest(payload) == lock["assets"][name], "binary SHA-256 mismatch")
-        require(payload[:6] == b"\x7fELF\x02\x01" and len(payload) >= 20 and
-                struct.unpack("<H", payload[18:20])[0] == (62 if architecture == "amd64" else 183), "binary ELF architecture mismatch")
+        verify_elf(payload, architecture)
         atomic_write(Path(directory) / "xboard-node", payload, 0o700)
     except (OSError, ValueError) as exc:
         if isinstance(exc, SafetyError):
@@ -739,6 +830,8 @@ def _perform_migration(args):
 
 
 def prepare(args):
+    release = getattr(args, "release", "pinned")
+    require(release in ("pinned", "latest") and (release == "pinned" or args.download), "latest preparation requires --download")
     directory = safe_path(args.output_dir, existing=False)
     require(re.fullmatch(r"/[A-Za-z0-9_./-]+", str(directory)) if os.name == "posix" else True,
             "prepared directory requires a simple absolute Linux path")
@@ -780,10 +873,15 @@ def prepare(args):
                    "\nExecStart=" + str(directory / "xboard-node") + " -c " + str(directory / "config.yml") +
                    "\nRestart=on-failure\nRestartSec=5\nUMask=0077\n\n[Install]\nWantedBy=multi-user.target\n")
         atomic_write(directory / unit_name, service.encode())
-        lock = download_binary(args.architecture, directory) if args.download else json.loads(LOCK_PATH.read_text("utf-8"))
+        if release == "latest":
+            lock = download_binary(args.architecture, directory, release="latest")
+        else:
+            lock = download_binary(args.architecture, directory) if args.download else json.loads(LOCK_PATH.read_text("utf-8"))
+        if release == "latest":
+            atomic_write(directory / "selected-release-lock.json", json.dumps(lock, indent=2).encode())
         prepared = {"schema": 1, "version": VERSION, "upstream_version": lock["version"], "service": unit_name,
                     "architecture": args.architecture, "mode": args.mode, "panel_url": base, "preflight": result,
-                    "binary_downloaded": args.download, "new_identity_acknowledged": True}
+                    "binary_downloaded": args.download, "new_identity_acknowledged": True, "release_selection": release}
         prepared["files"] = {file.name: digest(file.read_bytes()) for file in directory.iterdir() if file.is_file()}
         atomic_write(directory / "prepared.json", json.dumps(prepared, indent=2).encode())
         return prepared
@@ -818,8 +916,7 @@ def _install_new(args):
     for name, expected in prepared["files"].items():
         require(Path(name).name == name and digest(safe_path(directory / name, private=True).read_bytes()) == expected,
                 "prepared file changed after verification")
-    lock = json.loads(LOCK_PATH.read_text("utf-8"))
-    require(digest((directory / "xboard-node").read_bytes()) == lock["assets"]["xboard-node-linux-" + architecture], "prepared binary no longer matches release lock")
+    verify_prepared_binary(directory, prepared, architecture)
     unit = systemd_directory() / prepared["service"]
     safe_path(unit, existing=False)
     require(not unit.exists() and run(["systemctl", "show", prepared["service"], "--property=LoadState", "--value"], check=False) == "not-found",
@@ -887,6 +984,8 @@ def main():
     prep = actions.add_parser("prepare", help="preflight and stage a completely new Node installation")
     prep.add_argument("--output-dir", required=True)
     prep.add_argument("--download", action="store_true")
+    prep.add_argument("--release", choices=["pinned", "latest"], default="pinned",
+                      help="latest resolves a stable official tag once; the private preparation pins it for install-new")
     prep.add_argument("--confirm-new-identity", choices=["UNUSED"], required=True,
                       help="declare target identity unused and exclusive; WS authentication registers/clears its device state")
     prep.add_argument("--kernel", choices=["singbox", "xray"], default="singbox")

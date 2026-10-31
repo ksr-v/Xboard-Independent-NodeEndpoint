@@ -6,7 +6,7 @@ use Plugin\NodeEndpoint\Middleware\NativeMachineInstall;
 use Plugin\NodeEndpoint\Services\AdminIntegration;
 class Plugin extends AbstractPlugin
 {
-    public const VERSION = '1.1.2';
+    public const VERSION = '1.1.3';
     public function boot(): void
     {
         app(AdminIntegration::class)->register();
